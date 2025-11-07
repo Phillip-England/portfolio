@@ -1,0 +1,15 @@
+{
+  "name": "portfolio-site",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "xerus": "github:phillip-england/xerus"
+  }
+}
