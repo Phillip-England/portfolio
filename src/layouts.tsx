@@ -14,8 +14,13 @@ export const Layout = (props: {
             <link href='/static/output.css' rel='stylesheet'></link>
             <title>{props.title}</title>
         </head>
-        <body className="font-mono">
-            {props.children}
+        <body className="font-mono flex justify-center">
+            <div id='root' className="w-full md:w-[80%] max-w-[900px]">
+                {props.children}
+                <footer className="p-12 flex items-center justify-center text-gray-500">
+                  <p>This site was generate using <a className="underline text-[#f802fa]" href='https://github.com/phillip-england/flint' target="_blank">flint</a>, a language-agnostic static-site generator I developed.</p>
+                </footer>
+            </div>
             <script src="/static/index.js"></script>
         </body>
         </html>

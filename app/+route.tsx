@@ -6,16 +6,17 @@ import { Header } from "../src/components";
 let module = new RouteModule();
 
 module.get(async (c: HTTPContext) => {
+  console.log(c.path)
   return c.jsx(
     <Layout title='Phillip England - Software Developer'>
         <>
-            <Header mainText="Phillip England" subText="Software Developer" hasIcon={false}/>
+            <Header mainText="Phillip England" subText="Software Developer" hasIcon={false} hasNav={false} reqPath={c.path}/>
             <div className="flex items-center justify-center p-12 flex-col gap-12">
-                <img src="/static/image1.png" className="w-[200px]"></img>
-                <h2 className="text-4xl text-center">Welcome to my Portfolio!</h2>
+                <img src="/static/image1.png" className="w-[400px]"></img>
+                <h2 className="text-4xl text-center">Welcome to my Portfolio</h2>
                 <div>
-                    <button className="bg-red-500 w-fit px-4 py-2 rounded-sm text-white text-lg hover:bg-white hover:text-red-500 border border-red-500 cursor-pointer animate-bounce">Hire Me</button>
-                    <div className="h-[2px] bg-red-100 animate-bounce rounded-full animate-ping"></div>
+                    <button className="bg-[#f802fa] w-fit px-4 py-2 rounded-sm text-white text-lg hover:bg-white hover:text-[#f802fa] border border-[#f802fa] cursor-pointer animate-bounce">Hire Me</button>
+                    <div className="h-[2px] bg-[#eddced] rounded-full animate-ping"></div>
                 </div>
             </div>
             <nav className="flex flex-col items-center justify-center p-8 text-lg gap-12">
@@ -46,7 +47,7 @@ module.get(async (c: HTTPContext) => {
                         </a>
                     </li>
                     <li>
-                        <a href="https://x.com/Phillip98282955">
+                        <a href="https://www.facebook.com/phillip.england.559842/">
                             <svg className="w-12 h-12 text-gray-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                 <path fillRule="evenodd" d="M13.135 6H15V3h-1.865a4.147 4.147 0 0 0-4.142 4.142V9H7v3h2v9.938h3V12h2.021l.592-3H12V6.591A.6.6 0 0 1 12.592 6h.543Z" clipRule="evenodd"/>
                             </svg>
