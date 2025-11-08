@@ -4,7 +4,7 @@ export const NavLink = (props: {
     reqPath: string,
 }) => {
     let activeClass = 'p-2 md:p-0 underline'
-    if (props.reqPath == props.href) {
+    if (props.reqPath == props.href || props.href.startsWith(props.reqPath)) {
       activeClass = activeClass +  ' text-[#f802fa]'
     }
     return (

@@ -4,12 +4,13 @@ import { MenuMain } from "../../src/components/MenuMain";
 import { Overlay } from "../../src/components/Overlay";
 import { Layout } from "../../src/layouts/Layout";
 import { TitleCard } from "../../src/components/TitleCard";
+import { ProjectCard } from "../../src/components/ProjectCard";
 
 let module = new RouteModule();
 
 module.get(async (c: HTTPContext) => {
   return c.jsx(
-    <Layout title='Phillip England - Software Developer'>
+    <Layout title='Projects - Phillip England'>
         <>
             <Header mainText="Projects" subText="Phillip England" hasIcon={true} hasNav={true} reqPath={c.path}/>
             <MenuMain reqPath={c.path} />
@@ -23,13 +24,8 @@ module.get(async (c: HTTPContext) => {
               </TitleCard>
             </div>
             <div className="flex flex-col p-4">
-              <div className="rounded-lg border border-gray-100  shadow-md w-fit p-4 flex flex-col gap-4 hover:shadow-xl hover:shadow-secondary cursor-pointer">
-                <div className="flex flex-row justify-between items-center">
-                  <h2 className="text-xl font-semibold text-gray-500">rlex</h2>
-                  <img src='/static/ferris.svg' className="w-10"></img>
-                </div>
-                <p className="text-sm max-w-sm">A cursor-based lexer for parsing and tokenizing utf-8 string.</p>
-              </div>
+              <ProjectCard href="/projects/rlex"/>
+
             </div>
             <script src='/static/three.js'></script>
         </>

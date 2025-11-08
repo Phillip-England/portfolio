@@ -20,7 +20,7 @@ export const Layout = (props: {
                 {props.children}
                 <Footer />
             </div>
-            <script src="/static/index.js"></script>
+            <script type='module' src="/static/index.js"></script>
         </body>
         </html>
     )
