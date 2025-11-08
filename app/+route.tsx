@@ -6,7 +6,6 @@ import { Layout } from "../src/layouts/Layout";
 let module = new RouteModule();
 
 module.get(async (c: HTTPContext) => {
-  console.log(c.path)
   return c.jsx(
     <Layout title='Phillip England - Software Developer'>
         <>

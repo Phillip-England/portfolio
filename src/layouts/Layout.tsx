@@ -1,4 +1,5 @@
 import type { JSX } from "react"
+import { Footer } from "../components/Footer"
 
 
 
@@ -17,9 +18,7 @@ export const Layout = (props: {
         <body className="font-mono flex justify-center">
             <div id='root' className="w-full md:w-[80%] max-w-[900px]">
                 {props.children}
-                <footer className="p-12 flex items-center justify-center text-gray-500">
-                  <p className="text-center">This site was generate using <a className="underline text-primary" href='https://github.com/phillip-england/flint' target="_blank">flint</a>, a language-agnostic static-site generator I developed.</p>
-                </footer>
+                <Footer />
             </div>
             <script src="/static/index.js"></script>
         </body>
