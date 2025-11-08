@@ -1,3 +1,4 @@
+import { NavLink } from "./NavLink"
 
 
 export const Header = (props: {
@@ -61,47 +62,5 @@ export const Header = (props: {
                 <></>
             }
         </header>
-    )
-}
-
-
-export const MenuMain = (props: {
-  reqPath: string,
-}) => {
-    return (
-        <nav id='menu-main' className="bg-white p-4 text-lg w-[70%] max-w-sm h-full fixed left-0 top-0 z-30 hidden">
-            <ul className="flex flex-col gap-2">
-                <div className="h-[90px]"></div>
-                <NavLink href="/" text="Home" reqPath={props.reqPath} />
-                <NavLink href="/about" text="About" reqPath={props.reqPath} />
-                <NavLink href="/projects" text="Projects" reqPath={props.reqPath} />
-                <NavLink href="/blog" text="Blog" reqPath={props.reqPath} />
-            </ul>
-        </nav>
-    )
-}
-
-
-export const NavLink = (props: {
-    text: string,
-    href: string,
-    reqPath: string,
-}) => {
-    let activeClass = 'p-2 md:p-0 underline'
-    if (props.reqPath == props.href) {
-      activeClass = activeClass +  ' text-[#f802fa]'
-    }
-    return (
-        <li className={activeClass}>
-            <a href={props.href}>{props.text}</a>
-        </li>
-    )
-}
-
-export const Overlay = (props: {
-
-}) => {
-    return (
-        <div id='overlay' className="fixed top-0 h-screen w-screen bg-black opacity-40 hidden"></div>
     )
 }

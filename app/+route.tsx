@@ -1,6 +1,6 @@
 import { RouteModule, HTTPContext } from "xerus";
-import { Layout } from "../src/layouts";
-import { Header } from "../src/components";
+import { Header } from "../src/components/Header";
+import { Layout } from "../src/layouts/Layout";
 
 
 let module = new RouteModule();
@@ -15,8 +15,8 @@ module.get(async (c: HTTPContext) => {
                 <img src="/static/image1.png" className="w-[400px]"></img>
                 <h2 className="text-4xl text-center">Welcome to my Portfolio</h2>
                 <div>
-                    <button className="bg-[#f802fa] w-fit px-4 py-2 rounded-sm text-white text-lg hover:bg-white hover:text-[#f802fa] border border-[#f802fa] cursor-pointer animate-bounce">Hire Me</button>
-                    <div className="h-[2px] bg-[#eddced] rounded-full animate-ping"></div>
+                    <button className="bg-primary w-fit px-4 py-2 rounded-sm text-white text-lg hover:bg-white hover:text-[#f802fa] border border-[#f802fa] cursor-pointer animate-bounce">Hire Me</button>
+                    <div className="h-0.5 bg-secondary rounded-full animate-ping"></div>
                 </div>
             </div>
             <nav className="flex flex-col items-center justify-center p-8 text-lg gap-12">
