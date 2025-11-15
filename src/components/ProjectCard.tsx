@@ -11,6 +11,7 @@ const LanguageIcon = (langName: string) => {
 
 export const ProjectCard = (props: {
   href: string;
+  languages: string[],
 }) => {
   return (
     <a

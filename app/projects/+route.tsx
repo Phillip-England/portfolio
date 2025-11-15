@@ -34,8 +34,8 @@ module.get(async (c: HTTPContext) => {
           </TitleCard>
         </div>
         <div className="flex flex-col p-4">
-          <ProjectCard href="/projects/rlex" />
-          <ProjectCard href="/projects/xerus" />
+          <ProjectCard href="/projects/rlex" languages={["rust"]} />
+          {/* <ProjectCard href="/projects/xerus" languages={["rust"]} /> */}
         </div>
         <script src="/static/three.js"></script>
       </>
