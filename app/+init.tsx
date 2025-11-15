@@ -1,5 +1,5 @@
 import { InitModule } from "xerus";
-import { Xerus, logger } from "xerus";
+import { logger, Xerus } from "xerus";
 
 let module = new InitModule();
 
