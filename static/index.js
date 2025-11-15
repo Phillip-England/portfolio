@@ -385,33 +385,6 @@ class HashTitleScroll extends HTMLElement {
   }
 }
 
-class BibleQuote extends HTMLElement {
-  constructor() {
-    super();
-    this.title = this.getAttribute("title") || "Verse";
-    this.translation = this.getAttribute("translation") || "Translation";
-    this.verse = this.innerHTML.trim() || "Verse text goes here.";
-  }
-
-  connectedCallback() {
-    this.render();
-  }
-
-  render() {
-    this.innerHTML = `
-        <div class="bible-quote p-4 border border-gray-300 dark:border-dracula-background rounded mb-4 text-gray-800 dark:text-gray-400">
-          <div class="bible-quote-header mb-4">
-            <h2 class="text-lg">${this.title}</h2>
-            <p class="text-xs italic">(${this.translation})</p>
-          </div>
-          <div class="bible-quote-body">
-            <p class="text-sm">${this.verse}</p>
-          </div>
-        </div>
-      `;
-  }
-}
-
 window.addEventListener("DOMContentLoaded", () => {
   customElements.define("the-blinker", TheBlinker);
   customElements.define("tw-markdown", TwMarkdown);
@@ -419,5 +392,4 @@ window.addEventListener("DOMContentLoaded", () => {
   customElements.define("title-links", TitleLinks);
   customElements.define("hash-title-scroll", HashTitleScroll);
   // customElements.define("custom-scroll", CustomScroll);
-  customElements.define("bible-quote", BibleQuote);
 });

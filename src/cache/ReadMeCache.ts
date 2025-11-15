@@ -49,4 +49,28 @@ export async function loadProjectReadme(projectName: string): Promise<string> {
   return `<p>unable to load README.md from ${readMeUrl}</p>`;
 }
 
+export async function primeReadMeCache() {
+  let projects = [
+    "rlex",
+    "xerus",
+    "gtml",
+    "finli",
+    "translation-bot",
+    "bible-bot",
+    "wherr"
+  ]
+  for (let i = 0; i < projects.length; i++) {
+    let projectName = projects[i]
+    let readMeUrl = `https://raw.githubusercontent.com/Phillip-England/${projectName}/refs/heads/main/README.md`
+    let res = await fetch(readMeUrl);
+    if (res.status == 200) {
+      let readMeText = await res.text();
+      const readMeResponse = new Response(readMeText);
+      let result = await $`marki convert dracula < ${readMeResponse}`.quiet();
+      let html = result.stdout.toString().trim();
+      console.log('primed for '+readMeUrl)
+      readMeCache.save(readMeUrl, html);
+    }
+  }
+}
 

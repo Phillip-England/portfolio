@@ -15,7 +15,7 @@ export const ProjectCard = (props: {
       className="rounded-lg border border-gray-100 shadow-md p-4 flex flex-col gap-4 hover:shadow-xl hover:shadow-secondary cursor-pointer w-full"
     >
       <div className="flex flex-row justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-500">{props.name}</h2>
+        <h2 className="text-xl font-semibold text-gray-600">{props.name}</h2>
         <div className="flex flex-row gap-2" dangerouslySetInnerHTML={{ __html: langElement }}/>
       </div>
       <p className="text-sm max-w-sm">

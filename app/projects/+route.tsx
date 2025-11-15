@@ -40,6 +40,7 @@ module.get(async (c: HTTPContext) => {
           <ProjectCard name='finli' href="/projects/finli" languages={["rust"]} description="A system for generating .pdf invoices from a directory of .pdf receipts" />
           <ProjectCard name='translation-bot' href="/projects/translation-bot" languages={["go"]} description="Setup an API endpoint for auto-translating messages on GroupMe" />
           <ProjectCard name='bible-bot' href="/projects/bible-bot" languages={["go"]} description="Webscrape multiple translations of the bible from https://bible.com and save each verse in a Sqlite database" />
+          <ProjectCard name='wherr' href="/projects/wherr" languages={["go"]} description="Never wonder 'wherr' your error occured again" />
           {/* <ProjectCard href="/projects/xerus" languages={["rust"]} /> */}
         </div>
         <script src="/static/three.js"></script>
