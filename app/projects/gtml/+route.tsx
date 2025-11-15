@@ -1,12 +1,12 @@
 import { HTTPContext, RouteModule } from "xerus";
-import { ProjectPage } from "../../../src/components/ProjectPage";
 import { loadProjectReadme } from "../../../src/cache/ReadMeCache";
-loadProjectReadme
+import { ProjectPage } from "../../../src/components/ProjectPage";
+
 
 let module = new RouteModule();
 
 module.get(async (c: HTTPContext) => {
-  let projectName = "Rlex"
+  let projectName = "Gtml"
   let readMeHtml = await loadProjectReadme(projectName);
   return c.jsx(
     <ProjectPage projectName={projectName} reqPath={c.path} readMeHtml={readMeHtml} />

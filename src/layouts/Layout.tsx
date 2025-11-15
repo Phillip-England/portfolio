@@ -14,10 +14,10 @@ export const Layout = (props: {
         <title>{props.title}</title>
       </head>
       <body className="font-mono flex flex-col justify-center min-h-screen items-center">
-        <div id="root" className="w-full md:w-[80%] max-w-[900px]">
+        <div id="root" className="w-full md:w-[80%] max-w-[900px] relative">
           {props.children}
-          <Footer />
         </div>
+          <Footer />
         <script type="module" src="/static/index.js"></script>
       </body>
     </html>

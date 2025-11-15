@@ -1,6 +1,6 @@
 export const Footer = () => {
   return (
-    <footer className="p-12 flex items-center justify-center text-gray-500">
+    <footer className="p-12 flex items-center justify-center text-gray-500 z-50 bg-white">
       <p className="text-center">
         This site was served using{" "}
         <a

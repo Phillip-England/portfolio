@@ -33,8 +33,13 @@ module.get(async (c: HTTPContext) => {
             </p>
           </TitleCard>
         </div>
-        <div className="flex flex-col p-4">
-          <ProjectCard href="/projects/rlex" languages={["rust"]} />
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 p-4">
+          <ProjectCard name='rlex' href="/projects/rlex" languages={["rust"]} description="A cursor-based lexer for parsing and tokenizing utf-8 string." />
+          <ProjectCard name='xerus' href="/projects/xerus" languages={["bun", "ts"]} description="An express-inspired web framework with it's own file-based routing system." />
+          <ProjectCard name='gtml' href="/projects/gtml" languages={["go"]} description="Make writing html in Go a breeze" />
+          <ProjectCard name='finli' href="/projects/finli" languages={["rust"]} description="A system for generating .pdf invoices from a directory of .pdf receipts" />
+          <ProjectCard name='translation-bot' href="/projects/translation-bot" languages={["go"]} description="Setup an API endpoint for auto-translating messages on GroupMe" />
+          <ProjectCard name='bible-bot' href="/projects/bible-bot" languages={["go"]} description="Webscrape multiple translations of the bible from https://bible.com and save each verse in a Sqlite database" />
           {/* <ProjectCard href="/projects/xerus" languages={["rust"]} /> */}
         </div>
         <script src="/static/three.js"></script>

@@ -138,15 +138,16 @@ class TwMarkdown extends HTMLElement {
         element.classList.add(
           // "pl-1",
           // "border-l-1",
-          "bg-gray-200",
-          "dark:bg-dracula-background",
+          // "bg-gray-200",
+          "border",
+          // "dark:bg-dracula-background",
           "w-fit",
           "p-4",
           "rounded",
-          // "border-gray-300",
-          "italic",
+          "border-gray-300",
+          // "italic",
           "text-gray-800",
-          "dark:text-gray-200",
+          // "dark:text-gray-200",
           "mb-4",
         );
         break;
@@ -417,6 +418,6 @@ window.addEventListener("DOMContentLoaded", () => {
   customElements.define("random-beads", RandomBeads);
   customElements.define("title-links", TitleLinks);
   customElements.define("hash-title-scroll", HashTitleScroll);
-  customElements.define("custom-scroll", CustomScroll);
+  // customElements.define("custom-scroll", CustomScroll);
   customElements.define("bible-quote", BibleQuote);
 });
