@@ -27,6 +27,7 @@ export let readMeCache = new ReadMeCache();
 const CACHE_EXPIRATION_MS = 5 * 60 * 1000;
 
 export async function loadProjectReadme(projectName: string): Promise<string> {
+  projectName = projectName.toLowerCase()
   let readMeUrl =
     `https://raw.githubusercontent.com/Phillip-England/${projectName}/refs/heads/main/README.md`;
   let potentialCacheEntry = readMeCache.load(readMeUrl);
@@ -57,7 +58,12 @@ export async function primeReadMeCache() {
     "finli",
     "translation-bot",
     "bible-bot",
-    "wherr"
+    "wherr",
+    "godocument",
+    "pride",
+    "marki",
+    "vii",
+    "flint",
   ]
   for (let i = 0; i < projects.length; i++) {
     let projectName = projects[i]

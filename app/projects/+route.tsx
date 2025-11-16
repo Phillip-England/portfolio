@@ -41,7 +41,11 @@ module.get(async (c: HTTPContext) => {
           <ProjectCard name='translation-bot' href="/projects/translation-bot" languages={["go"]} description="Setup an API endpoint for auto-translating messages on GroupMe" />
           <ProjectCard name='bible-bot' href="/projects/bible-bot" languages={["go"]} description="Webscrape multiple translations of the bible from https://bible.com and save each verse in a Sqlite database" />
           <ProjectCard name='wherr' href="/projects/wherr" languages={["go"]} description="Never wonder 'wherr' your error occured again" />
-          {/* <ProjectCard href="/projects/xerus" languages={["rust"]} /> */}
+          <ProjectCard name='godocument' href="/projects/godocument" languages={["go"]} description="Generate an HTMX-base documentation site with markdown" />
+          <ProjectCard name='marki' href="/projects/marki" languages={["go"]} description="A runtime for converting .md files into .html" />
+          <ProjectCard name='pride' href="/projects/pride" languages={["go"]} description="A hugo-inspired static site generator" />
+          <ProjectCard name='vii' href="/projects/vii" languages={["go"]} description="A light wrapper around the net/http package in Go" />
+          <ProjectCard name='flint' href="/projects/flint" languages={["go"]} description="A language-agnostic static site generator" />
         </div>
         <script src="/static/three.js"></script>
       </>
