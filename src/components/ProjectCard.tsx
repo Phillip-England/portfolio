@@ -1,13 +1,14 @@
-
 export const ProjectCard = (props: {
   name: string;
   href: string;
-  languages: string[],
-  description: string,
+  languages: string[];
+  description: string;
 }) => {
-  let langElement = ""
+  let langElement = "";
   for (let i = 0; i < props.languages.length; i++) {
-    langElement += `<img class='w-8' src='/static/${props.languages[i]}.svg'></img>`
+    langElement += `<img class='w-8' src='/static/${
+      props.languages[i]
+    }.svg'></img>`;
   }
   return (
     <a
@@ -16,7 +17,10 @@ export const ProjectCard = (props: {
     >
       <div className="flex flex-row justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-600">{props.name}</h2>
-        <div className="flex flex-row gap-2" dangerouslySetInnerHTML={{ __html: langElement }}/>
+        <div
+          className="flex flex-row gap-2"
+          dangerouslySetInnerHTML={{ __html: langElement }}
+        />
       </div>
       <p className="text-sm max-w-sm">
         {props.description}

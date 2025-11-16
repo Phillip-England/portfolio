@@ -13,15 +13,15 @@ let module = new RouteModule();
 
 module.get(async (c: HTTPContext) => {
   let path = c.path;
-  let pathParts = path.split('/')
-  let articleNumber = pathParts[pathParts.length-1]
+  let pathParts = path.split("/");
+  let articleNumber = pathParts[pathParts.length - 1];
   let article: Article;
   try {
-    article = articleCache.load(articleNumber)
+    article = articleCache.load(articleNumber);
   } catch (e: any) {
-    console.error(e.message)
-    c.setStatus(404)
-    return c.html("<h1>404 not found</h1>")
+    console.error(e.message);
+    c.setStatus(404);
+    return c.html("<h1>404 not found</h1>");
   }
   return c.jsx(
     <Layout title="Projects - Phillip England">

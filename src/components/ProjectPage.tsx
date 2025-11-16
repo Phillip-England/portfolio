@@ -1,16 +1,15 @@
-import { TwMarkdown } from "./TwMarkdown"
-import { Layout } from "../layouts/Layout"
-import { Header } from "./Header"
-import { MenuMain } from "./MenuMain"
-import { Overlay } from "./Overlay"
-import { TitleLinks } from "./TitleLinks"
-import { loadProjectReadme } from "../cache/ReadMeCache"
-
+import { TwMarkdown } from "./TwMarkdown";
+import { Layout } from "../layouts/Layout";
+import { Header } from "./Header";
+import { MenuMain } from "./MenuMain";
+import { Overlay } from "./Overlay";
+import { TitleLinks } from "./TitleLinks";
+import { loadProjectReadme } from "../cache/ReadMeCache";
 
 export const ProjectPage = (props: {
-  reqPath: string,
-  projectName: string,
-  readMeHtml: string,
+  reqPath: string;
+  projectName: string;
+  readMeHtml: string;
 }) => {
   return (
     <Layout title={props.projectName + " - Phillip England"}>
@@ -36,5 +35,5 @@ export const ProjectPage = (props: {
         </div>
       </>
     </Layout>
-  )
-}
+  );
+};

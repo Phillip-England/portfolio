@@ -34,18 +34,78 @@ module.get(async (c: HTTPContext) => {
           </TitleCard>
         </div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 p-4">
-          <ProjectCard name='rlex' href="/projects/rlex" languages={["rust"]} description="A cursor-based lexer for parsing and tokenizing utf-8 string." />
-          <ProjectCard name='xerus' href="/projects/xerus" languages={["bun", "ts"]} description="An express-inspired web framework with it's own file-based routing system." />
-          <ProjectCard name='gtml' href="/projects/gtml" languages={["go"]} description="Make writing html in Go a breeze" />
-          <ProjectCard name='finli' href="/projects/finli" languages={["rust"]} description="A system for generating .pdf invoices from a directory of .pdf receipts" />
-          <ProjectCard name='translation-bot' href="/projects/translation-bot" languages={["go"]} description="Setup an API endpoint for auto-translating messages on GroupMe" />
-          <ProjectCard name='bible-bot' href="/projects/bible-bot" languages={["go"]} description="Webscrape multiple translations of the bible from https://bible.com and save each verse in a Sqlite database" />
-          <ProjectCard name='wherr' href="/projects/wherr" languages={["go"]} description="Never wonder 'wherr' your error occured again" />
-          <ProjectCard name='godocument' href="/projects/godocument" languages={["go"]} description="Generate an HTMX-base documentation site with markdown" />
-          <ProjectCard name='marki' href="/projects/marki" languages={["go"]} description="A runtime for converting .md files into .html" />
-          <ProjectCard name='pride' href="/projects/pride" languages={["go"]} description="A hugo-inspired static site generator" />
-          <ProjectCard name='vii' href="/projects/vii" languages={["go"]} description="A light wrapper around the net/http package in Go" />
-          <ProjectCard name='flint' href="/projects/flint" languages={["go"]} description="A language-agnostic static site generator" />
+          <ProjectCard
+            name="rlex"
+            href="/projects/rlex"
+            languages={["rust"]}
+            description="A cursor-based lexer for parsing and tokenizing utf-8 string."
+          />
+          <ProjectCard
+            name="xerus"
+            href="/projects/xerus"
+            languages={["bun", "ts"]}
+            description="An express-inspired web framework with it's own file-based routing system."
+          />
+          <ProjectCard
+            name="gtml"
+            href="/projects/gtml"
+            languages={["go"]}
+            description="Make writing html in Go a breeze"
+          />
+          <ProjectCard
+            name="finli"
+            href="/projects/finli"
+            languages={["rust"]}
+            description="A system for generating .pdf invoices from a directory of .pdf receipts"
+          />
+          <ProjectCard
+            name="translation-bot"
+            href="/projects/translation-bot"
+            languages={["go"]}
+            description="Setup an API endpoint for auto-translating messages on GroupMe"
+          />
+          <ProjectCard
+            name="bible-bot"
+            href="/projects/bible-bot"
+            languages={["go"]}
+            description="Webscrape multiple translations of the bible from https://bible.com and save each verse in a Sqlite database"
+          />
+          <ProjectCard
+            name="wherr"
+            href="/projects/wherr"
+            languages={["go"]}
+            description="Never wonder 'wherr' your error occured again"
+          />
+          <ProjectCard
+            name="godocument"
+            href="/projects/godocument"
+            languages={["go"]}
+            description="Generate an HTMX-base documentation site with markdown"
+          />
+          <ProjectCard
+            name="marki"
+            href="/projects/marki"
+            languages={["go"]}
+            description="A runtime for converting .md files into .html"
+          />
+          <ProjectCard
+            name="pride"
+            href="/projects/pride"
+            languages={["go"]}
+            description="A hugo-inspired static site generator"
+          />
+          <ProjectCard
+            name="vii"
+            href="/projects/vii"
+            languages={["go"]}
+            description="A light wrapper around the net/http package in Go"
+          />
+          <ProjectCard
+            name="flint"
+            href="/projects/flint"
+            languages={["go"]}
+            description="A language-agnostic static site generator"
+          />
         </div>
         <script src="/static/three.js"></script>
       </>

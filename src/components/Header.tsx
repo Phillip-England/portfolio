@@ -7,13 +7,14 @@ export const Header = (props: {
   hasNav: boolean;
   reqPath: string;
 }) => {
-  let theBlinkerHtml = '<the-blinker>_</the-blinker>'
+  let theBlinkerHtml = "<the-blinker>_</the-blinker>";
   return (
     <header className="p-4 flex gap-8 justify-between top-0 sticky bg-white z-50 select-none flex-row md:flex-col">
       <div className="flex flex-col gap-2">
         <h1 className="font-mono text-3xl">{props.mainText}</h1>
-        <p className="font-mono">{props.subText}
-          <span dangerouslySetInnerHTML={{ __html: theBlinkerHtml }}/>
+        <p className="font-mono">
+          {props.subText}
+          <span dangerouslySetInnerHTML={{ __html: theBlinkerHtml }} />
         </p>
       </div>
       {props.hasIcon

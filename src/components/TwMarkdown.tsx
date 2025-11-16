@@ -1,11 +1,8 @@
-
-
 export const TwMarkdown = (props: {
-
-  html: string
+  html: string;
 }) => {
-  let component = '<tw-markdown>'+props.html+"</tw-markdown>"
+  let component = "<tw-markdown>" + props.html + "</tw-markdown>";
   return (
-    <div id='tw-markdown' dangerouslySetInnerHTML={{ __html: component }}/>
-  )
-}
+    <div id="tw-markdown" dangerouslySetInnerHTML={{ __html: component }} />
+  );
+};

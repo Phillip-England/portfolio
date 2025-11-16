@@ -40,18 +40,17 @@ function initToggleNav() {
 
 initToggleNav();
 
-
 function initHireMeLink() {
-  let hireMe = document.querySelector('#hire-me')
+  let hireMe = document.querySelector("#hire-me");
   if (!hireMe) {
-    return
+    return;
   }
-  hireMe.addEventListener('click', () => {
-    window.location = '/contact'
-  })
+  hireMe.addEventListener("click", () => {
+    window.location = "/contact";
+  });
 }
 
-initHireMeLink()
+initHireMeLink();
 
 class TwMarkdown extends HTMLElement {
   constructor() {

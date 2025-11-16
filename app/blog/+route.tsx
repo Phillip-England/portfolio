@@ -26,7 +26,8 @@ module.get(async (c: HTTPContext) => {
         <div className="p-4 md:max-w-lg">
           <TitleCard title="See What I'm Learning">
             <p>
-              As I progress in my skillset, I intend to continue posting articles about what I've learned.
+              As I progress in my skillset, I intend to continue posting
+              articles about what I've learned.
             </p>
           </TitleCard>
         </div>

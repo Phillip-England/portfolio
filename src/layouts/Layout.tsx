@@ -17,7 +17,7 @@ export const Layout = (props: {
         <div id="root" className="w-full md:w-[80%] max-w-[900px] relative">
           {props.children}
         </div>
-          <Footer />
+        <Footer />
         <script type="module" src="/static/index.js"></script>
       </body>
     </html>

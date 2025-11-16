@@ -27,7 +27,7 @@ export let readMeCache = new ReadMeCache();
 const CACHE_EXPIRATION_MS = 5 * 60 * 1000;
 
 export async function loadProjectReadme(projectName: string): Promise<string> {
-  projectName = projectName.toLowerCase()
+  projectName = projectName.toLowerCase();
   let readMeUrl =
     `https://raw.githubusercontent.com/Phillip-England/${projectName}/refs/heads/main/README.md`;
   let potentialCacheEntry = readMeCache.load(readMeUrl);
@@ -64,19 +64,19 @@ export async function primeReadMeCache() {
     "marki",
     "vii",
     "flint",
-  ]
+  ];
   for (let i = 0; i < projects.length; i++) {
-    let projectName = projects[i]
-    let readMeUrl = `https://raw.githubusercontent.com/Phillip-England/${projectName}/refs/heads/main/README.md`
+    let projectName = projects[i];
+    let readMeUrl =
+      `https://raw.githubusercontent.com/Phillip-England/${projectName}/refs/heads/main/README.md`;
     let res = await fetch(readMeUrl);
     if (res.status == 200) {
       let readMeText = await res.text();
       const readMeResponse = new Response(readMeText);
       let result = await $`marki convert dracula < ${readMeResponse}`.quiet();
       let html = result.stdout.toString().trim();
-      console.log('primed for '+readMeUrl)
+      console.log("primed for " + readMeUrl);
       readMeCache.save(readMeUrl, html);
     }
   }
 }
-

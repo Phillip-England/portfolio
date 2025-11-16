@@ -1,34 +1,31 @@
-import { readdir } from "fs/promises"
+import { readdir } from "fs/promises";
 import path from "path";
 import { Article } from "./Article";
 import { JSX } from "react";
 
-
 export class ArticleCache {
-  articleDirPath: string
-  cache: Record<string, Article>
+  articleDirPath: string;
+  cache: Record<string, Article>;
   constructor(articleDirPath: string, cache: Record<string, Article>) {
-    this.articleDirPath = articleDirPath
-    this.cache = cache
+    this.articleDirPath = articleDirPath;
+    this.cache = cache;
   }
   static async new(articleDirPath: string) {
     let files = await readdir(articleDirPath, {
       recursive: true,
-    })
-    let cache: Record<string, Article> = {}
+    });
+    let cache: Record<string, Article> = {};
     for (const file of files) {
-      let article = await Article.new(path.join(articleDirPath, file))
-      cache[article.number] = article
+      let article = await Article.new(path.join(articleDirPath, file));
+      cache[article.number] = article;
     }
-    return new ArticleCache(articleDirPath, cache)
+    return new ArticleCache(articleDirPath, cache);
   }
   load(number: string) {
-    let article = this.cache[number]
+    let article = this.cache[number];
     if (article) {
-      return article
+      return article;
     }
-    throw new Error(`no aricle with number ${number}`)
+    throw new Error(`no aricle with number ${number}`);
   }
 }
-
-

@@ -1,11 +1,12 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "portfolio-site",
       "dependencies": {
         "three": "^0.181.0",
-        "xerus": "github:phillip-england/xerus",
+        "xerus": "github:phillip-england/xerus/#v0.0.31",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -44,8 +45,8 @@
 
     "undici-types": ["undici-types@7.16.0", "", {}, "sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw=="],
 
-    "xerus": ["xerus@github:phillip-england/xerus#e1a4a35", { "dependencies": { "floss": "github:phillip-england/floss/#v0.0.2", "hoist": "github:phillip-england/hoist/#v0.0.6" }, "peerDependencies": { "@types/react-dom": "^19.2.2", "react": "^19.2.0", "react-dom": "^19.2.0", "typescript": "^5.0.0" } }, "Phillip-England-xerus-e1a4a35"],
+    "xerus": ["xerus@github:phillip-england/xerus/#4a746b1", { "dependencies": { "floss": "github:phillip-england/floss/#v0.0.2", "hoist": "github:phillip-england/hoist/#v0.0.6" }, "peerDependencies": { "@types/react-dom": "^19.2.2", "react": "^19.2.0", "react-dom": "^19.2.0", "typescript": "^5.0.0" } }, "Phillip-England-xerus-4a746b1"],
 
-    "hoist/floss": ["floss@git+ssh://github.com:phillip-england/floss#ebe7ce046a55edd2684c48f305db672a366dec43", { "peerDependencies": { "typescript": "^5" } }, "ebe7ce046a55edd2684c48f305db672a366dec43"],
+    "hoist/floss": ["floss@git+ssh://github.com:phillip-england/floss#4bb40bbe9ebda7827d27d207e1ba9dbc1b89b567", { "peerDependencies": { "typescript": "^5" } }, "4bb40bbe9ebda7827d27d207e1ba9dbc1b89b567"],
   }
 }
