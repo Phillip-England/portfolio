@@ -16,10 +16,10 @@ module.get(async (c: HTTPContext) => {
           reqPath={c.path}
         />
         <div className="flex items-center justify-center p-12 flex-col gap-12">
-          <img src="/static/image1.png" className="w-[400px]"></img>
+          <img src="/static/image1.webp" className="w-[300px]"></img>
           <h2 className="text-4xl text-center">Welcome to my Portfolio</h2>
           <div>
-            <button className="bg-primary w-fit px-4 py-2 rounded-sm text-white text-lg hover:bg-white hover:text-primary border border-primary cursor-pointer animate-bounce">
+            <button id='hire-me' className="bg-primary w-fit px-4 py-2 rounded-sm text-white text-lg hover:bg-white hover:text-primary border border-primary cursor-pointer animate-bounce">
               Hire Me
             </button>
             <div className="h-0.5 bg-secondary rounded-full animate-ping"></div>

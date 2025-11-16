@@ -40,6 +40,19 @@ function initToggleNav() {
 
 initToggleNav();
 
+
+function initHireMeLink() {
+  let hireMe = document.querySelector('#hire-me')
+  if (!hireMe) {
+    return
+  }
+  hireMe.addEventListener('click', () => {
+    window.location = '/contact'
+  })
+}
+
+initHireMeLink()
+
 class TwMarkdown extends HTMLElement {
   constructor() {
     super();
@@ -70,14 +83,14 @@ class TwMarkdown extends HTMLElement {
         break;
       case "h1":
         element.classList.add(
-          "font-bold",
+          // "font-bold",
           "text-3xl",
           "pb-4",
         );
         break;
       case "h2":
         element.classList.add(
-          "font-bold",
+          // "font-bold",
           "text-2xl",
           "pb-4",
           "pt-4",
@@ -88,7 +101,7 @@ class TwMarkdown extends HTMLElement {
         break;
       case "h3":
         element.classList.add(
-          "font-bold",
+          // "font-bold",
           "text-xl",
           "mt-6",
           "mb-4",

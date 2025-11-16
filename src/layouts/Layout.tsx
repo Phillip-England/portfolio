@@ -13,7 +13,7 @@ export const Layout = (props: {
         <link href="/static/output.css" rel="stylesheet"></link>
         <title>{props.title}</title>
       </head>
-      <body className="font-mono flex flex-col justify-center min-h-screen items-center">
+      <body className="font-mono flex flex-col min-h-screen items-center justify-start">
         <div id="root" className="w-full md:w-[80%] max-w-[900px] relative">
           {props.children}
         </div>

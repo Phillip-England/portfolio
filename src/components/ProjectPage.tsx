@@ -29,7 +29,7 @@ export const ProjectPage = (props: {
             <TwMarkdown html={props.readMeHtml} />
           </div>
           <div className="md:col-span-1 hidden md:flex relative">
-            <div className="fixed top-50 z-30 bg-white overflow-y-scroll h-[500px]">
+            <div className="fixed top-50 z-30 bg-white overflow-y-scroll h-[500px] min-w-[270px]">
               <TitleLinks />
             </div>
           </div>

@@ -21,7 +21,7 @@ module.get(async (c: HTTPContext) => {
         <MenuMain reqPath={c.path} />
         <Overlay />
         <div className="flex items-center justify-center">
-          <img src="/static/profile.png" className=""></img>
+          <img src="/static/profile.webp" className=""></img>
         </div>
         <article className="md:max-w-lg p-4 gap-12 flex flex-col">
           <TitleCard title="10 Years at Chick-fil-A">

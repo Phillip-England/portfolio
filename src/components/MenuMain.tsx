@@ -12,6 +12,7 @@ export const MenuMain = (props: {
         <div className="h-[90px]"></div>
         <NavLink href="/" text="Home" reqPath={props.reqPath} />
         <NavLink href="/about" text="About" reqPath={props.reqPath} />
+        <NavLink href="/contact" text="Contact" reqPath={props.reqPath} />
         <NavLink href="/projects" text="Projects" reqPath={props.reqPath} />
         <NavLink href="/blog" text="Blog" reqPath={props.reqPath} />
       </ul>
