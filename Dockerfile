@@ -23,7 +23,7 @@ RUN mv marki_linux marki && \
 
 RUN which marki
 RUN marki --help || true
-RUN bun --version && go version
+RUN bun --version
 
 WORKDIR /app
 RUN bun install
