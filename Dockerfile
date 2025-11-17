@@ -6,9 +6,9 @@ COPY . .
 # installing go
 RUN apt-get update && \
     apt-get install -y wget git build-essential && \
-    wget https://go.dev/dl/go1.23.3.linux-amd64.tar.gz && \
-    tar -C /usr/local -xzf go1.23.3.linux-amd64.tar.gz && \
-    rm go1.23.3.linux-amd64.tar.gz
+    wget https://go.dev/dl/go1.25.3.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.25.3.linux-amd64.tar.gz && \
+    rm go1.25.3.linux-amd64.tar.gz
 
 # Add Go paths so "go install" binaries become runnable
 ENV GOPATH="/root/go"
