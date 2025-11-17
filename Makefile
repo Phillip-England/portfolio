@@ -15,6 +15,10 @@ docker-clean:
 
 docker-run:
 	sudo docker run \
+		--restart=unless-stopped \
 		-p 8080:8080 \
 		-v myapp_db:/app/data \
+		--name myapp_container \
+		-d \
 		myapp
+
