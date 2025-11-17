@@ -16,7 +16,7 @@ ENV PATH="/usr/local/go/bin:/root/go/bin:${PATH}"
 
 # installing marki for markdown conversions
 WORKDIR /app/marki_repo
-RUN go build main.go -o marki
+RUN go build -o marki main.go
 RUN mv ./marki /root/go/bin/ 
 # RUN go install github.com/phillip-england/marki@latest
 
