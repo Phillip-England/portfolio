@@ -5,8 +5,8 @@ import { ArticleCache } from "./src/cache/ArticleCache";
 import { Database } from "bun:sqlite";
 import { ContactFormTable } from "./src/database/SqLiteDb";
 
-let cwd = process.cwd()
 
+let cwd = process.cwd()
 console.log(`current director: ${cwd}`)
 
 await primeReadMeCache()
@@ -14,7 +14,7 @@ export const articleCache = await ArticleCache.new(
   path.join(cwd, "articles"),
 );
 
-export const db = new Database(path.join(cwd, "./main.db"));
+export const db = new Database(path.join(cwd, "main.db"));
 export const contactFormTable =  new ContactFormTable(db)
 
 let router = await FileRouter.new({
