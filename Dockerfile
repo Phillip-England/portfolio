@@ -30,6 +30,7 @@ RUN bun --version && go version
 RUN bun install
 
 # running app
+WORKDIR /app
 CMD ["bun", "run", "index.ts"]
 
 
