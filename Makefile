@@ -16,5 +16,5 @@ docker-clean:
 docker-run:
 	sudo docker run \
 		-p 8080:8080 \
-		-v myapp_db:/app/main.db \
+		-v myapp_db:/app/data \
 		myapp

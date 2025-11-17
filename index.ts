@@ -14,7 +14,7 @@ export const articleCache = await ArticleCache.new(
   path.join(cwd, "articles"),
 );
 
-export const db = new Database(path.join(cwd, "main.db"));
+export const db = new Database(path.join(cwd, "data", "main.db"));
 export const contactFormTable =  new ContactFormTable(db)
 
 let router = await FileRouter.new({
