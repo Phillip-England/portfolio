@@ -17,7 +17,7 @@ WORKDIR /app/bin
 
 RUN mkdir -p /root/go/bin
 
-RUN mv marki_x86_64 marki && \
+RUN mv marki_linux marki && \
     mv marki /usr/local/bin/
 
 
