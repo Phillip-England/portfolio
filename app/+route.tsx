@@ -33,7 +33,7 @@ module.get(async (c: HTTPContext) => {
             <li>
               <a
                 href="/about"
-                className="cursor-pointer border rounded-lg p-2 border-gray-400 hover:bg-black hover:text-white"
+                className="cursor-pointer border rounded-lg p-2 border-gray-400 active:bg-black hover:bg-black active:text-white hover:text-white"
               >
                 About
               </a>
@@ -41,7 +41,7 @@ module.get(async (c: HTTPContext) => {
             <li>
               <a
                 href="/projects"
-                className="cursor-pointer border rounded-lg p-2 border-gray-400 hover:bg-black hover:text-white"
+                className="cursor-pointer border rounded-lg p-2 border-gray-400 active:bg-black hover:bg-black active:text-white hover:text-white"
               >
                 Projects
               </a>
@@ -49,7 +49,7 @@ module.get(async (c: HTTPContext) => {
             <li>
               <a
                 href="/blog"
-                className="cursor-pointer border rounded-lg p-2 border-gray-400 hover:bg-black hover:text-white"
+                className="cursor-pointer border rounded-lg p-2 border-gray-400 active:bg-black hover:bg-black active:text-white hover:text-white"
               >
                 Blog
               </a>
