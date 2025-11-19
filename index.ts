@@ -7,7 +7,6 @@ import { ContactFormTable } from "./src/database/SqLiteDb";
 import { mkdir } from "fs/promises";
 
 let cwd = process.cwd()
-console.log(`current director: ${cwd}`)
 
 await primeReadMeCache()
 export const articleCache = await ArticleCache.new(
