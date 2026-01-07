@@ -1,0 +1,396 @@
+{{ layout "./layouts/guest_layout.html" }}
+
+{{ block "title" }}Caddy Web Server: Configuration and Building Custom Plugins with xcaddy - Blog{{ endblock }}
+
+{{ block "main" }}
+<article class="max-w-3xl">
+    <header class="mb-12">
+        <a href="/blog" class="text-sm text-neutral-500 hover:text-white transition-colors flex items-center gap-2 mb-6">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Blog
+        </a>
+        <h1 class="text-4xl font-bold text-white mb-4">Caddy Web Server: Configuration and Building Custom Plugins with xcaddy</h1>
+        <div class="flex items-center gap-4 text-sm text-neutral-500">
+            <time datetime="2026-01-05">January 5, 2026</time>
+            <span class="text-neutral-700">|</span>
+            <span>DevOps</span>
+        </div>
+    </header>
+
+    <div class="prose prose-invert max-w-none">
+        <p class="text-lg text-neutral-300 mb-8">
+            <strong class="text-white">Caddy</strong> is a modern, open-source web server written in Go that stands out for its
+            automatic HTTPS, simple configuration, and extensible plugin architecture. If you're tired of wrestling with
+            Nginx configs or manually renewing SSL certificates, Caddy might be exactly what you need.
+        </p>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Why Caddy?</h2>
+            <p class="text-neutral-300 mb-4">
+                Caddy has gained significant popularity among developers and sysadmins for several compelling reasons:
+            </p>
+            <ul class="space-y-3 text-neutral-400 mb-4">
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">Automatic HTTPS</span>
+                    <span>Caddy automatically obtains and renews TLS certificates from Let's Encrypt. No more certbot cron jobs or expired certificates.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">Simple Config</span>
+                    <span>The Caddyfile syntax is human-readable and far simpler than traditional web server configs.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">Single Binary</span>
+                    <span>Written in Go, Caddy compiles to a single static binary with no dependencies.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">Extensible</span>
+                    <span>A rich plugin ecosystem lets you add features like rate limiting, caching, and custom authentication.</span>
+                </li>
+            </ul>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Installing Caddy</h2>
+            <p class="text-neutral-300 mb-4">
+                On Debian/Ubuntu systems, you can install Caddy from the official repository:
+            </p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-green-400">sudo</span> apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+<span class="text-green-400">curl</span> -1sLf <span class="text-yellow-400">'https://dl.cloudsmith.io/public/caddy/stable/gpg.key'</span> | <span class="text-green-400">sudo</span> gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+<span class="text-green-400">curl</span> -1sLf <span class="text-yellow-400">'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt'</span> | <span class="text-green-400">sudo</span> tee /etc/apt/sources.list.d/caddy-stable.list
+<span class="text-green-400">sudo</span> apt update
+<span class="text-green-400">sudo</span> apt install caddy</code></pre>
+
+            <p class="text-neutral-300 mb-4">
+                Or download directly from the <a href="https://caddyserver.com/download" class="text-blue-400 hover:text-blue-300">Caddy download page</a>,
+                which also lets you select plugins to include.
+            </p>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Caddyfile Basics</h2>
+            <p class="text-neutral-300 mb-4">
+                The Caddyfile is Caddy's configuration format. It lives at <code class="bg-neutral-800 text-neutral-300 px-1.5 py-0.5 rounded text-xs font-mono">/etc/caddy/Caddyfile</code>
+                by default. Here's the simplest possible configuration to serve static files:
+            </p>
+
+            <p class="text-sm text-neutral-500 mb-2 font-medium">/etc/caddy/Caddyfile</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-purple-400">example.com</span> {
+    <span class="text-blue-400">root</span> * /var/www/html
+    <span class="text-blue-400">file_server</span>
+}</code></pre>
+
+            <p class="text-neutral-300 mb-4">
+                That's it. Caddy will automatically obtain an SSL certificate for <code class="bg-neutral-800 px-1 rounded text-xs">example.com</code>
+                and serve files from <code class="bg-neutral-800 px-1 rounded text-xs">/var/www/html</code>.
+            </p>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Reverse Proxy Configuration</h2>
+            <p class="text-neutral-300 mb-4">
+                One of the most common use cases for Caddy is as a reverse proxy in front of application servers:
+            </p>
+
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-purple-400">api.example.com</span> {
+    <span class="text-blue-400">reverse_proxy</span> localhost:8080
+}
+
+<span class="text-purple-400">app.example.com</span> {
+    <span class="text-blue-400">reverse_proxy</span> localhost:3000
+}</code></pre>
+
+            <p class="text-neutral-300 mb-4">
+                For load balancing across multiple backends:
+            </p>
+
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-purple-400">example.com</span> {
+    <span class="text-blue-400">reverse_proxy</span> localhost:8001 localhost:8002 localhost:8003 {
+        <span class="text-blue-400">lb_policy</span> round_robin
+        <span class="text-blue-400">health_uri</span> /health
+        <span class="text-blue-400">health_interval</span> 10s
+    }
+}</code></pre>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Common Configuration Patterns</h2>
+
+            <h3 class="text-lg font-semibold text-white mb-3">Redirect HTTP to HTTPS and www to non-www:</h3>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-purple-400">www.example.com</span> {
+    <span class="text-blue-400">redir</span> https://example.com{uri} permanent
+}
+
+<span class="text-purple-400">example.com</span> {
+    <span class="text-blue-400">root</span> * /var/www/html
+    <span class="text-blue-400">file_server</span>
+}</code></pre>
+
+            <h3 class="text-lg font-semibold text-white mb-3">Add security headers:</h3>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-purple-400">example.com</span> {
+    <span class="text-blue-400">header</span> {
+        Strict-Transport-Security <span class="text-yellow-400">"max-age=31536000; includeSubDomains; preload"</span>
+        X-Content-Type-Options <span class="text-yellow-400">"nosniff"</span>
+        X-Frame-Options <span class="text-yellow-400">"DENY"</span>
+        Referrer-Policy <span class="text-yellow-400">"strict-origin-when-cross-origin"</span>
+    }
+    <span class="text-blue-400">reverse_proxy</span> localhost:8080
+}</code></pre>
+
+            <h3 class="text-lg font-semibold text-white mb-3">Enable gzip compression:</h3>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-purple-400">example.com</span> {
+    <span class="text-blue-400">encode</span> gzip zstd
+    <span class="text-blue-400">file_server</span>
+}</code></pre>
+
+            <h3 class="text-lg font-semibold text-white mb-3">Basic authentication:</h3>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-purple-400">admin.example.com</span> {
+    <span class="text-blue-400">basicauth</span> * {
+        <span class="text-neutral-500"># Password hash generated with: caddy hash-password</span>
+        admin $2a$14$Zkx19XLiW6VYouLHR5NmfOFU0z2GTNmpkT/5qqR7hx4IjWJPDhjvG
+    }
+    <span class="text-blue-400">reverse_proxy</span> localhost:8080
+}</code></pre>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">What is xcaddy?</h2>
+            <p class="text-neutral-300 mb-4">
+                <strong class="text-white">xcaddy</strong> is a command-line tool that lets you build custom versions of Caddy with
+                additional plugins compiled in. Since Caddy is written in Go, plugins must be compiled into the binary rather
+                than loaded at runtime.
+            </p>
+
+            <h3 class="text-lg font-semibold text-white mb-3">Installing xcaddy:</h3>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-neutral-500"># Requires Go 1.21+</span>
+<span class="text-green-400">go</span> install github.com/caddyserver/xcaddy/cmd/xcaddy@latest</code></pre>
+
+            <h3 class="text-lg font-semibold text-white mb-3">Building Caddy with plugins:</h3>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-green-400">xcaddy</span> build \
+    --with github.com/caddy-dns/cloudflare \
+    --with github.com/mholt/caddy-ratelimit \
+    --with github.com/caddyserver/cache-handler</code></pre>
+
+            <p class="text-neutral-300 mb-4">
+                This creates a <code class="bg-neutral-800 px-1 rounded text-xs">caddy</code> binary in your current directory with
+                the specified plugins included.
+            </p>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Popular xcaddy Plugins</h2>
+            <p class="text-neutral-300 mb-4">
+                Here are some of the most useful plugins you can add with xcaddy:
+            </p>
+
+            <div class="space-y-6">
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">caddy-dns/cloudflare</h4>
+                    <p class="text-neutral-400 text-sm mb-3">DNS challenge provider for Cloudflare. Essential for obtaining wildcard certificates or when port 80 isn't accessible.</p>
+                    <pre class="bg-neutral-950 rounded p-3 overflow-x-auto"><code class="text-sm font-mono"><span class="text-purple-400">*.example.com</span> {
+    <span class="text-blue-400">tls</span> {
+        dns cloudflare {env.CF_API_TOKEN}
+    }
+    <span class="text-blue-400">reverse_proxy</span> localhost:8080
+}</code></pre>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">mholt/caddy-ratelimit</h4>
+                    <p class="text-neutral-400 text-sm mb-3">Add rate limiting to protect your APIs and prevent abuse.</p>
+                    <pre class="bg-neutral-950 rounded p-3 overflow-x-auto"><code class="text-sm font-mono"><span class="text-purple-400">api.example.com</span> {
+    <span class="text-blue-400">rate_limit</span> {
+        zone api_zone {
+            key {remote_host}
+            events 100
+            window 1m
+        }
+    }
+    <span class="text-blue-400">reverse_proxy</span> localhost:8080
+}</code></pre>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">caddyserver/cache-handler</h4>
+                    <p class="text-neutral-400 text-sm mb-3">HTTP caching middleware that supports RFC 7234 compliant caching.</p>
+                    <pre class="bg-neutral-950 rounded p-3 overflow-x-auto"><code class="text-sm font-mono"><span class="text-purple-400">example.com</span> {
+    <span class="text-blue-400">cache</span> {
+        ttl 1h
+        stale 24h
+    }
+    <span class="text-blue-400">reverse_proxy</span> localhost:8080
+}</code></pre>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">greenpau/caddy-security</h4>
+                    <p class="text-neutral-400 text-sm mb-3">Comprehensive authentication portal supporting OAuth2, SAML, local auth, and more.</p>
+                    <pre class="bg-neutral-950 rounded p-3 overflow-x-auto"><code class="text-sm font-mono"><span class="text-purple-400">example.com</span> {
+    <span class="text-blue-400">authenticate</span> with myportal
+    <span class="text-blue-400">reverse_proxy</span> localhost:8080
+}</code></pre>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">caddy-dns/route53</h4>
+                    <p class="text-neutral-400 text-sm mb-3">DNS challenge provider for AWS Route 53.</p>
+                    <pre class="bg-neutral-950 rounded p-3 overflow-x-auto"><code class="text-sm font-mono"><span class="text-purple-400">example.com</span> {
+    <span class="text-blue-400">tls</span> {
+        dns route53 {
+            access_key_id {env.AWS_ACCESS_KEY_ID}
+            secret_access_key {env.AWS_SECRET_ACCESS_KEY}
+        }
+    }
+}</code></pre>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">mholt/caddy-webdav</h4>
+                    <p class="text-neutral-400 text-sm mb-3">WebDAV server support for file sharing and synchronization.</p>
+                    <pre class="bg-neutral-950 rounded p-3 overflow-x-auto"><code class="text-sm font-mono"><span class="text-purple-400">files.example.com</span> {
+    <span class="text-blue-400">webdav</span> /dav/* {
+        root /srv/webdav
+    }
+}</code></pre>
+                </div>
+
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">lucaslorentz/caddy-docker-proxy</h4>
+                    <p class="text-neutral-400 text-sm mb-3">Automatically configure Caddy based on Docker container labels. Great for dynamic container environments.</p>
+                    <pre class="bg-neutral-950 rounded p-3 overflow-x-auto"><code class="text-sm font-mono"><span class="text-neutral-500"># In docker-compose.yml, add labels to your service:</span>
+labels:
+  caddy: example.com
+  caddy.reverse_proxy: <span class="text-yellow-400">"{{upstreams 8080}}"</span></code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Building a Production-Ready Caddy</h2>
+            <p class="text-neutral-300 mb-4">
+                Here's a complete example of building Caddy with commonly needed plugins and replacing the system binary:
+            </p>
+
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-neutral-500"># Build custom Caddy</span>
+<span class="text-green-400">xcaddy</span> build \
+    --with github.com/caddy-dns/cloudflare \
+    --with github.com/mholt/caddy-ratelimit \
+    --with github.com/caddyserver/cache-handler \
+    --with github.com/greenpau/caddy-security \
+    --output /tmp/caddy
+
+<span class="text-neutral-500"># Stop existing Caddy service</span>
+<span class="text-green-400">sudo</span> systemctl stop caddy
+
+<span class="text-neutral-500"># Backup and replace the binary</span>
+<span class="text-green-400">sudo</span> mv /usr/bin/caddy /usr/bin/caddy.bak
+<span class="text-green-400">sudo</span> mv /tmp/caddy /usr/bin/caddy
+<span class="text-green-400">sudo</span> chmod +x /usr/bin/caddy
+
+<span class="text-neutral-500"># Verify plugins are included</span>
+<span class="text-green-400">caddy</span> list-modules | grep -E <span class="text-yellow-400">"cloudflare|ratelimit|cache|security"</span>
+
+<span class="text-neutral-500"># Restart Caddy</span>
+<span class="text-green-400">sudo</span> systemctl start caddy</code></pre>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Managing Caddy</h2>
+            <p class="text-neutral-300 mb-4">
+                Essential commands for managing your Caddy server:
+            </p>
+
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-neutral-500"># Validate Caddyfile syntax</span>
+<span class="text-green-400">caddy</span> validate --config /etc/caddy/Caddyfile
+
+<span class="text-neutral-500"># Reload configuration without downtime</span>
+<span class="text-green-400">sudo</span> systemctl reload caddy
+
+<span class="text-neutral-500"># Format your Caddyfile</span>
+<span class="text-green-400">caddy</span> fmt --overwrite /etc/caddy/Caddyfile
+
+<span class="text-neutral-500"># View loaded modules</span>
+<span class="text-green-400">caddy</span> list-modules
+
+<span class="text-neutral-500"># View logs</span>
+<span class="text-green-400">journalctl</span> -u caddy -f
+
+<span class="text-neutral-500"># Test a config without applying</span>
+<span class="text-green-400">caddy</span> adapt --config /etc/caddy/Caddyfile</code></pre>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">A Complete Production Example</h2>
+            <p class="text-neutral-300 mb-4">
+                Here's a full Caddyfile demonstrating multiple sites with various features:
+            </p>
+
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-neutral-500"># Global options</span>
+{
+    <span class="text-blue-400">email</span> admin@example.com
+    <span class="text-blue-400">acme_ca</span> https://acme-v02.api.letsencrypt.org/directory
+}
+
+<span class="text-neutral-500"># Main website</span>
+<span class="text-purple-400">example.com</span> {
+    <span class="text-blue-400">encode</span> gzip zstd
+    <span class="text-blue-400">header</span> {
+        Strict-Transport-Security <span class="text-yellow-400">"max-age=31536000; includeSubDomains"</span>
+        X-Content-Type-Options <span class="text-yellow-400">"nosniff"</span>
+        X-Frame-Options <span class="text-yellow-400">"SAMEORIGIN"</span>
+    }
+    <span class="text-blue-400">root</span> * /var/www/example.com
+    <span class="text-blue-400">file_server</span>
+}
+
+<span class="text-neutral-500"># API with rate limiting</span>
+<span class="text-purple-400">api.example.com</span> {
+    <span class="text-blue-400">rate_limit</span> {
+        zone api {
+            key {remote_host}
+            events 60
+            window 1m
+        }
+    }
+    <span class="text-blue-400">reverse_proxy</span> localhost:8080 {
+        <span class="text-blue-400">header_up</span> X-Real-IP {remote_host}
+        <span class="text-blue-400">header_up</span> X-Forwarded-Proto {scheme}
+    }
+}
+
+<span class="text-neutral-500"># Wildcard subdomain for tenants (requires DNS challenge)</span>
+<span class="text-purple-400">*.tenants.example.com</span> {
+    <span class="text-blue-400">tls</span> {
+        dns cloudflare {env.CF_API_TOKEN}
+    }
+    <span class="text-blue-400">reverse_proxy</span> localhost:3000 {
+        <span class="text-blue-400">header_up</span> X-Tenant {labels.0}
+    }
+}
+
+<span class="text-neutral-500"># Admin panel with basic auth</span>
+<span class="text-purple-400">admin.example.com</span> {
+    <span class="text-blue-400">basicauth</span> * {
+        admin $2a$14$Zkx19XLiW6VYouLHR5NmfOFU0z2GTNmpkT
+    }
+    <span class="text-blue-400">reverse_proxy</span> localhost:9000
+}</code></pre>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Conclusion</h2>
+            <p class="text-neutral-300 mb-4">
+                Caddy is a powerful and user-friendly web server that handles many common tasks automatically.
+                With automatic HTTPS, simple configuration syntax, and the ability to extend functionality through xcaddy plugins,
+                it's an excellent choice for both simple static sites and complex production deployments.
+            </p>
+            <p class="text-neutral-300">
+                Start with the basic configuration, add plugins as you need them, and enjoy never having to worry about
+                SSL certificate renewals again.
+            </p>
+        </section>
+    </div>
+</article>
+{{ endblock }}
+{{ endlayout }}

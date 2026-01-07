@@ -1,0 +1,266 @@
+{{ layout "./layouts/guest_layout.html" }}
+
+{{ block "title" }}How to Wire Up systemctl Service Files - Blog{{ endblock }}
+
+{{ block "main" }}
+<article class="max-w-3xl">
+    <header class="mb-12">
+        <a href="/blog" class="text-sm text-neutral-500 hover:text-white transition-colors flex items-center gap-2 mb-6">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Blog
+        </a>
+        <h1 class="text-4xl font-bold text-white mb-4">How to Wire Up systemctl Service Files</h1>
+        <div class="flex items-center gap-4 text-sm text-neutral-500">
+            <time datetime="2025-01-05">January 5, 2025</time>
+            <span class="text-neutral-700">|</span>
+            <span>DevOps</span>
+        </div>
+    </header>
+
+    <div class="prose prose-invert max-w-none">
+        <p class="text-lg text-neutral-300 mb-8">
+            If you've ever deployed an application to a Linux server, you've probably needed to run it as a background service.
+            <strong class="text-white">systemd</strong> is the init system used by most modern Linux distributions, and understanding
+            how to create service unit files is essential for any developer working with servers.
+        </p>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">What is systemd?</h2>
+            <p class="text-neutral-300 mb-4">
+                systemd is a system and service manager for Linux. It's responsible for initializing the system, managing services,
+                and handling dependencies between them. The <code class="bg-neutral-800 text-blue-400 px-2 py-1 rounded text-sm font-mono">systemctl</code>
+                command is the primary tool for interacting with systemd.
+            </p>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Creating a Service File</h2>
+            <p class="text-neutral-300 mb-4">
+                Service unit files live in <code class="bg-neutral-800 text-neutral-300 px-1.5 py-0.5 rounded text-xs font-mono">/etc/systemd/system/</code>.
+                Let's create one for a simple web application.
+            </p>
+
+            <p class="text-sm text-neutral-500 mb-2 font-medium">/etc/systemd/system/myapp.service</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-purple-400">[Unit]</span>
+<span class="text-blue-400">Description</span>=My Web Application
+<span class="text-blue-400">After</span>=network.target
+
+<span class="text-purple-400">[Service]</span>
+<span class="text-blue-400">Type</span>=simple
+<span class="text-blue-400">User</span>=www-data
+<span class="text-blue-400">Group</span>=www-data
+<span class="text-blue-400">WorkingDirectory</span>=/var/www/myapp
+<span class="text-blue-400">ExecStart</span>=/var/www/myapp/myapp
+<span class="text-blue-400">Restart</span>=on-failure
+<span class="text-blue-400">RestartSec</span>=5
+
+<span class="text-purple-400">[Install]</span>
+<span class="text-blue-400">WantedBy</span>=multi-user.target</code></pre>
+
+            <p class="text-neutral-300 mb-4">Let's break down each section:</p>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">The [Unit] Section</h2>
+            <p class="text-neutral-300 mb-4">
+                This section contains metadata and dependency information.
+            </p>
+            <ul class="space-y-3 text-neutral-400 mb-4">
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">Description</span>
+                    <span>A human-readable description of what the service does.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">After</span>
+                    <span>Specifies ordering dependencies. Here, we wait for the network to be available before starting.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">Requires</span>
+                    <span>(Optional) Hard dependencies. If these units fail, this unit will fail too.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">Wants</span>
+                    <span>(Optional) Soft dependencies. These are started alongside your service but won't cause failure if they fail.</span>
+                </li>
+            </ul>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">The [Service] Section</h2>
+            <p class="text-neutral-300 mb-4">
+                This is where the actual service configuration lives.
+            </p>
+            <ul class="space-y-3 text-neutral-400 mb-4">
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">Type</span>
+                    <span>The process type. Common values: <code class="bg-neutral-800 px-1 rounded text-xs">simple</code> (default),
+                    <code class="bg-neutral-800 px-1 rounded text-xs">forking</code>, <code class="bg-neutral-800 px-1 rounded text-xs">oneshot</code>,
+                    <code class="bg-neutral-800 px-1 rounded text-xs">notify</code>.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">User/Group</span>
+                    <span>The user and group to run the service as. Never run as root unless absolutely necessary.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">WorkingDirectory</span>
+                    <span>The directory to run the service from.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">ExecStart</span>
+                    <span>The command to start the service. Must be an absolute path.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">Restart</span>
+                    <span>When to restart: <code class="bg-neutral-800 px-1 rounded text-xs">no</code>,
+                    <code class="bg-neutral-800 px-1 rounded text-xs">on-failure</code>,
+                    <code class="bg-neutral-800 px-1 rounded text-xs">always</code>, etc.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">RestartSec</span>
+                    <span>How long to wait before restarting (in seconds).</span>
+                </li>
+            </ul>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">The [Install] Section</h2>
+            <p class="text-neutral-300 mb-4">
+                This section defines how the service is enabled.
+            </p>
+            <ul class="space-y-3 text-neutral-400 mb-4">
+                <li class="flex items-start gap-3">
+                    <span class="text-blue-400 mt-1 font-mono text-sm">WantedBy</span>
+                    <span>Which target to attach this service to. <code class="bg-neutral-800 px-1 rounded text-xs">multi-user.target</code>
+                    is typical for services that should start on boot.</span>
+                </li>
+            </ul>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Environment Variables</h2>
+            <p class="text-neutral-300 mb-4">
+                There are two ways to set environment variables for your service:
+            </p>
+
+            <h3 class="text-lg font-semibold text-white mb-3">Inline in the service file:</h3>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-purple-400">[Service]</span>
+<span class="text-blue-400">Environment</span>=PORT=8080
+<span class="text-blue-400">Environment</span>=NODE_ENV=production
+<span class="text-blue-400">Environment</span>=DATABASE_URL=postgres://localhost/mydb</code></pre>
+
+            <h3 class="text-lg font-semibold text-white mb-3">Using an environment file:</h3>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-4"><code class="text-sm font-mono"><span class="text-purple-400">[Service]</span>
+<span class="text-blue-400">EnvironmentFile</span>=/var/www/myapp/.env</code></pre>
+            <p class="text-neutral-400 text-sm mb-4">
+                The environment file should contain simple <code class="bg-neutral-800 px-1 rounded text-xs">KEY=value</code> pairs, one per line.
+            </p>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Managing Your Service</h2>
+            <p class="text-neutral-300 mb-4">
+                Once your service file is in place, here are the essential commands:
+            </p>
+
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-neutral-500"># Reload systemd to recognize new/changed service files</span>
+<span class="text-green-400">sudo</span> systemctl daemon-reload
+
+<span class="text-neutral-500"># Start the service</span>
+<span class="text-green-400">sudo</span> systemctl start myapp
+
+<span class="text-neutral-500"># Stop the service</span>
+<span class="text-green-400">sudo</span> systemctl stop myapp
+
+<span class="text-neutral-500"># Restart the service</span>
+<span class="text-green-400">sudo</span> systemctl restart myapp
+
+<span class="text-neutral-500"># Check service status</span>
+<span class="text-green-400">sudo</span> systemctl status myapp
+
+<span class="text-neutral-500"># Enable service to start on boot</span>
+<span class="text-green-400">sudo</span> systemctl enable myapp
+
+<span class="text-neutral-500"># Disable service from starting on boot</span>
+<span class="text-green-400">sudo</span> systemctl disable myapp
+
+<span class="text-neutral-500"># View service logs</span>
+<span class="text-green-400">journalctl</span> -u myapp -f</code></pre>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">A Real-World Example</h2>
+            <p class="text-neutral-300 mb-4">
+                Here's a more complete example for a Go web application with logging and security hardening:
+            </p>
+
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-purple-400">[Unit]</span>
+<span class="text-blue-400">Description</span>=Production Web Server
+<span class="text-blue-400">After</span>=network.target
+<span class="text-blue-400">Wants</span>=network-online.target
+
+<span class="text-purple-400">[Service]</span>
+<span class="text-blue-400">Type</span>=simple
+<span class="text-blue-400">User</span>=appuser
+<span class="text-blue-400">Group</span>=appuser
+<span class="text-blue-400">WorkingDirectory</span>=/opt/myapp
+
+<span class="text-neutral-500"># Environment</span>
+<span class="text-blue-400">EnvironmentFile</span>=/opt/myapp/.env
+
+<span class="text-neutral-500"># Start command</span>
+<span class="text-blue-400">ExecStart</span>=/opt/myapp/server
+<span class="text-blue-400">ExecReload</span>=/bin/kill -HUP $MAINPID
+
+<span class="text-neutral-500"># Restart policy</span>
+<span class="text-blue-400">Restart</span>=always
+<span class="text-blue-400">RestartSec</span>=5
+<span class="text-blue-400">StartLimitIntervalSec</span>=60
+<span class="text-blue-400">StartLimitBurst</span>=3
+
+<span class="text-neutral-500"># Security hardening</span>
+<span class="text-blue-400">NoNewPrivileges</span>=true
+<span class="text-blue-400">PrivateTmp</span>=true
+<span class="text-blue-400">ProtectSystem</span>=strict
+<span class="text-blue-400">ProtectHome</span>=true
+<span class="text-blue-400">ReadWritePaths</span>=/opt/myapp/data
+
+<span class="text-neutral-500"># Resource limits</span>
+<span class="text-blue-400">LimitNOFILE</span>=65535
+<span class="text-blue-400">MemoryMax</span>=512M
+
+<span class="text-purple-400">[Install]</span>
+<span class="text-blue-400">WantedBy</span>=multi-user.target</code></pre>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Debugging Tips</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">Check syntax errors</h4>
+                    <code class="text-sm font-mono text-neutral-400">systemd-analyze verify /etc/systemd/system/myapp.service</code>
+                </div>
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">View detailed logs</h4>
+                    <code class="text-sm font-mono text-neutral-400">journalctl -u myapp --since "10 minutes ago"</code>
+                </div>
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">Check why a service failed</h4>
+                    <code class="text-sm font-mono text-neutral-400">systemctl status myapp -l</code>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-white mb-4 pb-2 border-b border-neutral-800">Conclusion</h2>
+            <p class="text-neutral-300">
+                systemd service files are powerful and flexible. Start with a simple configuration,
+                test it thoroughly, and add security hardening and resource limits as needed.
+                The key is understanding what each directive does so you can debug issues when they arise.
+            </p>
+        </section>
+    </div>
+</article>
+{{ endblock }}
+{{ endlayout }}

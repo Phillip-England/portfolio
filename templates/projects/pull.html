@@ -1,0 +1,151 @@
+{{ layout "./layouts/guest_layout.html" }}
+{{ block "title" }}Pull - Clipboard-First CLI{{ endblock }}
+{{ block "main" }}
+<div class="flex flex-col lg:flex-row gap-8 -mx-6 lg:-mx-0">
+    <aside class="hidden lg:block lg:w-64 flex-shrink-0">
+        <div class="sticky top-8">
+            <div class="mb-6">
+                <a href="/" class="text-sm text-neutral-500 hover:text-white transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Portfolio
+                </a>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-6 bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">pull</h2>
+            <nav class="space-y-6">
+                <div>
+                    <h3 class="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-3">Getting Started</h3>
+                    <div class="space-y-2">
+                        <a href="#overview" class="block text-neutral-400 hover:text-orange-400 hover:pl-2 transition-all text-sm">Overview</a>
+                        <a href="#installation" class="block text-neutral-400 hover:text-orange-400 hover:pl-2 transition-all text-sm">Installation</a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-3">Core Features</h3>
+                    <div class="space-y-2">
+                        <a href="#files" class="block text-neutral-400 hover:text-orange-400 hover:pl-2 transition-all text-sm">Files & Directories</a>
+                        <a href="#urls" class="block text-neutral-400 hover:text-orange-400 hover:pl-2 transition-all text-sm">Fetching URLs</a>
+                        <a href="#modes" class="block text-neutral-400 hover:text-orange-400 hover:pl-2 transition-all text-sm">Append & Prepend</a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-3">Output</h3>
+                    <div class="space-y-2">
+                        <a href="#emit" class="block text-neutral-400 hover:text-orange-400 hover:pl-2 transition-all text-sm">Emit to Stdout</a>
+                        <a href="#write" class="block text-neutral-400 hover:text-orange-400 hover:pl-2 transition-all text-sm">Write to File</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </aside>
+
+    <main class="flex-1 min-w-0 px-6 lg:px-0">
+        <div class="lg:hidden mb-8">
+            <a href="/" class="text-sm text-neutral-500 hover:text-white transition-colors flex items-center gap-2 mb-4">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Portfolio
+            </a>
+        </div>
+
+        <section id="overview" class="mb-16 scroll-mt-8">
+            <div class="mb-6 pb-4 border-b border-neutral-800">
+                <h1 class="text-3xl font-bold text-orange-400 mb-2">pull</h1>
+                <p class="text-neutral-400">A clipboard-first CLI tool designed for rapid "grab → paste → think" development loops.</p>
+                <div class="flex gap-2 mt-4">
+                    <span class="bg-neutral-900 border border-neutral-800 px-2 py-1 rounded text-xs font-mono text-neutral-400">Go 1.25</span>
+                    <span class="bg-neutral-900 border border-neutral-800 px-2 py-1 rounded text-xs font-mono text-neutral-400">MIT License</span>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-4">Overview</h2>
+            <p class="text-neutral-300 mb-4"><strong class="text-white">Pull</strong> is deliberately opinionated: it moves useful content into your clipboard, fast. It is designed specifically for AI/LLM workflows, static-site tooling, and rapid iteration.</p>
+            
+            
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-4">
+                    <h4 class="text-white font-semibold mb-2">üìã Clipboard-First</h4>
+                    <p class="text-neutral-400 text-sm">No need to pipe to `pbcopy` or `xclip`. The clipboard is the default destination.</p>
+                </div>
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-4">
+                    <h4 class="text-white font-semibold mb-2">üö´ Git Aware</h4>
+                    <p class="text-neutral-400 text-sm">Automatically respects `.gitignore` rules when recursively pulling directories.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="installation" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">Installation</h2>
+            <p class="text-neutral-300 mb-4">Install directly via Go:</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-4"><code class="text-sm font-mono text-orange-400">go install github.com/phillip-england/pull@latest</code></pre>
+        </section>
+
+        <section id="files" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">Files & Directories</h2>
+            <p class="text-neutral-300 mb-4">Pull recursively reads files and directories, cleaning up empty lines and adding headers for context.</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-4"><code class="text-sm font-mono text-neutral-300"><span class="text-orange-400">pull</span> main.go
+<span class="text-orange-400">pull</span> src/ components/</code></pre>
+            <div class="bg-neutral-900 border-l-4 border-orange-500 p-4 rounded-r-lg">
+                <p class="text-neutral-300 text-sm"><strong>Note:</strong> By default, ignored files (like `node_modules` or `.env`) are skipped. Use <code class="bg-neutral-800 px-1 rounded text-orange-400">--includeIgnore</code> to force inclusion.</p>
+            </div>
+        </section>
+
+        <section id="urls" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">Fetching URLs</h2>
+            <p class="text-neutral-300 mb-4">You can pull the raw HTML/text body of a URL directly into your clipboard.</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto"><code class="text-sm font-mono text-neutral-300"><span class="text-orange-400">pull</span> href github.com/phillip-england
+<span class="text-orange-400">pull</span> href https://example.com docs.bun.sh</code></pre>
+        </section>
+
+        <section id="modes" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">Append & Prepend</h2>
+            <p class="text-neutral-300 mb-4">Instead of overwriting your clipboard, you can add context to what is already there. This is extremely useful for building complex prompts for LLMs.</p>
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-neutral-900">
+                            <th class="text-left p-4 text-white font-semibold border-b border-neutral-800">Flag</th>
+                            <th class="text-left p-4 text-white font-semibold border-b border-neutral-800">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <tr class="border-b border-neutral-800">
+                            <td class="p-4"><code class="text-orange-400 font-mono">--append</code></td>
+                            <td class="p-4 text-neutral-400">Adds the new content <strong>after</strong> the current clipboard contents.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4"><code class="text-orange-400 font-mono">--prepend</code></td>
+                            <td class="p-4 text-neutral-400">Adds the new content <strong>before</strong> the current clipboard contents.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-sm text-neutral-500 mt-4">Example: Pulling source code and a webpage into one payload.</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mt-2"><code class="text-sm font-mono text-neutral-300">pull src/handlers
+pull <span class="text-orange-400">--append</span> href example.com</code></pre>
+        </section>
+
+        <section id="emit" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">Output Options</h2>
+            
+            <h3 class="text-xl font-semibold text-white mb-4">Emit (Stdout)</h3>
+            <p class="text-neutral-400 mb-4">If you want to pipe the content elsewhere instead of the clipboard, use `emit`.</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-8"><code class="text-sm font-mono text-neutral-300">pull emit | sed 's/foo/bar/' | pbcopy</code></pre>
+
+            <h3 id="write" class="text-xl font-semibold text-white mb-4">Write to File</h3>
+            <p class="text-neutral-400 mb-4">Dump the current clipboard contents directly to a file.</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto"><code class="text-sm font-mono text-neutral-300"><span class="text-orange-400">pull</span> write output.txt</code></pre>
+        </section>
+        
+        <section class="mb-16">
+            <div class="border-t border-neutral-800 pt-8 text-center">
+                <p class="text-neutral-500 text-sm mb-2">MIT License &copy; 2026 Phillip England</p>
+                <a href="https://github.com/Phillip-England/pull" target="_blank" class="text-orange-400 hover:text-orange-300 transition-colors text-sm">View on GitHub</a>
+            </div>
+        </section>
+    </main>
+</div>
+{{ endblock }}
+{{ endlayout }}

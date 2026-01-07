@@ -1,0 +1,155 @@
+{{ layout "./layouts/guest_layout.html" }}
+{{ block "title" }}Joystick - Global Macro Engine{{ endblock }}
+{{ block "main" }}
+<div class="flex flex-col lg:flex-row gap-8 -mx-6 lg:-mx-0">
+    <aside class="hidden lg:block lg:w-64 flex-shrink-0">
+        <div class="sticky top-8">
+            <div class="mb-6">
+                <a href="/" class="text-sm text-neutral-500 hover:text-white transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Portfolio
+                </a>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-6 bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">joystick</h2>
+            <nav class="space-y-6">
+                <div>
+                    <h3 class="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-3">Getting Started</h3>
+                    <div class="space-y-2">
+                        <a href="#overview" class="block text-neutral-400 hover:text-red-400 hover:pl-2 transition-all text-sm">Overview</a>
+                        <a href="#installation" class="block text-neutral-400 hover:text-red-400 hover:pl-2 transition-all text-sm">Installation</a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-3">Configuration</h3>
+                    <div class="space-y-2">
+                        <a href="#setup" class="block text-neutral-400 hover:text-red-400 hover:pl-2 transition-all text-sm">Setup</a>
+                        <a href="#syntax" class="block text-neutral-400 hover:text-red-400 hover:pl-2 transition-all text-sm">Config Syntax</a>
+                        <a href="#leader-key" class="block text-neutral-400 hover:text-red-400 hover:pl-2 transition-all text-sm">Leader Key</a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-3">Usage</h3>
+                    <div class="space-y-2">
+                        <a href="#cli" class="block text-neutral-400 hover:text-red-400 hover:pl-2 transition-all text-sm">CLI Commands</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </aside>
+
+    <main class="flex-1 min-w-0 px-6 lg:px-0">
+        <div class="lg:hidden mb-8">
+            <a href="/" class="text-sm text-neutral-500 hover:text-white transition-colors flex items-center gap-2 mb-4">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Portfolio
+            </a>
+        </div>
+
+        <section id="overview" class="mb-16 scroll-mt-8">
+            <div class="mb-6 pb-4 border-b border-neutral-800">
+                <h1 class="text-3xl font-bold text-red-400 mb-2">joystick</h1>
+                <p class="text-neutral-400">A global key mapping macro engine for hackers and power users.</p>
+                <div class="flex gap-2 mt-4">
+                    <span class="bg-neutral-900 border border-neutral-800 px-2 py-1 rounded text-xs font-mono text-neutral-400">Go 1.25</span>
+                    <span class="bg-neutral-900 border border-neutral-800 px-2 py-1 rounded text-xs font-mono text-neutral-400">MIT License</span>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-4">Overview</h2>
+            <p class="text-neutral-300 mb-4"><strong class="text-white">Joystick</strong> is a lightweight background service that listens for specific key "chords" (a sequence of keys) and executes shell commands in response. It is designed to let you trigger scripts, launch applications, or control your system from anywhere, regardless of which application is in focus.</p>
+            
+            <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5 mt-6">
+                <h4 class="text-white font-semibold mb-2 flex items-center gap-2">
+                    <span class="text-red-400">⚡</span> Hot Reloading
+                </h4>
+                <p class="text-neutral-400 text-sm">Joystick watches your configuration file. Save changes, and your new macros work instantly—no restart required.</p>
+            </div>
+        </section>
+
+        <section id="installation" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">Installation</h2>
+            <p class="text-neutral-300 mb-4">Install directly via Go:</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-4"><code class="text-sm font-mono text-red-400">go install github.com/phillip-england/joystick@latest</code></pre>
+            <p class="text-neutral-400 text-sm mb-4">Or clone and build from source:</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto"><code class="text-sm font-mono text-neutral-300">git clone https://github.com/phillip-england/joystick.git
+cd joystick
+go build -o joystick main.go</code></pre>
+        </section>
+
+        <section id="setup" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">Configuration</h2>
+            <p class="text-neutral-300 mb-4">Joystick uses a simple text-based configuration file. When you run it for the first time, it creates a default config at:</p>
+            <ul class="list-disc list-inside space-y-2 text-neutral-400 mb-6">
+                <li><strong>macOS/Linux:</strong> <code class="bg-neutral-800 px-1.5 py-0.5 rounded text-xs">~/.config/joystick/keys.conf</code></li>
+                <li><strong>Windows:</strong> <code class="bg-neutral-800 px-1.5 py-0.5 rounded text-xs">%APPDATA%\joystick\keys.conf</code></li>
+            </ul>
+
+            <h3 id="syntax" class="text-xl font-semibold text-white mb-4">Config Syntax</h3>
+            <p class="text-neutral-400 mb-4">The configuration file defines a <strong>Leader Key</strong> followed by mappings. Mappings consist of a trigger key and the shell command to execute.</p>
+            
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono"><span class="text-neutral-500"># Define the leader key (must be wrapped in quotes if it's a special char)</span>
+LEADER: ';
+
+<span class="text-neutral-500"># Trigger: Leader + g</span>
+g:
+  echo "Hello from Joystick"
+
+<span class="text-neutral-500"># Trigger: Leader + 1</span>
+1:
+  open -a "Google Chrome"
+
+<span class="text-neutral-500"># Trigger: Leader + t (Multi-line commands are supported)</span>
+t:
+  cd ~/src/project;
+  code .</code></pre>
+
+            <h3 id="leader-key" class="text-xl font-semibold text-white mb-4">Leader Key</h3>
+            <p class="text-neutral-300 mb-4">The <strong>Leader Key</strong> acts as a safety mechanism. Joystick only listens for commands immediately after the leader key is pressed. The default is <code class="bg-neutral-800 px-1 rounded text-red-400">;</code> (semicolon), but you can change it to any key.</p>
+            <p class="text-neutral-400 text-sm">When a valid trigger sequence is detected, Joystick automatically sends "Backspace" keystrokes to erase the trigger characters from your current input field before executing the command.</p>
+        </section>
+
+        <section id="cli" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">CLI Commands</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-neutral-900">
+                            <th class="text-left p-4 text-white font-semibold border-b border-neutral-800">Command</th>
+                            <th class="text-left p-4 text-white font-semibold border-b border-neutral-800">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <tr class="border-b border-neutral-800">
+                            <td class="p-4"><code class="text-red-400 font-mono">joystick</code></td>
+                            <td class="p-4 text-neutral-400">Starts the macro engine. It will watch your config file for changes.</td>
+                        </tr>
+                        <tr class="border-b border-neutral-800">
+                            <td class="p-4"><code class="text-red-400 font-mono">joystick edit</code></td>
+                            <td class="p-4 text-neutral-400">Opens the configuration file in your default editor (uses <code class="font-mono">$EDITOR</code> or <code class="font-mono">$VISUAL</code>).</td>
+                        </tr>
+                        <tr class="border-b border-neutral-800">
+                            <td class="p-4"><code class="text-red-400 font-mono">joystick path</code></td>
+                            <td class="p-4 text-neutral-400">Prints the absolute path to the configuration file.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4"><code class="text-red-400 font-mono">joystick help</code></td>
+                            <td class="p-4 text-neutral-400">Displays help information.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="mb-16">
+            <div class="border-t border-neutral-800 pt-8 text-center">
+                <p class="text-neutral-500 text-sm mb-2">MIT License &copy; 2026 Phillip England</p>
+                <a href="https://github.com/Phillip-England/joystick" target="_blank" class="text-red-400 hover:text-red-300 transition-colors text-sm">View on GitHub</a>
+            </div>
+        </section>
+    </main>
+</div>
+{{ endblock }}
+{{ endlayout }}

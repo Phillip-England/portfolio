@@ -1,0 +1,196 @@
+{{ layout "./layouts/guest_layout.html" }}
+{{ block "title" }}Shawty - Automated Movie Generator{{ endblock }}
+{{ block "main" }}
+<div class="flex flex-col lg:flex-row gap-8 -mx-6 lg:-mx-0">
+    <aside class="hidden lg:block lg:w-64 flex-shrink-0">
+        <div class="sticky top-8">
+            <div class="mb-6">
+                <a href="/" class="text-sm text-neutral-500 hover:text-white transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Portfolio
+                </a>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-6 bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">shawty</h2>
+            <nav class="space-y-6">
+                <div>
+                    <h3 class="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-3">Getting Started</h3>
+                    <div class="space-y-2">
+                        <a href="#overview" class="block text-neutral-400 hover:text-pink-400 hover:pl-2 transition-all text-sm">Overview</a>
+                        <a href="#installation" class="block text-neutral-400 hover:text-pink-400 hover:pl-2 transition-all text-sm">Installation</a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-3">Core Commands</h3>
+                    <div class="space-y-2">
+                        <a href="#audio" class="block text-neutral-400 hover:text-pink-400 hover:pl-2 transition-all text-sm">Generating Audio</a>
+                        <a href="#init" class="block text-neutral-400 hover:text-pink-400 hover:pl-2 transition-all text-sm">Project Init</a>
+                        <a href="#movie" class="block text-neutral-400 hover:text-pink-400 hover:pl-2 transition-all text-sm">Making Movies</a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-3">Reference</h3>
+                    <div class="space-y-2">
+                        <a href="#script-format" class="block text-neutral-400 hover:text-pink-400 hover:pl-2 transition-all text-sm">Script Format</a>
+                        <a href="#project-structure" class="block text-neutral-400 hover:text-pink-400 hover:pl-2 transition-all text-sm">Structure</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </aside>
+
+    <main class="flex-1 min-w-0 px-6 lg:px-0">
+        <div class="lg:hidden mb-8">
+            <a href="/" class="text-sm text-neutral-500 hover:text-white transition-colors flex items-center gap-2 mb-4">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Portfolio
+            </a>
+        </div>
+
+        <section id="overview" class="mb-16 scroll-mt-8">
+            <div class="mb-6 pb-4 border-b border-neutral-800">
+                <h1 class="text-3xl font-bold text-pink-400 mb-2">shawty</h1>
+                <p class="text-neutral-400">A CLI tool for automating video generation using Edge TTS and FFmpeg.</p>
+                <div class="flex gap-2 mt-4">
+                    <span class="bg-neutral-900 border border-neutral-800 px-2 py-1 rounded text-xs font-mono text-neutral-400">Python 3.12+</span>
+                    <span class="bg-neutral-900 border border-neutral-800 px-2 py-1 rounded text-xs font-mono text-neutral-400">MIT License</span>
+                    <span class="bg-neutral-900 border border-neutral-800 px-2 py-1 rounded text-xs font-mono text-neutral-400">FFmpeg</span>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-4">Overview</h2>
+            <p class="text-neutral-300 mb-4"><strong class="text-white">Shawty</strong> automates the tedious process of creating short-form video content. It bridges the gap between a text script and a rendered video file.</p>
+            <p class="text-neutral-300 mb-4">By combining <strong>Edge TTS</strong> for high-quality voiceovers and <strong>FFmpeg</strong> for media processing, Shawty allows you to define a video in a simple JSON format. It handles:</p>
+            <ul class="list-disc list-inside text-neutral-400 space-y-2 ml-2">
+                <li>Generating high-quality speech from text.</li>
+                <li>Calculating scene duration based on audio length.</li>
+                <li>Cycling through images evenly during each scene.</li>
+                <li>Burning subtitles (or generating SRT files).</li>
+                <li>Mixing background music with auto-ducking.</li>
+            </ul>
+        </section>
+
+        <section id="installation" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">Installation</h2>
+            <p class="text-neutral-300 mb-4">Shawty requires <strong>Python 3.12+</strong> and <strong>FFmpeg</strong> installed on your system.</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-4"><code class="text-sm font-mono text-pink-400">git clone https://github.com/Phillip-England/shawty.git
+cd shawty
+pip install .</code></pre>
+            <div class="bg-neutral-900 border-l-4 border-pink-500 p-4 rounded-r-lg">
+                <p class="text-neutral-300 text-sm"><strong>Note:</strong> Ensure <code>ffmpeg</code> and <code>ffprobe</code> are in your system PATH.</p>
+            </div>
+        </section>
+
+        <section id="audio" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">Core Commands</h2>
+            
+            <h3 class="text-xl font-semibold text-white mb-4">Generating Audio</h3>
+            <p class="text-neutral-400 mb-4">Generate standalone MP3 files from text using high-quality neural voices.</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-4"><code class="text-sm font-mono text-neutral-300">shawty <span class="text-pink-400">audio</span> "Hello world, this is a test." output.mp3</code></pre>
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-neutral-900">
+                            <th class="text-left p-4 text-white font-semibold border-b border-neutral-800">Flag</th>
+                            <th class="text-left p-4 text-white font-semibold border-b border-neutral-800">Description</th>
+                            <th class="text-left p-4 text-white font-semibold border-b border-neutral-800">Default</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <tr class="border-b border-neutral-800">
+                            <td class="p-4"><code class="text-yellow-400 font-mono">--voice</code></td>
+                            <td class="p-4 text-neutral-400">TTS voice selection</td>
+                            <td class="p-4 text-neutral-400">en-US-JennyNeural</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="init" class="mb-16 scroll-mt-8">
+            <h3 class="text-xl font-semibold text-white mb-4">Project Initialization</h3>
+            <p class="text-neutral-400 mb-4">Scaffold a new movie project with example assets and a `script.json` file.</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto"><code class="text-sm font-mono text-neutral-300">shawty <span class="text-pink-400">init</span> my_new_movie</code></pre>
+            <p class="text-sm text-neutral-500 mt-2">This creates dummy images and audio files using FFmpeg filters so you can render a test video immediately.</p>
+        </section>
+
+        <section id="movie" class="mb-16 scroll-mt-8">
+            <h3 class="text-xl font-semibold text-white mb-4">Making Movies</h3>
+            <p class="text-neutral-400 mb-4">The core command. Reads a project directory, processes the `script.json`, and outputs a finished video.</p>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-4"><code class="text-sm font-mono text-neutral-300">shawty <span class="text-pink-400">movie</span> ./my_new_movie output.mp4</code></pre>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-neutral-900">
+                            <th class="text-left p-4 text-white font-semibold border-b border-neutral-800">Flag</th>
+                            <th class="text-left p-4 text-white font-semibold border-b border-neutral-800">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <tr class="border-b border-neutral-800">
+                            <td class="p-4"><code class="text-yellow-400 font-mono">--script</code></td>
+                            <td class="p-4 text-neutral-400">Specific JSON file to use (default: script.json)</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4"><code class="text-yellow-400 font-mono">--voice</code></td>
+                            <td class="p-4 text-neutral-400">Global default voice for the project</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="script-format" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">Script Format</h2>
+            <p class="text-neutral-300 mb-4">The `script.json` file controls every aspect of the video generation.</p>
+            
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono">{
+  <span class="text-purple-400">"format"</span>: <span class="text-green-400">"full"</span>,  <span class="text-neutral-500">// or "short" (1080x1920)</span>
+  <span class="text-purple-400">"background_track"</span>: <span class="text-green-400">"music/chill.mp3"</span>,
+  <span class="text-purple-400">"background_volume"</span>: <span class="text-blue-400">0.1</span>,
+  <span class="text-purple-400">"subtitles"</span>: {
+    <span class="text-purple-400">"burn"</span>: <span class="text-blue-400">true</span>,
+    <span class="text-purple-400">"size"</span>: <span class="text-blue-400">32</span>,
+    <span class="text-purple-400">"position"</span>: <span class="text-green-400">"center"</span>
+  },
+  <span class="text-purple-400">"scenes"</span>: [
+    {
+      <span class="text-purple-400">"text"</span>: <span class="text-green-400">"This is the first scene. The duration is calculated by TTS."</span>,
+      <span class="text-purple-400">"voice"</span>: <span class="text-green-400">"en-US-GuyNeural"</span>,
+      <span class="text-purple-400">"speed"</span>: <span class="text-green-400">"+10%"</span>,
+      <span class="text-purple-400">"images"</span>: [<span class="text-green-400">"img/intro_1.jpg"</span>, <span class="text-green-400">"img/intro_2.jpg"</span>]
+    },
+    {
+      <span class="text-purple-400">"audio"</span>: <span class="text-green-400">"audio/voiceover.mp3"</span>,
+      <span class="text-purple-400">"images"</span>: [<span class="text-green-400">"img/chart.png"</span>]
+    }
+  ]
+}</code></pre>
+        </section>
+
+        <section id="project-structure" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">Project Structure</h2>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto"><code class="text-sm font-mono"><span class="text-pink-400 font-bold">shawty/</span>
+├── <span class="text-pink-400 font-bold">shawty/</span>
+│   ├── cli.py <span class="text-neutral-500">(Entry point)</span>
+│   └── <span class="text-pink-400 font-bold">commands/</span>
+│       ├── audio.py <span class="text-neutral-500">(Edge TTS integration)</span>
+│       ├── init.py <span class="text-neutral-500">(Project scaffolding)</span>
+│       └── movie.py <span class="text-neutral-500">(FFmpeg pipeline)</span>
+├── pyproject.toml
+└── Makefile</code></pre>
+        </section>
+
+        <section class="mb-16">
+            <div class="border-t border-neutral-800 pt-8 text-center">
+                <p class="text-neutral-500 text-sm mb-2">Built with Python and FFmpeg.</p>
+                <a href="https://github.com/Phillip-England/shawty" target="_blank" class="text-pink-400 hover:text-pink-300 transition-colors text-sm">View on GitHub</a>
+            </div>
+        </section>
+    </main>
+</div>
+{{ endblock }}
+{{ endlayout }}

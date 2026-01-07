@@ -1,0 +1,353 @@
+{{ layout "./layouts/guest_layout.html" }}
+
+{{ block "title" }}vii - Go Web Framework{{ endblock }}
+
+{{ block "main" }}
+<div class="flex flex-col lg:flex-row gap-8 -mx-6 lg:-mx-0">
+    <!-- Sidebar Navigation -->
+    <aside class="hidden lg:block lg:w-64 flex-shrink-0">
+        <div class="sticky top-8">
+            <div class="mb-6">
+                <a href="/" class="text-sm text-neutral-500 hover:text-white transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Portfolio
+                </a>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-6 bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">vii</h2>
+
+            <nav class="space-y-6">
+                <div>
+                    <h3 class="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-3">Getting Started</h3>
+                    <div class="space-y-2">
+                        <a href="#introduction" class="block text-neutral-400 hover:text-purple-400 hover:pl-2 transition-all text-sm">Introduction</a>
+                        <a href="#installation" class="block text-neutral-400 hover:text-purple-400 hover:pl-2 transition-all text-sm">Installation</a>
+                        <a href="#example" class="block text-neutral-400 hover:text-purple-400 hover:pl-2 transition-all text-sm">Full Example</a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xs uppercase tracking-wider text-neutral-500 font-semibold mb-3">API Reference</h3>
+                    <div class="space-y-2">
+                        <a href="#core-app" class="block text-neutral-400 hover:text-purple-400 hover:pl-2 transition-all text-sm">Core App</a>
+                        <a href="#routing" class="block text-neutral-400 hover:text-purple-400 hover:pl-2 transition-all text-sm">Routing & Groups</a>
+                        <a href="#templates" class="block text-neutral-400 hover:text-purple-400 hover:pl-2 transition-all text-sm">Templates</a>
+                        <a href="#static-files" class="block text-neutral-400 hover:text-purple-400 hover:pl-2 transition-all text-sm">Static Files</a>
+                        <a href="#request-helpers" class="block text-neutral-400 hover:text-purple-400 hover:pl-2 transition-all text-sm">Request Helpers</a>
+                        <a href="#response-writers" class="block text-neutral-400 hover:text-purple-400 hover:pl-2 transition-all text-sm">Response Writers</a>
+                        <a href="#middleware" class="block text-neutral-400 hover:text-purple-400 hover:pl-2 transition-all text-sm">Middleware</a>
+                        <a href="#url-primitive" class="block text-neutral-400 hover:text-purple-400 hover:pl-2 transition-all text-sm">URL Primitive</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 min-w-0 px-6 lg:px-0">
+        <!-- Mobile Header -->
+        <div class="lg:hidden mb-8">
+            <a href="/" class="text-sm text-neutral-500 hover:text-white transition-colors flex items-center gap-2 mb-4">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Portfolio
+            </a>
+        </div>
+
+        <!-- Introduction -->
+        <section id="introduction" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">vii</h2>
+            <p class="text-neutral-300 mb-4">A minimal, expressive, and fast web framework for Go.</p>
+            <p class="text-neutral-400 mb-6">vii provides a simple yet powerful API to build web applications and services, getting out of your way so you can focus on your logic.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">Simple Routing</h4>
+                    <p class="text-neutral-400 text-sm">Expressive and straightforward route definition.</p>
+                </div>
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">Route Groups</h4>
+                    <p class="text-neutral-400 text-sm">Organize your routes and apply middleware to entire groups.</p>
+                </div>
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">Middleware Support</h4>
+                    <p class="text-neutral-400 text-sm">Built-in middleware for logging, timeouts, CORS, and rate limiting.</p>
+                </div>
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">Flexible Templates</h4>
+                    <p class="text-neutral-400 text-sm">Load templates from filesystem or embed them into your binary.</p>
+                </div>
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">Static File Serving</h4>
+                    <p class="text-neutral-400 text-sm">Serve static assets from a directory or embedded filesystem.</p>
+                </div>
+                <div class="bg-neutral-900 border border-neutral-800 rounded-lg p-5">
+                    <h4 class="text-white font-semibold mb-2">URL Primitives</h4>
+                    <p class="text-neutral-400 text-sm">Define URL patterns once and reuse them for type-safe URL generation.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Installation -->
+        <section id="installation" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">Installation</h2>
+            <p class="text-neutral-300 mb-4">The library code is in the <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono">pkg</code> directory. To use it, import it in your Go files:</p>
+
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto"><code class="text-sm font-mono text-purple-400">import "github.com/Phillip-England/vii/vii"</code></pre>
+        </section>
+
+        <!-- Full Example -->
+        <section id="example" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">Full Usage Example</h2>
+            <p class="text-neutral-300 mb-4">Here is a complete example demonstrating the main features of vii.</p>
+
+            <h3 class="text-xl font-semibold text-white mb-4">Project Structure</h3>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto mb-6"><code class="text-sm font-mono text-neutral-300">/my-app
+├── go.mod
+├── main.go
+├── static/
+│   └── style.css
+└── templates/
+    ├── index.html
+    └── layout.html</code></pre>
+
+            <h3 class="text-xl font-semibold text-white mb-4">main.go</h3>
+            <pre class="bg-neutral-900 border border-neutral-800 rounded-lg p-4 overflow-x-auto"><code class="text-sm font-mono"><span class="text-purple-400">package</span> main
+
+<span class="text-purple-400">import</span> (
+    <span class="text-green-400">"embed"</span>
+    <span class="text-green-400">"fmt"</span>
+    <span class="text-green-400">"net/http"</span>
+    <span class="text-green-400">"time"</span>
+    <span class="text-green-400">"github.com/Phillip-England/vii/vii"</span>
+)
+
+<span class="text-purple-400">var</span> embeddedStaticFS embed.FS
+<span class="text-purple-400">var</span> embeddedTemplateFS embed.FS
+<span class="text-purple-400">var</span> greetURL = vii.NewURL(<span class="text-green-400">"/greet"</span>).WithQuery(<span class="text-green-400">"name"</span>)
+
+<span class="text-purple-400">func</span> main() {
+    app := vii.NewApp()
+    app.Use(vii.Logger, vii.CORS, vii.RateLimiter(vii.RateLimiterConfig{
+        Limit: <span class="text-blue-400">100</span>, Window: time.Minute,
+    }))
+
+    <span class="text-purple-400">if</span> err := app.LoadTemplatesFS(embeddedTemplateFS, <span class="text-purple-400">nil</span>); err != <span class="text-purple-400">nil</span> {
+        <span class="text-purple-400">panic</span>(err)
+    }
+
+    app.ServeFS(<span class="text-green-400">"/static"</span>, embeddedStaticFS)
+    app.Favicon()
+
+    app.Handle(<span class="text-green-400">"GET /"</span>, <span class="text-purple-400">func</span>(w http.ResponseWriter, r *http.Request) {
+        data := <span class="text-purple-400">map</span>[<span class="text-purple-400">string</span>]<span class="text-purple-400">string</span>{<span class="text-green-400">"Title"</span>: <span class="text-green-400">"Home Page"</span>}
+        <span class="text-purple-400">if</span> err := vii.Render(w, r, <span class="text-green-400">"index.html"</span>, data); err != <span class="text-purple-400">nil</span> {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+        }
+    })
+
+    apiGroup := app.Group(<span class="text-green-400">"/api"</span>)
+    apiGroup.Use(vii.Timeout(<span class="text-blue-400">10</span>))
+    apiGroup.Handle(<span class="text-green-400">"GET /greet"</span>, <span class="text-purple-400">func</span>(w http.ResponseWriter, r *http.Request) {
+        params := greetURL.Parse(r)
+        name := params[<span class="text-green-400">"name"</span>]
+        <span class="text-purple-400">if</span> name == <span class="text-green-400">""</span> { name = <span class="text-green-400">"World"</span> }
+        vii.WriteJSON(w, http.StatusOK, <span class="text-purple-400">map</span>[<span class="text-purple-400">string</span>]<span class="text-purple-400">string</span>{<span class="text-green-400">"message"</span>: <span class="text-green-400">"Hello, "</span> + name})
+    })
+
+    <span class="text-purple-400">if</span> err := app.Serve(<span class="text-green-400">"8080"</span>); err != <span class="text-purple-400">nil</span> {
+        <span class="text-purple-400">panic</span>(err)
+    }
+}</code></pre>
+        </section>
+
+        <!-- Core App -->
+        <section id="core-app" class="mb-16 scroll-mt-8">
+            <h2 class="text-3xl font-bold text-white mb-6 pb-4 border-b border-neutral-800">API Overview</h2>
+
+            <h3 class="text-xl font-semibold text-white mb-4">Core App</h3>
+            <ul class="space-y-3 text-neutral-400">
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.NewApp()</code>
+                    <span>Creates a new vii application instance.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">app.Use(...)</code>
+                    <span>Applies one or more global middleware to all routes.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">app.Handle(...)</code>
+                    <span>Registers a handler for a specific method and path pattern.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">app.Serve(port)</code>
+                    <span>Starts the HTTP server.</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Routing -->
+        <section id="routing" class="mb-16 scroll-mt-8">
+            <h3 class="text-xl font-semibold text-white mb-4">Routing and Groups</h3>
+            <ul class="space-y-3 text-neutral-400">
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">app.Group(prefix)</code>
+                    <span>Creates a new route group with a URL prefix.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">group.Use(...)</code>
+                    <span>Applies middleware to all routes within the group.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">group.Handle(...)</code>
+                    <span>Registers a handler within the group.</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Templates -->
+        <section id="templates" class="mb-16 scroll-mt-8">
+            <h3 class="text-xl font-semibold text-white mb-4">Templates</h3>
+            <ul class="space-y-3 text-neutral-400">
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">app.LoadTemplates(...)</code>
+                    <span>Loads and parses HTML templates from a directory.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">app.LoadTemplatesFS(...)</code>
+                    <span>Loads templates from an embedded filesystem (embed.FS).</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.Render(...)</code>
+                    <span>Renders a previously loaded template by its filename.</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Static Files -->
+        <section id="static-files" class="mb-16 scroll-mt-8">
+            <h3 class="text-xl font-semibold text-white mb-4">Static Files</h3>
+            <ul class="space-y-3 text-neutral-400">
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">app.ServeDir(...)</code>
+                    <span>Serves static files from a directory on the filesystem.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">app.ServeFS(...)</code>
+                    <span>Serves static files from an embedded filesystem.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">app.Favicon()</code>
+                    <span>Registers a handler to serve a favicon.ico file.</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Request Helpers -->
+        <section id="request-helpers" class="mb-16 scroll-mt-8">
+            <h3 class="text-xl font-semibold text-white mb-4">Request Helpers</h3>
+            <ul class="space-y-3 text-neutral-400">
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.ReadJSON(...)</code>
+                    <span>Decodes a JSON request body into a struct or map.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.Header(...)</code>
+                    <span>Gets a request header value.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.Cookie(...)</code>
+                    <span>Retrieves a specific cookie.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.Query(...)</code>
+                    <span>Gets a URL query parameter's value.</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Response Writers -->
+        <section id="response-writers" class="mb-16 scroll-mt-8">
+            <h3 class="text-xl font-semibold text-white mb-4">Response Writers</h3>
+            <ul class="space-y-3 text-neutral-400">
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.WriteJSON(...)</code>
+                    <span>Writes a JSON response.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.WriteHTML(...)</code>
+                    <span>Writes a raw HTML string response.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.WriteText(...)</code>
+                    <span>Writes a plain text response.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.WriteError(...)</code>
+                    <span>Writes a consistent JSON error response.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.Redirect(...)</code>
+                    <span>Performs an HTTP redirect.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.SetHeader(...)</code>
+                    <span>Sets a response header.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.SetCookie(...)</code>
+                    <span>Sets a response cookie.</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Middleware -->
+        <section id="middleware" class="mb-16 scroll-mt-8">
+            <h3 class="text-xl font-semibold text-white mb-4">Middleware</h3>
+            <ul class="space-y-3 text-neutral-400">
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.Logger</code>
+                    <span>A request logger that prints the method, path, and request duration.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.Timeout(seconds)</code>
+                    <span>A middleware that applies a timeout to requests.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.CORS</code>
+                    <span>A permissive Cross-Origin Resource Sharing (CORS) middleware.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.RateLimiter(...)</code>
+                    <span>An in-memory, IP-based rate-limiting middleware.</span>
+                </li>
+            </ul>
+        </section>
+
+        <!-- URL Primitive -->
+        <section id="url-primitive" class="mb-16 scroll-mt-8">
+            <h3 class="text-xl font-semibold text-white mb-4">URL Primitive</h3>
+            <ul class="space-y-3 text-neutral-400">
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">vii.NewURL(path)</code>
+                    <span>Creates a new URL definition.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">url.WithQuery(...)</code>
+                    <span>Adds expected query parameters to the definition.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">url.Build(values)</code>
+                    <span>Builds a URL string with query parameters.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <code class="bg-neutral-800 text-purple-400 px-2 py-1 rounded text-sm font-mono flex-shrink-0">url.Parse(r)</code>
+                    <span>Extracts defined query parameters from a request.</span>
+                </li>
+            </ul>
+        </section>
+    </main>
+</div>
+{{ endblock }}
+{{ endlayout }}

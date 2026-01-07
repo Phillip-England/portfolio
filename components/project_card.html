@@ -1,0 +1,22 @@
+<a href='{{ prop "href" }}' class="group relative block h-full bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden hover:border-neutral-600 transition-all duration-300 thispage-component">
+    <div class="p-6">
+        <div class="flex justify-between items-start mb-4">
+            <div class="p-2 bg-{{ prop "color" }}-900/30 text-{{ prop "color" }}-400 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d='{{ prop "icon" }}' />
+                </svg>
+            </div>
+            <span class="inline-flex items-center rounded-md bg-neutral-800 px-2 py-1 text-xs font-medium text-neutral-400 ring-1 ring-inset ring-neutral-700/10">{{ prop "badge" }}</span>
+        </div>
+        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-{{ prop "color" }}-400 transition-colors">{{ prop "title" }}</h3>
+        <p class="text-neutral-400 text-sm mb-4 line-clamp-3">
+            {{ prop "description" }}
+        </p>
+        <div class="flex items-center text-sm font-medium text-{{ prop "color" }}-500">
+            View Documentation
+            <svg class="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+        </div>
+    </div>
+</a>
