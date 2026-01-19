@@ -1,36 +1,287 @@
-{{ layout "./layouts/guest_layout.html" }}
-{{ block "title" }}Portfolio - This Page{{ endblock }}
-{{ block "main" }}
-    <div class="flex flex-col items-center justify-center mb-16 text-center">
-        <div class="relative mb-6 group">
-            <div class="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full opacity-75 group-hover:opacity-100 transition duration-1000 blur"></div>
-            <img src="/static/me.webp" alt="Profile Picture" class="relative w-32 h-32 rounded-full object-cover border-2 border-neutral-900 shadow-xl">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: '#0a0a0a',
+                        panel: '#111111',
+                        border: '#222222',
+                        primary: '#00ff9d',
+                        secondary: '#ff6b6b',
+                        accent: '#ffd93d',
+                        dim: '#555555',
+                        text: '#e0e0e0',
+                        muted: '#888888',
+                    },
+                    fontFamily: {
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(0, 255, 157, 0.15)',
+                        'glow-sm': '0 0 10px rgba(0, 255, 157, 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'JetBrains Mono', monospace; }
+        .cursor-blink { animation: blink 1s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+        .scanline {
+            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.1) 51%);
+            background-size: 100% 4px;
+        }
+        .typing-effect {
+            overflow: hidden;
+            border-right: 2px solid #00ff9d;
+            animation: typing 2s steps(30, end), blink 0.5s step-end infinite;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(0, 255, 157, 0.1);
+            animation: scan 4s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.03;
+            z-index: 0;
+        }
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(0, 255, 157, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 157, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        .panel-hover:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
+            border-color: #00ff9d;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00ff9d; }
+    </style>
+</head>
+<body class="bg-[#0a0a0a] text-[#e0e0e0] min-h-screen antialiased selection:bg-[#00ff9d] selection:text-[#0a0a0a]">
+    <canvas id="matrix" class="matrix-rain"></canvas>
+    <div class="scan-line"></div>
+
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur border-b border-[#222]">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="w-2 h-2 bg-[#00ff9d] rounded-full animate-pulse"></span>
+                <a href="/" class="text-sm font-semibold tracking-wide text-[#e0e0e0]">~/phillip-england</a>
+            </div>
+            <div class="flex flex-wrap items-center gap-1 text-xs">
+                <a href="/" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#00ff9d]">[HOME]</a>
+                <a href="/about" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors hover:text-[#00ff9d0]">[ABOUT]</a>
+                <a href="/projects" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors hover:text-[#00ff9d]">[PROJECTS]</a>
+                <a href="/blog" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors hover:text-[#00ff9d]">[BLOG]</a>
+                <a href="/contact" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors hover:text-[#00ff9d]">[CONTACT]</a>
+            </div>
         </div>
-        <h1 class="text-4xl font-bold text-white mb-3">Phillip England</h1>
-        <p class="text-lg text-neutral-400 max-w-xl leading-relaxed">
-            Software Engineer specializing in Go, TypeScript, and Systems Programming. 
-            Building tools to simplify developer workflows.
-        </p>
-        <div class="flex gap-4 mt-6">
-            <a href="https://github.com/Phillip-England" target="_blank" class="text-neutral-500 hover:text-white transition-colors">
-                <span class="sr-only">GitHub</span>
-                <svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" /></svg>
-            </a>
+    </nav>
+
+    <main class="pt-20 pb-16 px-4 relative z-10 grid-bg min-h-screen">
+        <div class="max-w-6xl mx-auto">
+            <section class="grid lg:grid-cols-[1fr_300px] gap-8 mb-12">
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2 text-xs text-[#555]">
+                        <span>~/</span>
+                        <span class="text-[#00ff9d]">home</span>
+                        <span class="cursor-blink">_</span>
+                    </div>
+                    <div class="bg-[#111] border border-[#222] rounded-lg p-6 shadow-glow">
+                        <div class="flex items-center gap-2 mb-4 border-b border-[#222] pb-3">
+                            <div class="flex gap-1.5">
+                                <div class="w-3 h-3 rounded-full bg-[#ff6b6b]"></div>
+                                <div class="w-3 h-3 rounded-full bg-[#ffd93d]"></div>
+                                <div class="w-3 h-3 rounded-full bg-[#00ff9d]"></div>
+                            </div>
+                            <span class="text-xs text-[#555] ml-2">bash — 80x24</span>
+                        </div>
+                        <div class="space-y-4 font-mono text-sm">
+                            <div>
+                                <span class="text-[#00ff9d]">➜</span> <span class="text-[#ffd93d]">~</span> <span class="text-[#555]">cat about.txt</span>
+                            </div>
+                            <p class="text-[#e0e0e0] leading-relaxed">
+                                I'm <span class="text-[#00ff9d]">Phillip England</span>, a software engineer focused on building robust tooling, calm interfaces, and reliable systems. I work primarily with <span class="text-[#ff6b6b]">Go</span>, <span class="text-[#ff6b6b]">Rust</span>, and <span class="text-[#ff6b6b]">TypeScript</span>.
+                            </p>
+                            <p class="text-[#e0e0e0] leading-relaxed">
+                                My approach prioritizes <span class="text-[#ffd93d]">simplicity</span>, <span class="text-[#ffd93d]">performance</span>, and <span class="text-[#ffd93d]">maintainability</span>. I believe the best software is invisible software—it just works.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="/projects" class="px-5 py-2 bg-[#00ff9d] text-[#0a0a0a] rounded font-semibold text-sm hover:bg-[#00ff9d]/90 transition-colors shadow-glow-sm">./run_projects.sh</a>
+                        <a href="/contact" class="px-5 py-2 border border-[#222] text-[#e0e0e0] rounded font-semibold text-sm hover:border-[#00ff9d] hover:text-[#00ff9d] transition-colors">mail -s "hello"</a>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-[#111] border border-[#222] rounded-lg p-5 panel-hover transition-all">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="text-[#00ff9d]">●</span>
+                            <h3 class="text-sm font-semibold">Status</h3>
+                        </div>
+                        <div class="space-y-3 text-xs">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[#555]">Location</span>
+                                <span class="text-[#e0e0e0]">San Francisco, CA</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[#555]">Time</span>
+                                <span id="clock" class="text-[#00ff9d]">--:--:--</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[#555]">Uptime</span>
+                                <span class="text-[#00ff9d]">99.9%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-[#111] border border-[#222] rounded-lg p-5 panel-hover transition-all">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="text-[#ff6b6b]">●</span>
+                            <h3 class="text-sm font-semibold">Stack</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-2 py-1 bg-[#222] rounded text-xs text-[#00ff9d]">Go</span>
+                            <span class="px-2 py-1 bg-[#222] rounded text-xs text-[#00ff9d]">Rust</span>
+                            <span class="px-2 py-1 bg-[#222] rounded text-xs text-[#00ff9d]">TypeScript</span>
+                            <span class="px-2 py-1 bg-[#222] rounded text-xs text-[#00ff9d]">PostgreSQL</span>
+                            <span class="px-2 py-1 bg-[#222] rounded text-xs text-[#00ff9d]">Docker</span>
+                        </div>
+                    </div>
+                    <div class="bg-[#111] border border-[#222] rounded-lg p-5 panel-hover transition-all">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="text-[#ffd93d]">●</span>
+                            <h3 class="text-sm font-semibold">Quick Links</h3>
+                        </div>
+                        <div class="space-y-2 text-xs">
+                            <a href="https://github.com/phillip-england" target="_blank" class="flex items-center gap-2 text-[#555] hover:text-[#00ff9d] transition-colors">
+                                <span>→</span> github.com/phillip-england
+                            </a>
+                            <a href="/blog" class="flex items-center gap-2 text-[#555] hover:text-[#00ff9d] transition-colors">
+                                <span>→</span> Read my blog
+                            </a>
+                            <a href="/about" class="flex items-center gap-2 text-[#555] hover:text-[#00ff9d] transition-colors">
+                                <span>→</span> More about me
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="grid sm:grid-cols-3 gap-4">
+                <a href="/projects" class="bg-[#111] border border-[#222] rounded-lg p-5 panel-hover transition-all group">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-[#00ff9d]">▸</span>
+                        <p class="text-xs text-[#555]">projects/</p>
+                    </div>
+                    <h3 class="text-lg font-semibold text-[#e0e0e0] group-hover:text-[#00ff9d] transition-colors">Open Source</h3>
+                    <p class="text-xs text-[#555] mt-2">CLI tools, libraries, and experiments.</p>
+                </a>
+                <a href="/blog" class="bg-[#111] border border-[#222] rounded-lg p-5 panel-hover transition-all group">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-[#ffd93d]">▸</span>
+                        <p class="text-xs text-[#555]">blog/</p>
+                    </div>
+                    <h3 class="text-lg font-semibold text-[#e0e0e0] group-hover:text-[#ffd93d] transition-colors">Writing</h3>
+                    <p class="text-xs text-[#555] mt-2">Thoughts on code, design, and systems.</p>
+                </a>
+                <a href="/contact" class="bg-[#111] border border-[#222] rounded-lg p-5 panel-hover transition-all group">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-[#ff6b6b]">▸</span>
+                        <p class="text-xs text-[#555]">contact/</p>
+                    </div>
+                    <h3 class="text-lg font-semibold text-[#e0e0e0] group-hover:text-[#ff6b6b] transition-colors">Get in Touch</h3>
+                    <p class="text-xs text-[#555] mt-2">Collaborate or just say hello.</p>
+                </a>
+            </section>
         </div>
-    </div>
-    <div class="w-full h-px bg-neutral-800 mb-12"></div>
-    <div>
-        <div class="flex items-center justify-between mb-8">
-            <h2 class="text-2xl font-bold text-white">Selected Projects</h2>
-            <span class="text-sm text-neutral-500">2024 - Present</span>
+    </main>
+
+    <footer class="border-t border-[#222] py-6 mt-12 bg-[#0a0a0a]">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-xs text-[#555]">
+                <span class="text-[#00ff9d]">© 2026</span> Phillip England 
+                <span class="text-[#333] mx-2">|</span> 
+                <span class="text-[#555]">Built with</span> 
+                <span class="text-[#ffd93d]">Go</span> 
+                <span class="text-[#555]">+</span> 
+                <span class="text-[#00ff9d]">Tailwind</span>
+            </p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {{ include "./components/project_card.html" href="/projects/thispage" title="ThisPage" description="A robust static site generator designed for speed and simplicity. Combines a custom HTML-first templating engine with automatic Tailwind integration." color="green" badge="SSG" icon="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 01-2.25 2.25M16.5 7.5V18a2.25 2.25 0 002.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 002.25 2.25h13.5M6 7.5h3v3H6v-3z" }}
-            {{ include "./components/project_card.html" href="/projects/konf" title="Konf" description="A robust configuration management CLI designed to remove the need to memorize config syntax. Supports automatic Caddyfile generation." color="blue" badge="CLI Tool" icon="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" }}
-            {{ include "./components/project_card.html" href="/projects/vii" title="vii" description="A minimal, expressive, and fast web framework for Go. Features simple routing, route groups, built-in middleware, and flexible template rendering." color="purple" badge="Web Framework" icon="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" }}
-            {{ include "./components/project_card.html" href="/projects/pull" title="pull" description="A clipboard-first CLI tool designed for rapid grab-paste-think development loops. Built for AI/LLM workflows and rapid iteration." color="orange" badge="CLI Tool" icon="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9.75a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184" }}
-            {{ include "./components/project_card.html" href="/projects/shawty" title="Shawty" description="Automated movie generation CLI. Transforms JSON scripts into videos with edge-tts narration, auto-cycling images, subtitles, and background music." color="pink" badge="Media Tool" icon="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z M19.5 10.5c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z m-9 0c0 1.657-1.343 3-3 3s-3-1.343-3-3 1.343-3 3-3 3 1.343 3 3z m1.5 4.5v3.75A2.25 2.25 0 019.75 21h-4.5A2.25 2.25 0 013 18.75V6.75A2.25 2.25 0 015.25 4.5h13.5A2.25 2.25 0 0121 6.75v12a2.25 2.25 0 01-2.25 2.25h-4.5a2.25 2.25 0 01-2.25-2.25v-3.75" }}
-        </div>
-    </div>
-{{ endblock }}
-{{ endlayout }}
+    </footer>
+
+    <script src="/static/site.js" defer></script>
+    <script>
+        (function(){
+            const canvas = document.getElementById('matrix');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            const drops = Array(Math.floor(columns)).fill(1);
+            function draw() {
+                ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#00ff9d';
+                ctx.font = fontSize + 'px monospace';
+                for(let i = 0; i < drops.length; i++) {
+                    const char = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+                    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+            }
+            setInterval(draw, 50);
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        })();
+        (function(){
+            function updateClock() {
+                const el = document.getElementById('clock');
+                if(el) {
+                    const now = new Date();
+                    el.textContent = now.toLocaleTimeString('en-US', {hour12: false});
+                }
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        })();
+    </script>
+</body>
+</html>

@@ -91,20 +91,18 @@
             <div class="flex flex-wrap items-center gap-1 text-xs">
                 <a href="/" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[HOME]</a>
                 <a href="/about" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[ABOUT]</a>
-                <a href="/projects" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[PROJECTS]</a>
+                <a href="/projects" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#00ff9d]">[PROJECTS]</a>
                 <a href="/blog" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[BLOG]</a>
-                <a href="/contact" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#00ff9d]">[CONTACT]</a>
+                <a href="/contact" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[CONTACT]</a>
             </div>
         </div>
     </nav>
 
     <main class="pt-20 pb-16 px-4 relative z-10 grid-bg min-h-screen">
-        <div class="max-w-3xl mx-auto">
-            <div class="flex items-center gap-2 text-xs text-[#555] mb-8">
-                <span>~/</span>
-                <span class="text-[#ff6b6b]">contact</span>
-                <span class="cursor-blink">_</span>
-            </div>
+        <div class="max-w-4xl mx-auto">
+            <a href="/projects" class="inline-flex items-center gap-2 text-xs text-[#555] hover:text-[#00ff9d] transition-colors mb-6">
+                <span>←</span> cd ..
+            </a>
 
             <div class="space-y-6">
                 <div class="bg-[#111] border border-[#222] rounded-lg p-6 shadow-glow">
@@ -116,33 +114,28 @@
                         </div>
                         <span class="text-xs text-[#555] ml-2">bash — 80x24</span>
                     </div>
-                    <div class="space-y-3 font-mono text-sm mb-6">
+                    <div class="space-y-3 font-mono text-sm">
                         <div>
-                            <span class="text-[#ff6b6b]">➜</span> <span class="text-[#ffd93d]">~</span> <span class="text-[#555]">mail -s "hello"</span>
+                            <span class="text-[#00ff9d]">➜</span> <span class="text-[#ffd93d]">~</span> <span class="text-[#555]">cd {{.CurrentProject.Name}}/</span>
                         </div>
-                        <p class="text-[#e0e0e0]">Drop a short message. I typically respond within 24-48 hours.</p>
+                        <div>
+                            <span class="text-[#00ff9d]">➜</span> <span class="text-[#ffd93d]">~/{{.CurrentProject.Name}}</span> <span class="text-[#555]">cat README.md</span>
+                        </div>
+                        {{if .CurrentProject.Description}}
+                        <p class="text-[#555] pl-4">{{.CurrentProject.Description}}</p>
+                        {{end}}
+                        <a href="https://github.com/{{.GitHubUser}}/{{.CurrentProject.Slug}}" target="_blank" class="flex items-center gap-2 text-[#ffd93d] hover:underline pl-4">
+                            <span>↗</span> github.com/{{.GitHubUser}}/{{.CurrentProject.Slug}}
+                        </a>
                     </div>
+                </div>
 
-                    <form id="contactForm" class="space-y-4">
-                        <div>
-                            <label for="email" class="block text-xs text-[#555] mb-2">EMAIL_ADDRESS</label>
-                            <input type="email" id="email" name="email" required
-                                class="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg focus:ring-1 focus:ring-[#00ff9d] focus:border-[#00ff9d] outline-none transition-colors text-sm"
-                                placeholder="you@example.com">
-                        </div>
-                        <div>
-                            <label for="message" class="block text-xs text-[#555] mb-2">MESSAGE_CONTENT (max 255)</label>
-                            <textarea id="message" name="message" required maxlength="255" rows="4"
-                                class="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg focus:ring-1 focus:ring-[#00ff9d] focus:border-[#00ff9d] outline-none transition-colors text-sm resize-none"
-                                placeholder="Your message here..."></textarea>
-                            <p class="text-xs text-[#555] mt-2"><span id="count">0</span>/255</p>
-                        </div>
-                        <button type="submit"
-                            class="w-full py-3 px-6 bg-[#00ff9d] text-[#0a0a0a] font-semibold rounded-lg hover:bg-[#00ff9d]/90 transition-colors">
-                            ./send_message.sh
-                        </button>
-                        <p id="status" class="text-xs text-[#00ff9d]" aria-live="polite"></p>
-                    </form>
+                <div class="bg-[#111] border border-[#222] rounded-lg p-5">
+                    <div class="flex items-center justify-between text-xs text-[#555] mb-4">
+                        <span>README.md</span>
+                        <span id="readmeStatus" class="text-[#ffd93d]">loading...</span>
+                    </div>
+                    <pre class="bg-[#0a0a0a] border border-[#222] rounded-lg p-4 overflow-x-auto"><code id="readmeCode" class="text-xs text-[#e0e0e0] font-mono"></code></pre>
                 </div>
             </div>
         </div>
@@ -161,7 +154,10 @@
         </div>
     </footer>
 
-    <script src="/static/contact.js" defer></script>
+    <script>
+        window.__PROJECT_REPO__ = "{{.CurrentProject.Slug}}";
+    </script>
+    <script src="/static/readme.js" defer></script>
     <script src="/static/site.js" defer></script>
     <script>
         (function(){

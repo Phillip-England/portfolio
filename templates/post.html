@@ -76,6 +76,13 @@
         ::-webkit-scrollbar-track { background: #111; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #00ff9d; }
+        .prose pre { background: #0a0a0a; border: 1px solid #222; border-radius: 8px; }
+        .prose code { color: #00ff9d; }
+        .prose h1, .prose h2, .prose h3 { color: #e0e0e0; font-weight: 600; }
+        .prose p { color: #888; line-height: 1.8; }
+        .prose a { color: #ffd93d; text-decoration: none; }
+        .prose a:hover { text-decoration: underline; }
+        .prose blockquote { border-left: 3px solid #00ff9d; color: #555; padding-left: 1rem; }
     </style>
 </head>
 <body class="bg-[#0a0a0a] text-[#e0e0e0] min-h-screen antialiased selection:bg-[#00ff9d] selection:text-[#0a0a0a]">
@@ -92,21 +99,19 @@
                 <a href="/" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[HOME]</a>
                 <a href="/about" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[ABOUT]</a>
                 <a href="/projects" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[PROJECTS]</a>
-                <a href="/blog" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[BLOG]</a>
-                <a href="/contact" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#00ff9d]">[CONTACT]</a>
+                <a href="/blog" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#ffd93d]">[BLOG]</a>
+                <a href="/contact" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[CONTACT]</a>
             </div>
         </div>
     </nav>
 
     <main class="pt-20 pb-16 px-4 relative z-10 grid-bg min-h-screen">
         <div class="max-w-3xl mx-auto">
-            <div class="flex items-center gap-2 text-xs text-[#555] mb-8">
-                <span>~/</span>
-                <span class="text-[#ff6b6b]">contact</span>
-                <span class="cursor-blink">_</span>
-            </div>
+            <a href="/blog" class="inline-flex items-center gap-2 text-xs text-[#555] hover:text-[#ffd93d] transition-colors mb-6">
+                <span>←</span> cd ..
+            </a>
 
-            <div class="space-y-6">
+            <article class="space-y-6">
                 <div class="bg-[#111] border border-[#222] rounded-lg p-6 shadow-glow">
                     <div class="flex items-center gap-2 mb-4 border-b border-[#222] pb-3">
                         <div class="flex gap-1.5">
@@ -116,35 +121,23 @@
                         </div>
                         <span class="text-xs text-[#555] ml-2">bash — 80x24</span>
                     </div>
-                    <div class="space-y-3 font-mono text-sm mb-6">
+                    <div class="space-y-3 font-mono text-sm">
                         <div>
-                            <span class="text-[#ff6b6b]">➜</span> <span class="text-[#ffd93d]">~</span> <span class="text-[#555]">mail -s "hello"</span>
+                            <span class="text-[#ffd93d]">➜</span> <span class="text-[#ffd93d]">~</span> <span class="text-[#555]">cat blog/{{.CurrentPost.Slug}}.md</span>
                         </div>
-                        <p class="text-[#e0e0e0]">Drop a short message. I typically respond within 24-48 hours.</p>
                     </div>
-
-                    <form id="contactForm" class="space-y-4">
-                        <div>
-                            <label for="email" class="block text-xs text-[#555] mb-2">EMAIL_ADDRESS</label>
-                            <input type="email" id="email" name="email" required
-                                class="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg focus:ring-1 focus:ring-[#00ff9d] focus:border-[#00ff9d] outline-none transition-colors text-sm"
-                                placeholder="you@example.com">
-                        </div>
-                        <div>
-                            <label for="message" class="block text-xs text-[#555] mb-2">MESSAGE_CONTENT (max 255)</label>
-                            <textarea id="message" name="message" required maxlength="255" rows="4"
-                                class="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg focus:ring-1 focus:ring-[#00ff9d] focus:border-[#00ff9d] outline-none transition-colors text-sm resize-none"
-                                placeholder="Your message here..."></textarea>
-                            <p class="text-xs text-[#555] mt-2"><span id="count">0</span>/255</p>
-                        </div>
-                        <button type="submit"
-                            class="w-full py-3 px-6 bg-[#00ff9d] text-[#0a0a0a] font-semibold rounded-lg hover:bg-[#00ff9d]/90 transition-colors">
-                            ./send_message.sh
-                        </button>
-                        <p id="status" class="text-xs text-[#00ff9d]" aria-live="polite"></p>
-                    </form>
                 </div>
-            </div>
+
+                <div class="bg-[#111] border border-[#222] rounded-lg p-6">
+                    <header class="mb-6 pb-4 border-b border-[#222]">
+                        <h1 class="text-2xl font-semibold text-[#e0e0e0] mb-2">{{.CurrentPost.Title}}</h1>
+                        <time class="text-xs text-[#555]">{{.CurrentPost.Date}}</time>
+                    </header>
+                    <div class="prose max-w-none text-sm">
+                        {{.CurrentPost.Content}}
+                    </div>
+                </div>
+            </article>
         </div>
     </main>
 
@@ -161,7 +154,6 @@
         </div>
     </footer>
 
-    <script src="/static/contact.js" defer></script>
     <script src="/static/site.js" defer></script>
     <script>
         (function(){
