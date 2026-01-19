@@ -10,6 +10,11 @@
             <a href="/projects" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors {{if eq .ActiveNav "projects"}}text-[#ff6b6b]{{else}}text-[#555] hover:text-[#ff6b6b]{{end}}">[PROJECTS]</a>
             <a href="/blog" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors {{if eq .ActiveNav "blog"}}text-[#ff6b6b]{{else}}text-[#555] hover:text-[#ff6b6b]{{end}}">[BLOG]</a>
         </div>
+        {{if .AdminAuthenticated}}
+        <form method="POST" action="/admin/logout" class="text-xs">
+            <button type="submit" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#ff6b6b]">[LOGOUT]</button>
+        </form>
+        {{end}}
     </div>
 </nav>
 {{end}}

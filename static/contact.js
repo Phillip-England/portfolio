@@ -50,6 +50,8 @@
         status.textContent = 'Message sent successfully!';
         form.reset();
         updateCount();
+      } else if (res.status === 429) {
+        status.textContent = 'Daily message limit reached. Please try again tomorrow.';
       } else {
         status.textContent = 'Failed to send. Please try again.';
       }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"crypto/sha256"
@@ -12,9 +13,11 @@ import (
 	"html/template"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -51,6 +54,7 @@ type PageData struct {
 	ReadmeHTML     template.HTML
 	ActiveNav      string
 	AdminError     string
+	AdminAuthenticated bool
 	Messages       []ContactMessage
 }
 
@@ -68,6 +72,7 @@ var markdown = goldmark.New(
 )
 
 func main() {
+	loadDotEnv()
 	templates = parseTemplates()
 	var err error
 	contactDB, err = initContactDB()
@@ -76,14 +81,16 @@ func main() {
 	}
 	defer contactDB.Close()
 
-	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/project/", projectHandler)
 	http.HandleFunc("/projects", projectsHandler)
 	http.HandleFunc("/blog", blogHandler)
 	http.HandleFunc("/blog/", blogPostHandler)
-	http.HandleFunc("/contact", contactHandler)
-	http.HandleFunc("/admin", adminLoginHandler)
+	http.HandleFunc("/", rateLimitMiddleware("contact_message", 3, rateLimitJSON("Too many messages from this IP today."), indexHandler))
+	http.HandleFunc("/contact", rateLimitMiddleware("contact_message", 3, rateLimitJSON("Too many messages from this IP today."), contactHandler))
+	http.HandleFunc("/admin", rateLimitMiddleware("admin_login", 3, rateLimitAdminLogin, adminLoginHandler))
 	http.HandleFunc("/admin/messages", adminMessagesHandler)
+	http.HandleFunc("/admin/messages/delete", adminDeleteMessageHandler)
+	http.HandleFunc("/admin/logout", adminLogoutHandler)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
@@ -96,6 +103,52 @@ func main() {
 	log.Printf("Server running at http://localhost%s", addr)
 	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatalf("server failed to start: %v", err)
+	}
+}
+
+func loadDotEnv() {
+	file, err := os.Open(".env")
+	if err != nil {
+		if os.IsNotExist(err) {
+			return
+		}
+		log.Printf("failed to read .env: %v", err)
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		if strings.HasPrefix(line, "export ") {
+			line = strings.TrimSpace(strings.TrimPrefix(line, "export "))
+		}
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		key := strings.TrimSpace(parts[0])
+		value := strings.TrimSpace(parts[1])
+		if key == "" {
+			continue
+		}
+		if len(value) >= 2 {
+			if (value[0] == '"' && value[len(value)-1] == '"') || (value[0] == '\'' && value[len(value)-1] == '\'') {
+				value = value[1 : len(value)-1]
+			}
+		}
+		if _, exists := os.LookupEnv(key); exists {
+			continue
+		}
+		if err := os.Setenv(key, value); err != nil {
+			log.Printf("failed to set .env var %s: %v", key, err)
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		log.Printf("failed to parse .env: %v", err)
 	}
 }
 
@@ -176,6 +229,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			BlogPosts:    getBlogPosts(),
 			ProfileImage: "/static/profile.jpeg",
 			ActiveNav:    "home",
+			AdminAuthenticated: isAdminAuthenticated(r),
 		}
 		templates["index.html"].Execute(w, data)
 	case http.MethodPost:
@@ -196,6 +250,7 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 			Title:      "Contact - Phillip England",
 			GitHubUser: "phillip-england",
 			ActiveNav:  "contact",
+			AdminAuthenticated: isAdminAuthenticated(r),
 		}
 		templates["contact.html"].Execute(w, data)
 	case http.MethodPost:
@@ -227,6 +282,7 @@ func projectHandler(w http.ResponseWriter, r *http.Request) {
 		CurrentProject: project,
 		ReadmeHTML:     loadProjectReadme("phillip-england", project.Slug),
 		ActiveNav:      "projects",
+		AdminAuthenticated: isAdminAuthenticated(r),
 	}
 	templates["project.html"].Execute(w, data)
 }
@@ -241,6 +297,7 @@ func projectsHandler(w http.ResponseWriter, r *http.Request) {
 		GitHubUser: "phillip-england",
 		Projects:   getProjects(),
 		ActiveNav:  "projects",
+		AdminAuthenticated: isAdminAuthenticated(r),
 	}
 	templates["projects.html"].Execute(w, data)
 }
@@ -255,6 +312,7 @@ func blogHandler(w http.ResponseWriter, r *http.Request) {
 		GitHubUser: "phillip-england",
 		BlogPosts:  getBlogPosts(),
 		ActiveNav:  "blog",
+		AdminAuthenticated: isAdminAuthenticated(r),
 	}
 	templates["blog.html"].Execute(w, data)
 }
@@ -279,6 +337,7 @@ func blogPostHandler(w http.ResponseWriter, r *http.Request) {
 		GitHubUser:  "phillip-england",
 		CurrentPost: post,
 		ActiveNav:   "blog",
+		AdminAuthenticated: isAdminAuthenticated(r),
 	}
 	templates["post.html"].Execute(w, data)
 }
@@ -332,6 +391,60 @@ func loadProjectReadme(user, repo string) template.HTML {
 	return template.HTML("<p class=\"text-[#555]\">Could not load README.md from GitHub.</p>")
 }
 
+func rateLimitMiddleware(action string, limit int, onLimit func(http.ResponseWriter, *http.Request), next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			ip := clientIP(r)
+			if ip == "" {
+				ip = "unknown"
+			}
+			allowed, err := checkAndIncrementRateLimit(r.Context(), ip, action, limit)
+			if err != nil {
+				log.Printf("rate limit check failed for %s: %v", ip, err)
+				http.Error(w, "Rate limit check failed", http.StatusInternalServerError)
+				return
+			}
+			if !allowed {
+				if onLimit != nil {
+					onLimit(w, r)
+				} else {
+					http.Error(w, "Rate limit exceeded", http.StatusTooManyRequests)
+				}
+				return
+			}
+		}
+		next(w, r)
+	}
+}
+
+func rateLimitJSON(message string) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, message, http.StatusTooManyRequests)
+	}
+}
+
+func rateLimitAdminLogin(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusTooManyRequests)
+	renderAdminLogin(w, "Too many login attempts. Try again tomorrow.")
+}
+
+func clientIP(r *http.Request) string {
+	if forwarded := r.Header.Get("X-Forwarded-For"); forwarded != "" {
+		parts := strings.Split(forwarded, ",")
+		if len(parts) > 0 {
+			return strings.TrimSpace(parts[0])
+		}
+	}
+	if realIP := strings.TrimSpace(r.Header.Get("X-Real-IP")); realIP != "" {
+		return realIP
+	}
+	host, _, err := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr))
+	if err == nil && host != "" {
+		return host
+	}
+	return strings.TrimSpace(r.RemoteAddr)
+}
+
 func contactPostHandler(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		Email   string `json:"email"`
@@ -367,6 +480,35 @@ func contactPostHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"status": "success", "message": "Message received"})
 }
 
+func checkAndIncrementRateLimit(ctx context.Context, ip, action string, limit int) (bool, error) {
+	if contactDB == nil {
+		return false, fmt.Errorf("database not initialized")
+	}
+	day := time.Now().UTC().Format("2006-01-02")
+	tx, err := contactDB.BeginTx(ctx, nil)
+	if err != nil {
+		return false, err
+	}
+	_, err = tx.ExecContext(ctx, `
+		INSERT INTO rate_limits (ip, action, day, count)
+		VALUES (?, ?, ?, 1)
+		ON CONFLICT(ip, action, day) DO UPDATE SET count = count + 1
+	`, ip, action, day)
+	if err != nil {
+		tx.Rollback()
+		return false, err
+	}
+	var count int
+	if err := tx.QueryRowContext(ctx, `SELECT count FROM rate_limits WHERE ip = ? AND action = ? AND day = ?`, ip, action, day).Scan(&count); err != nil {
+		tx.Rollback()
+		return false, err
+	}
+	if err := tx.Commit(); err != nil {
+		return false, err
+	}
+	return count <= limit, nil
+}
+
 func initContactDB() (*sql.DB, error) {
 	dbPath := os.Getenv("CONTACT_DB_PATH")
 	if dbPath == "" {
@@ -389,6 +531,13 @@ func initContactDB() (*sql.DB, error) {
 		email TEXT NOT NULL,
 		message TEXT NOT NULL,
 		created_at TEXT NOT NULL
+	);
+	CREATE TABLE IF NOT EXISTS rate_limits (
+		ip TEXT NOT NULL,
+		action TEXT NOT NULL,
+		day TEXT NOT NULL,
+		count INTEGER NOT NULL,
+		PRIMARY KEY (ip, action, day)
 	);`
 	if _, err := db.Exec(schema); err != nil {
 		db.Close()
@@ -453,8 +602,49 @@ func adminMessagesHandler(w http.ResponseWriter, r *http.Request) {
 		Title:     "Admin Messages - Phillip England",
 		Messages:  messages,
 		ActiveNav: "admin",
+		AdminAuthenticated: true,
 	}
 	templates["admin_messages.html"].Execute(w, data)
+}
+
+func adminDeleteMessageHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAdminAuthenticated(r) {
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
+		return
+	}
+	if r.Method != http.MethodPost {
+		http.NotFound(w, r)
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form submission", http.StatusBadRequest)
+		return
+	}
+	idStr := strings.TrimSpace(r.FormValue("id"))
+	id, err := strconv.Atoi(idStr)
+	if err != nil || id <= 0 {
+		http.Error(w, "Invalid message id", http.StatusBadRequest)
+		return
+	}
+	if err := deleteContactMessage(r.Context(), id); err != nil {
+		log.Printf("failed to delete message %d: %v", id, err)
+		http.Error(w, "Failed to delete message", http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/admin/messages", http.StatusSeeOther)
+}
+
+func adminLogoutHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAdminAuthenticated(r) {
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
+		return
+	}
+	if r.Method != http.MethodPost {
+		http.NotFound(w, r)
+		return
+	}
+	clearAdminCookie(w)
+	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 }
 
 func renderAdminLogin(w http.ResponseWriter, errMsg string) {
@@ -488,6 +678,14 @@ func fetchContactMessages(ctx context.Context) ([]ContactMessage, error) {
 		return nil, err
 	}
 	return messages, nil
+}
+
+func deleteContactMessage(ctx context.Context, id int) error {
+	if contactDB == nil {
+		return fmt.Errorf("database not initialized")
+	}
+	_, err := contactDB.ExecContext(ctx, `DELETE FROM contact_messages WHERE id = ?`, id)
+	return err
 }
 
 func adminCredentials() (string, string, bool) {
@@ -529,6 +727,18 @@ func setAdminCookie(w http.ResponseWriter) {
 		Path:     "/",
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
+	})
+}
+
+func clearAdminCookie(w http.ResponseWriter) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "admin_auth",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		MaxAge:   -1,
+		Expires:  time.Unix(0, 0),
 	})
 }
 
