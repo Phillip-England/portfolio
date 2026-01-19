@@ -13,9 +13,9 @@
                         bg: '#0a0a0a',
                         panel: '#111111',
                         border: '#222222',
-                        primary: '#00ff9d',
+                        primary: '#ff6b6b',
                         secondary: '#ff6b6b',
-                        accent: '#ffd93d',
+                        accent: '#2dd4bf',
                         dim: '#555555',
                         text: '#e0e0e0',
                         muted: '#888888',
@@ -42,7 +42,7 @@
         }
         .typing-effect {
             overflow: hidden;
-            border-right: 2px solid #00ff9d;
+            border-right: 2px solid #ff6b6b;
             animation: typing 2s steps(30, end), blink 0.5s step-end infinite;
         }
         @keyframes typing {
@@ -83,148 +83,116 @@
         }
         .panel-hover:hover {
             box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
-            border-color: #00ff9d;
+            border-color: #ff6b6b;
         }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #111; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #00ff9d; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff6b6b; }
     </style>
 </head>
-<body class="bg-[#0a0a0a] text-[#e0e0e0] min-h-screen antialiased selection:bg-[#00ff9d] selection:text-[#0a0a0a]">
+<body class="bg-[#0a0a0a] text-[#e0e0e0] min-h-screen antialiased selection:bg-[#ff6b6b] selection:text-[#0a0a0a]">
     <canvas id="matrix" class="matrix-rain"></canvas>
     <div class="scan-line"></div>
 
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur border-b border-[#222]">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <span class="w-2 h-2 bg-[#00ff9d] rounded-full animate-pulse"></span>
-                <a href="/" class="text-sm font-semibold tracking-wide text-[#e0e0e0]">~/phillip-england</a>
-            </div>
-            <div class="flex flex-wrap items-center gap-1 text-xs">
-                <a href="/" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#00ff9d]">[HOME]</a>
-                <a href="/about" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors hover:text-[#00ff9d0]">[ABOUT]</a>
-                <a href="/projects" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors hover:text-[#00ff9d]">[PROJECTS]</a>
-                <a href="/blog" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors hover:text-[#00ff9d]">[BLOG]</a>
-                <a href="/contact" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors hover:text-[#00ff9d]">[CONTACT]</a>
-            </div>
-        </div>
-    </nav>
+    {{template "navbar" .}}
 
     <main class="pt-20 pb-16 px-4 relative z-10 grid-bg min-h-screen">
         <div class="max-w-6xl mx-auto">
             <section class="grid lg:grid-cols-[1fr_300px] gap-8 mb-12">
-                <div class="space-y-6">
+                <div class="space-y-8">
                     <div class="flex items-center gap-2 text-xs text-[#555]">
                         <span>~/</span>
-                        <span class="text-[#00ff9d]">home</span>
+                        <span class="text-[#ff6b6b]">home</span>
                         <span class="cursor-blink">_</span>
                     </div>
+
                     <div class="bg-[#111] border border-[#222] rounded-lg p-6 shadow-glow">
-                        <div class="flex items-center gap-2 mb-4 border-b border-[#222] pb-3">
-                            <div class="flex gap-1.5">
-                                <div class="w-3 h-3 rounded-full bg-[#ff6b6b]"></div>
-                                <div class="w-3 h-3 rounded-full bg-[#ffd93d]"></div>
-                                <div class="w-3 h-3 rounded-full bg-[#00ff9d]"></div>
-                            </div>
-                            <span class="text-xs text-[#555] ml-2">bash — 80x24</span>
-                        </div>
-                        <div class="space-y-4 font-mono text-sm">
+                        <div class="flex items-center gap-4 mb-4">
+                            <img src="{{.ProfileImage}}" alt="Phillip England" class="w-16 h-16 rounded-full object-cover border-2 border-[#ff6b6b]">
                             <div>
-                                <span class="text-[#00ff9d]">➜</span> <span class="text-[#ffd93d]">~</span> <span class="text-[#555]">cat about.txt</span>
+                                <h3 class="text-[#ff6b6b] font-semibold">Phillip England</h3>
+                                <p class="text-xs text-[#555]">Software Engineer</p>
                             </div>
-                            <p class="text-[#e0e0e0] leading-relaxed">
-                                I'm <span class="text-[#00ff9d]">Phillip England</span>, a software engineer focused on building robust tooling, calm interfaces, and reliable systems. I work primarily with <span class="text-[#ff6b6b]">Go</span>, <span class="text-[#ff6b6b]">Rust</span>, and <span class="text-[#ff6b6b]">TypeScript</span>.
-                            </p>
-                            <p class="text-[#e0e0e0] leading-relaxed">
-                                My approach prioritizes <span class="text-[#ffd93d]">simplicity</span>, <span class="text-[#ffd93d]">performance</span>, and <span class="text-[#ffd93d]">maintainability</span>. I believe the best software is invisible software—it just works.
-                            </p>
                         </div>
-                    </div>
-                    <div class="flex gap-3">
-                        <a href="/projects" class="px-5 py-2 bg-[#00ff9d] text-[#0a0a0a] rounded font-semibold text-sm hover:bg-[#00ff9d]/90 transition-colors shadow-glow-sm">./run_projects.sh</a>
-                        <a href="/contact" class="px-5 py-2 border border-[#222] text-[#e0e0e0] rounded font-semibold text-sm hover:border-[#00ff9d] hover:text-[#00ff9d] transition-colors">mail -s "hello"</a>
-                    </div>
-                </div>
-                <div class="space-y-6">
-                    <div class="bg-[#111] border border-[#222] rounded-lg p-5 panel-hover transition-all">
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="text-[#00ff9d]">●</span>
-                            <h3 class="text-sm font-semibold">Status</h3>
-                        </div>
-                        <div class="space-y-3 text-xs">
+                        <div class="space-y-2 text-xs border-t border-[#222] pt-4">
                             <div class="flex justify-between items-center">
                                 <span class="text-[#555]">Location</span>
-                                <span class="text-[#e0e0e0]">San Francisco, CA</span>
+                                <span class="text-[#e0e0e0]">Tulsa, Oklahoma</span>
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-[#555]">Time</span>
-                                <span id="clock" class="text-[#00ff9d]">--:--:--</span>
+                                <span id="clock" class="text-[#ff6b6b]">--:--:--</span>
                             </div>
                             <div class="flex justify-between items-center">
-                                <span class="text-[#555]">Uptime</span>
-                                <span class="text-[#00ff9d]">99.9%</span>
+                                <span class="text-[#555]">GitHub</span>
+                                <a href="https://github.com/phillip-england" target="_blank" rel="noopener noreferrer"
+                                    class="inline-flex items-center gap-2 text-[#2dd4bf] hover:text-[#ff6b6b] transition-colors">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 fill-current">
+                                        <path d="M12 2C6.477 2 2 6.484 2 12.018c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.004.071 1.532 1.034 1.532 1.034.892 1.53 2.341 1.088 2.91.833.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.27.098-2.647 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.297 2.748-1.026 2.748-1.026.546 1.377.203 2.394.1 2.647.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.944.359.31.678.92.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.018C22 6.484 17.523 2 12 2Z"/>
+                                    </svg>
+                                    <span>phillip-england</span>
+                                </a>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="bg-[#111] border border-[#222] rounded-lg p-6 shadow-glow">
+                        <h4 class="text-xs font-semibold text-[#2dd4bf] mb-4">About Me</h4>
+                        <p class="text-sm text-[#e0e0e0] leading-relaxed">
+                            My name is Phillip England, and I love to learn. 7 years ago, I wanted to build a website, but I wanted it to be <span class="text-[#2dd4bf]">mine</span>. So, I stumbled upon HTML and down the rabbit hole I went.
+                        </p>
+                        <p class="text-sm text-[#e0e0e0] leading-relaxed mt-3">
+                            I value simplicity and specialize in backend technologies. I love building web applications, compilers, and DX-centric tooling.
+                        </p>
+                    </div>
+
+                    <div class="bg-[#111] border border-[#222] rounded-lg p-6 shadow-glow">
+                        <h4 class="text-xs font-semibold text-[#ff6b6b] mb-4">Contact</h4>
+                        <form id="contactForm" class="space-y-3">
+                            <div>
+                                <label for="email" class="block text-xs text-[#555] mb-1">EMAIL_ADDRESS</label>
+                                <input type="email" id="email" name="email" required
+                                    class="w-full px-3 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg focus:ring-1 focus:ring-[#ff6b6b] focus:border-[#ff6b6b] outline-none transition-colors text-sm"
+                                    placeholder="you@example.com">
+                            </div>
+                            <div>
+                                <label for="message" class="block text-xs text-[#555] mb-1">MESSAGE_CONTENT (max 255)</label>
+                                <textarea id="message" name="message" required maxlength="255" rows="3"
+                                    class="w-full px-3 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg focus:ring-1 focus:ring-[#ff6b6b] focus:border-[#ff6b6b] outline-none transition-colors text-sm resize-none"
+                                    placeholder="Your message here..."></textarea>
+                                <p class="text-xs text-[#555] mt-1"><span id="count">0</span>/255</p>
+                            </div>
+                            <button type="submit"
+                                class="w-full py-2 px-4 bg-[#ff6b6b] text-[#0a0a0a] font-semibold rounded-lg hover:bg-[#ff6b6b]/90 transition-colors text-sm">
+                                Submit
+                            </button>
+                            <p id="status" class="text-xs text-[#ff6b6b]" aria-live="polite"></p>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2 text-xs text-[#555]">
+                        <span>~/</span>
+                        <span class="text-[#ff6b6b]">projects</span>
+                        <span class="cursor-blink">_</span>
                     </div>
                     <div class="bg-[#111] border border-[#222] rounded-lg p-5 panel-hover transition-all">
                         <div class="flex items-center gap-2 mb-4">
                             <span class="text-[#ff6b6b]">●</span>
-                            <h3 class="text-sm font-semibold">Stack</h3>
+                            <h3 class="text-sm font-semibold">Projects</h3>
                         </div>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="px-2 py-1 bg-[#222] rounded text-xs text-[#00ff9d]">Go</span>
-                            <span class="px-2 py-1 bg-[#222] rounded text-xs text-[#00ff9d]">Rust</span>
-                            <span class="px-2 py-1 bg-[#222] rounded text-xs text-[#00ff9d]">TypeScript</span>
-                            <span class="px-2 py-1 bg-[#222] rounded text-xs text-[#00ff9d]">PostgreSQL</span>
-                            <span class="px-2 py-1 bg-[#222] rounded text-xs text-[#00ff9d]">Docker</span>
-                        </div>
-                    </div>
-                    <div class="bg-[#111] border border-[#222] rounded-lg p-5 panel-hover transition-all">
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="text-[#ffd93d]">●</span>
-                            <h3 class="text-sm font-semibold">Quick Links</h3>
-                        </div>
-                        <div class="space-y-2 text-xs">
-                            <a href="https://github.com/phillip-england" target="_blank" class="flex items-center gap-2 text-[#555] hover:text-[#00ff9d] transition-colors">
-                                <span>→</span> github.com/phillip-england
+                        <div class="space-y-3 text-xs">
+                            {{range .Projects}}
+                            <a href="/project/{{.Slug}}" class="flex flex-col p-2 rounded hover:bg-[#222] transition-colors group">
+                                <span class="text-[#e0e0e0] group-hover:text-[#ff6b6b]">{{.Name}}</span>
+                                <span class="text-[#555] mt-0.5 group-hover:text-[#888]">{{.Description}}</span>
                             </a>
-                            <a href="/blog" class="flex items-center gap-2 text-[#555] hover:text-[#00ff9d] transition-colors">
-                                <span>→</span> Read my blog
-                            </a>
-                            <a href="/about" class="flex items-center gap-2 text-[#555] hover:text-[#00ff9d] transition-colors">
-                                <span>→</span> More about me
-                            </a>
+                            {{end}}
                         </div>
                     </div>
                 </div>
-            </section>
-
-            <section class="grid sm:grid-cols-3 gap-4">
-                <a href="/projects" class="bg-[#111] border border-[#222] rounded-lg p-5 panel-hover transition-all group">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="text-[#00ff9d]">▸</span>
-                        <p class="text-xs text-[#555]">projects/</p>
-                    </div>
-                    <h3 class="text-lg font-semibold text-[#e0e0e0] group-hover:text-[#00ff9d] transition-colors">Open Source</h3>
-                    <p class="text-xs text-[#555] mt-2">CLI tools, libraries, and experiments.</p>
-                </a>
-                <a href="/blog" class="bg-[#111] border border-[#222] rounded-lg p-5 panel-hover transition-all group">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="text-[#ffd93d]">▸</span>
-                        <p class="text-xs text-[#555]">blog/</p>
-                    </div>
-                    <h3 class="text-lg font-semibold text-[#e0e0e0] group-hover:text-[#ffd93d] transition-colors">Writing</h3>
-                    <p class="text-xs text-[#555] mt-2">Thoughts on code, design, and systems.</p>
-                </a>
-                <a href="/contact" class="bg-[#111] border border-[#222] rounded-lg p-5 panel-hover transition-all group">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="text-[#ff6b6b]">▸</span>
-                        <p class="text-xs text-[#555]">contact/</p>
-                    </div>
-                    <h3 class="text-lg font-semibold text-[#e0e0e0] group-hover:text-[#ff6b6b] transition-colors">Get in Touch</h3>
-                    <p class="text-xs text-[#555] mt-2">Collaborate or just say hello.</p>
-                </a>
             </section>
         </div>
     </main>
@@ -232,17 +200,18 @@
     <footer class="border-t border-[#222] py-6 mt-12 bg-[#0a0a0a]">
         <div class="max-w-6xl mx-auto px-4 text-center">
             <p class="text-xs text-[#555]">
-                <span class="text-[#00ff9d]">© 2026</span> Phillip England 
+                <span class="text-[#ff6b6b]">© 2026</span> Phillip England 
                 <span class="text-[#333] mx-2">|</span> 
                 <span class="text-[#555]">Built with</span> 
-                <span class="text-[#ffd93d]">Go</span> 
+                <span class="text-[#2dd4bf]">Go</span> 
                 <span class="text-[#555]">+</span> 
-                <span class="text-[#00ff9d]">Tailwind</span>
+                <span class="text-[#ff6b6b]">Tailwind</span>
             </p>
         </div>
     </footer>
 
     <script src="/static/site.js" defer></script>
+    <script src="/static/contact.js" defer></script>
     <script>
         (function(){
             const canvas = document.getElementById('matrix');
@@ -256,7 +225,7 @@
             function draw() {
                 ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#00ff9d';
+                ctx.fillStyle = '#ff6b6b';
                 ctx.font = fontSize + 'px monospace';
                 for(let i = 0; i < drops.length; i++) {
                     const char = chars[Math.floor(Math.random() * chars.length)];

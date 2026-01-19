@@ -13,9 +13,9 @@
                         bg: '#0a0a0a',
                         panel: '#111111',
                         border: '#222222',
-                        primary: '#00ff9d',
+                        primary: '#ff6b6b',
                         secondary: '#ff6b6b',
-                        accent: '#ffd93d',
+                        accent: '#2dd4bf',
                         dim: '#555555',
                         text: '#e0e0e0',
                         muted: '#888888',
@@ -70,33 +70,19 @@
         }
         .panel-hover:hover {
             box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
-            border-color: #00ff9d;
+            border-color: #ff6b6b;
         }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #111; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #00ff9d; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff6b6b; }
     </style>
 </head>
-<body class="bg-[#0a0a0a] text-[#e0e0e0] min-h-screen antialiased selection:bg-[#00ff9d] selection:text-[#0a0a0a]">
+<body class="bg-[#0a0a0a] text-[#e0e0e0] min-h-screen antialiased selection:bg-[#ff6b6b] selection:text-[#0a0a0a]">
     <canvas id="matrix" class="matrix-rain"></canvas>
     <div class="scan-line"></div>
 
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur border-b border-[#222]">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <span class="w-2 h-2 bg-[#00ff9d] rounded-full animate-pulse"></span>
-                <a href="/" class="text-sm font-semibold tracking-wide text-[#e0e0e0]">~/phillip-england</a>
-            </div>
-            <div class="flex flex-wrap items-center gap-1 text-xs">
-                <a href="/" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[HOME]</a>
-                <a href="/about" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[ABOUT]</a>
-                <a href="/projects" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[PROJECTS]</a>
-                <a href="/blog" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#00ff9d]">[BLOG]</a>
-                <a href="/contact" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#00ff9d]">[CONTACT]</a>
-            </div>
-        </div>
-    </nav>
+    {{template "navbar" .}}
 
     <main class="pt-20 pb-16 px-4 relative z-10 grid-bg min-h-screen">
         <div class="max-w-3xl mx-auto">
@@ -111,14 +97,14 @@
                     <div class="flex items-center gap-2 mb-4 border-b border-[#222] pb-3">
                         <div class="flex gap-1.5">
                             <div class="w-3 h-3 rounded-full bg-[#ff6b6b]"></div>
-                            <div class="w-3 h-3 rounded-full bg-[#ffd93d]"></div>
-                            <div class="w-3 h-3 rounded-full bg-[#00ff9d]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#2dd4bf]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#ff6b6b]"></div>
                         </div>
                         <span class="text-xs text-[#555] ml-2">bash — 80x24</span>
                     </div>
                     <div class="space-y-3 font-mono text-sm mb-6">
                         <div>
-                            <span class="text-[#ff6b6b]">➜</span> <span class="text-[#ffd93d]">~</span> <span class="text-[#555]">mail -s "hello"</span>
+                            <span class="text-[#ff6b6b]">➜</span> <span class="text-[#2dd4bf]">~</span> <span class="text-[#555]">mail -s "hello"</span>
                         </div>
                         <p class="text-[#e0e0e0]">Drop a short message. I typically respond within 24-48 hours.</p>
                     </div>
@@ -127,21 +113,21 @@
                         <div>
                             <label for="email" class="block text-xs text-[#555] mb-2">EMAIL_ADDRESS</label>
                             <input type="email" id="email" name="email" required
-                                class="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg focus:ring-1 focus:ring-[#00ff9d] focus:border-[#00ff9d] outline-none transition-colors text-sm"
+                                class="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg focus:ring-1 focus:ring-[#ff6b6b] focus:border-[#ff6b6b] outline-none transition-colors text-sm"
                                 placeholder="you@example.com">
                         </div>
                         <div>
                             <label for="message" class="block text-xs text-[#555] mb-2">MESSAGE_CONTENT (max 255)</label>
                             <textarea id="message" name="message" required maxlength="255" rows="4"
-                                class="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg focus:ring-1 focus:ring-[#00ff9d] focus:border-[#00ff9d] outline-none transition-colors text-sm resize-none"
+                                class="w-full px-4 py-3 bg-[#0a0a0a] border border-[#333] rounded-lg focus:ring-1 focus:ring-[#ff6b6b] focus:border-[#ff6b6b] outline-none transition-colors text-sm resize-none"
                                 placeholder="Your message here..."></textarea>
                             <p class="text-xs text-[#555] mt-2"><span id="count">0</span>/255</p>
                         </div>
                         <button type="submit"
-                            class="w-full py-3 px-6 bg-[#00ff9d] text-[#0a0a0a] font-semibold rounded-lg hover:bg-[#00ff9d]/90 transition-colors">
+                            class="w-full py-3 px-6 bg-[#ff6b6b] text-[#0a0a0a] font-semibold rounded-lg hover:bg-[#ff6b6b]/90 transition-colors">
                             ./send_message.sh
                         </button>
-                        <p id="status" class="text-xs text-[#00ff9d]" aria-live="polite"></p>
+                        <p id="status" class="text-xs text-[#ff6b6b]" aria-live="polite"></p>
                     </form>
                 </div>
             </div>
@@ -151,12 +137,12 @@
     <footer class="border-t border-[#222] py-6 mt-12 bg-[#0a0a0a]">
         <div class="max-w-6xl mx-auto px-4 text-center">
             <p class="text-xs text-[#555]">
-                <span class="text-[#00ff9d]">© 2026</span> Phillip England 
+                <span class="text-[#ff6b6b]">© 2026</span> Phillip England 
                 <span class="text-[#333] mx-2">|</span> 
                 <span class="text-[#555]">Built with</span> 
-                <span class="text-[#ffd93d]">Go</span> 
+                <span class="text-[#2dd4bf]">Go</span> 
                 <span class="text-[#555]">+</span> 
-                <span class="text-[#00ff9d]">Tailwind</span>
+                <span class="text-[#ff6b6b]">Tailwind</span>
             </p>
         </div>
     </footer>
@@ -177,7 +163,7 @@
             function draw() {
                 ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#00ff9d';
+                ctx.fillStyle = '#ff6b6b';
                 ctx.font = fontSize + 'px monospace';
                 for(let i = 0; i < drops.length; i++) {
                     const char = chars[Math.floor(Math.random() * chars.length)];

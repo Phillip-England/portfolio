@@ -1,0 +1,15 @@
+{{define "navbar"}}
+<nav class="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur border-b border-[#222]">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+        <div class="flex items-center gap-3">
+            <span class="w-2 h-2 bg-[#ff6b6b] rounded-full animate-pulse"></span>
+            <a href="/" class="text-sm font-semibold tracking-wide text-[#e0e0e0]">~/phillip-england</a>
+        </div>
+        <div class="flex flex-wrap items-center gap-1 text-xs">
+            <a href="/" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors {{if eq .ActiveNav "home"}}text-[#ff6b6b]{{else}}text-[#555] hover:text-[#ff6b6b]{{end}}">[HOME]</a>
+            <a href="/projects" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors {{if eq .ActiveNav "projects"}}text-[#ff6b6b]{{else}}text-[#555] hover:text-[#ff6b6b]{{end}}">[PROJECTS]</a>
+            <a href="/blog" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors {{if eq .ActiveNav "blog"}}text-[#ff6b6b]{{else}}text-[#555] hover:text-[#ff6b6b]{{end}}">[BLOG]</a>
+        </div>
+    </div>
+</nav>
+{{end}}
