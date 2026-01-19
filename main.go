@@ -2,6 +2,11 @@ package main
 
 import (
 	"bytes"
+	"context"
+	"crypto/sha256"
+	"crypto/subtle"
+	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -11,11 +16,14 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
+
+	_ "modernc.org/sqlite"
 )
 
 type Project struct {
@@ -42,9 +50,12 @@ type PageData struct {
 	ProfileImage   string
 	ReadmeHTML     template.HTML
 	ActiveNav      string
+	AdminError     string
+	Messages       []ContactMessage
 }
 
 var templates map[string]*template.Template
+var contactDB *sql.DB
 var markdown = goldmark.New(
 	goldmark.WithExtensions(
 		extension.GFM,
@@ -58,12 +69,21 @@ var markdown = goldmark.New(
 
 func main() {
 	templates = parseTemplates()
+	var err error
+	contactDB, err = initContactDB()
+	if err != nil {
+		log.Fatalf("failed to initialize contact database: %v", err)
+	}
+	defer contactDB.Close()
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/project/", projectHandler)
 	http.HandleFunc("/projects", projectsHandler)
 	http.HandleFunc("/blog", blogHandler)
 	http.HandleFunc("/blog/", blogPostHandler)
+	http.HandleFunc("/contact", contactHandler)
+	http.HandleFunc("/admin", adminLoginHandler)
+	http.HandleFunc("/admin/messages", adminMessagesHandler)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
@@ -88,6 +108,8 @@ func parseTemplates() map[string]*template.Template {
 		"blog.html",
 		"post.html",
 		"contact.html",
+		"admin_login.html",
+		"admin_messages.html",
 	}
 
 	funcs := template.FuncMap{
@@ -111,6 +133,13 @@ func parseTemplates() map[string]*template.Template {
 		result[page] = tmpl
 	}
 	return result
+}
+
+type ContactMessage struct {
+	ID        int
+	Email     string
+	Message   string
+	CreatedAt string
 }
 
 func getProjects() []Project {
@@ -149,6 +178,26 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			ActiveNav:    "home",
 		}
 		templates["index.html"].Execute(w, data)
+	case http.MethodPost:
+		contactPostHandler(w, r)
+	default:
+		http.NotFound(w, r)
+	}
+}
+
+func contactHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/contact" && r.URL.Path != "/contact/" {
+		http.NotFound(w, r)
+		return
+	}
+	switch r.Method {
+	case http.MethodGet:
+		data := PageData{
+			Title:      "Contact - Phillip England",
+			GitHubUser: "phillip-england",
+			ActiveNav:  "contact",
+		}
+		templates["contact.html"].Execute(w, data)
 	case http.MethodPost:
 		contactPostHandler(w, r)
 	default:
@@ -295,13 +344,202 @@ func contactPostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	req.Email = strings.TrimSpace(req.Email)
+	req.Message = strings.TrimSpace(req.Message)
+	req.Date = strings.TrimSpace(req.Date)
+
 	if req.Email == "" || req.Message == "" || len(req.Message) > 255 {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
 
-	fmt.Printf("Contact form submission: Email=%s, Message=%s, Date=%s\n", req.Email, req.Message, req.Date)
+	if req.Date == "" {
+		req.Date = time.Now().UTC().Format(time.RFC3339)
+	}
+
+	if err := insertContactMessage(r.Context(), req.Email, req.Message, req.Date); err != nil {
+		log.Printf("failed to store contact message: %v", err)
+		http.Error(w, "Failed to store message", http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"status": "success", "message": "Message received"})
+}
+
+func initContactDB() (*sql.DB, error) {
+	dbPath := os.Getenv("CONTACT_DB_PATH")
+	if dbPath == "" {
+		dbPath = filepath.Join("data", "contact_messages.db")
+	}
+	if err := os.MkdirAll(filepath.Dir(dbPath), 0755); err != nil {
+		return nil, err
+	}
+	db, err := sql.Open("sqlite", dbPath)
+	if err != nil {
+		return nil, err
+	}
+	if err := db.Ping(); err != nil {
+		db.Close()
+		return nil, err
+	}
+	const schema = `
+	CREATE TABLE IF NOT EXISTS contact_messages (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		email TEXT NOT NULL,
+		message TEXT NOT NULL,
+		created_at TEXT NOT NULL
+	);`
+	if _, err := db.Exec(schema); err != nil {
+		db.Close()
+		return nil, err
+	}
+	return db, nil
+}
+
+func insertContactMessage(ctx context.Context, email, message, createdAt string) error {
+	if contactDB == nil {
+		return fmt.Errorf("database not initialized")
+	}
+	_, err := contactDB.ExecContext(ctx, `INSERT INTO contact_messages (email, message, created_at) VALUES (?, ?, ?)`, email, message, createdAt)
+	return err
+}
+
+func adminLoginHandler(w http.ResponseWriter, r *http.Request) {
+	if isAdminAuthenticated(r) {
+		http.Redirect(w, r, "/admin/messages", http.StatusSeeOther)
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		renderAdminLogin(w, "")
+	case http.MethodPost:
+		if err := r.ParseForm(); err != nil {
+			renderAdminLogin(w, "Invalid form submission.")
+			return
+		}
+		username := strings.TrimSpace(r.FormValue("username"))
+		password := strings.TrimSpace(r.FormValue("password"))
+		if !validateAdminCredentials(username, password) {
+			w.WriteHeader(http.StatusUnauthorized)
+			renderAdminLogin(w, "Invalid credentials.")
+			return
+		}
+		setAdminCookie(w)
+		http.Redirect(w, r, "/admin/messages", http.StatusSeeOther)
+	default:
+		http.NotFound(w, r)
+	}
+}
+
+func adminMessagesHandler(w http.ResponseWriter, r *http.Request) {
+	if !isAdminAuthenticated(r) {
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
+		return
+	}
+	if r.Method != http.MethodGet {
+		http.NotFound(w, r)
+		return
+	}
+
+	messages, err := fetchContactMessages(r.Context())
+	if err != nil {
+		log.Printf("failed to fetch messages: %v", err)
+		http.Error(w, "Failed to load messages", http.StatusInternalServerError)
+		return
+	}
+	data := PageData{
+		Title:     "Admin Messages - Phillip England",
+		Messages:  messages,
+		ActiveNav: "admin",
+	}
+	templates["admin_messages.html"].Execute(w, data)
+}
+
+func renderAdminLogin(w http.ResponseWriter, errMsg string) {
+	data := PageData{
+		Title:      "Admin Login - Phillip England",
+		AdminError: errMsg,
+		ActiveNav:  "admin",
+	}
+	templates["admin_login.html"].Execute(w, data)
+}
+
+func fetchContactMessages(ctx context.Context) ([]ContactMessage, error) {
+	if contactDB == nil {
+		return nil, fmt.Errorf("database not initialized")
+	}
+	rows, err := contactDB.QueryContext(ctx, `SELECT id, email, message, created_at FROM contact_messages ORDER BY id DESC`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var messages []ContactMessage
+	for rows.Next() {
+		var msg ContactMessage
+		if err := rows.Scan(&msg.ID, &msg.Email, &msg.Message, &msg.CreatedAt); err != nil {
+			return nil, err
+		}
+		messages = append(messages, msg)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return messages, nil
+}
+
+func adminCredentials() (string, string, bool) {
+	username := os.Getenv("ADMIN_USERNAME")
+	password := os.Getenv("ADMIN_PASSWORD")
+	if username == "" || password == "" {
+		return "", "", false
+	}
+	return username, password, true
+}
+
+func validateAdminCredentials(username, password string) bool {
+	expectedUser, expectedPass, ok := adminCredentials()
+	if !ok {
+		return false
+	}
+	userMatch := subtle.ConstantTimeCompare([]byte(username), []byte(expectedUser)) == 1
+	passMatch := subtle.ConstantTimeCompare([]byte(password), []byte(expectedPass)) == 1
+	return userMatch && passMatch
+}
+
+func adminToken() (string, bool) {
+	username, password, ok := adminCredentials()
+	if !ok {
+		return "", false
+	}
+	sum := sha256.Sum256([]byte(username + ":" + password))
+	return hex.EncodeToString(sum[:]), true
+}
+
+func setAdminCookie(w http.ResponseWriter) {
+	token, ok := adminToken()
+	if !ok {
+		return
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     "admin_auth",
+		Value:    token,
+		Path:     "/",
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+}
+
+func isAdminAuthenticated(r *http.Request) bool {
+	token, ok := adminToken()
+	if !ok {
+		return false
+	}
+	cookie, err := r.Cookie("admin_auth")
+	if err != nil {
+		return false
+	}
+	return subtle.ConstantTimeCompare([]byte(cookie.Value), []byte(token)) == 1
 }
