@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/yuin/goldmark"
@@ -60,6 +61,16 @@ type PageData struct {
 
 var templates map[string]*template.Template
 var contactDB *sql.DB
+var recentRequestsMu sync.Mutex
+var recentRequests = make(map[string][]time.Time)
+
+const (
+	dailyLimitContact     = 5
+	dailyLimitAdminFailed = 5
+	blacklistDuration     = 24 * time.Hour
+	recentPoolSize        = 20
+	recentAbuseWindow     = 10 * time.Second
+)
 var markdown = goldmark.New(
 	goldmark.WithExtensions(
 		extension.GFM,
@@ -252,10 +263,25 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		templates["contact.html"].Execute(w, data)
 	case http.MethodPost:
-		if !enforceRateLimit(w, r, "contact_message", 3, rateLimitJSON("Too many messages from this IP today.")) {
+		ip := clientIP(r)
+		if ip == "" {
+			ip = "unknown"
+		}
+		if isBlocked, err := isBlacklisted(r.Context(), ip, "contact_message"); err != nil {
+			log.Printf("failed to check blacklist for %s: %v", ip, err)
+		} else if isBlocked {
+			rateLimitJSON("Too many messages from this IP today.")(w, r)
 			return
 		}
-		contactPostHandler(w, r)
+		if abusive, window := trackRecentRequest(ip, "contact_message"); abusive {
+			if err := blacklistIP(r.Context(), ip, "contact_message", blacklistDuration); err != nil {
+				log.Printf("failed to blacklist %s: %v", ip, err)
+			}
+			log.Printf("blacklisted %s for contact_message abuse over %s", ip, window)
+			rateLimitJSON("Too many messages from this IP today.")(w, r)
+			return
+		}
+		contactPostHandler(w, r, ip)
 	default:
 		http.NotFound(w, r)
 	}
@@ -392,54 +418,6 @@ func loadProjectReadme(user, repo string) template.HTML {
 	return template.HTML("<p class=\"text-[#555]\">Could not load README.md from GitHub.</p>")
 }
 
-func rateLimitMiddleware(action string, limit int, onLimit func(http.ResponseWriter, *http.Request), next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			ip := clientIP(r)
-			if ip == "" {
-				ip = "unknown"
-			}
-			allowed, err := checkAndIncrementRateLimit(r.Context(), ip, action, limit)
-			if err != nil {
-				log.Printf("rate limit check failed for %s: %v", ip, err)
-				http.Error(w, "Rate limit check failed", http.StatusInternalServerError)
-				return
-			}
-			if !allowed {
-				if onLimit != nil {
-					onLimit(w, r)
-				} else {
-					http.Error(w, "Rate limit exceeded", http.StatusTooManyRequests)
-				}
-				return
-			}
-		}
-		next(w, r)
-	}
-}
-
-func enforceRateLimit(w http.ResponseWriter, r *http.Request, action string, limit int, onLimit func(http.ResponseWriter, *http.Request)) bool {
-	ip := clientIP(r)
-	if ip == "" {
-		ip = "unknown"
-	}
-	allowed, err := checkAndIncrementRateLimit(r.Context(), ip, action, limit)
-	if err != nil {
-		log.Printf("rate limit check failed for %s: %v", ip, err)
-		http.Error(w, "Rate limit check failed", http.StatusInternalServerError)
-		return false
-	}
-	if !allowed {
-		if onLimit != nil {
-			onLimit(w, r)
-		} else {
-			http.Error(w, "Rate limit exceeded", http.StatusTooManyRequests)
-		}
-		return false
-	}
-	return true
-}
-
 func rateLimitJSON(message string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, message, http.StatusTooManyRequests)
@@ -468,7 +446,7 @@ func clientIP(r *http.Request) string {
 	return strings.TrimSpace(r.RemoteAddr)
 }
 
-func contactPostHandler(w http.ResponseWriter, r *http.Request) {
+func contactPostHandler(w http.ResponseWriter, r *http.Request, ip string) {
 	var req struct {
 		Email   string `json:"email"`
 		Message string `json:"message"`
@@ -493,6 +471,16 @@ func contactPostHandler(w http.ResponseWriter, r *http.Request) {
 		req.Date = time.Now().UTC().Format(time.RFC3339)
 	}
 
+	allowed, err := incrementDailyCount(r.Context(), ip, "contact_message", dailyLimitContact)
+	if err != nil {
+		log.Printf("failed to update contact rate limit for %s: %v", ip, err)
+	} else if !allowed {
+		if err := blacklistIP(r.Context(), ip, "contact_message", blacklistDuration); err != nil {
+			log.Printf("failed to blacklist %s: %v", ip, err)
+		}
+		rateLimitJSON("Too many messages from this IP today.")(w, r)
+		return
+	}
 	if err := insertContactMessage(r.Context(), req.Email, req.Message, req.Date); err != nil {
 		log.Printf("failed to store contact message: %v", err)
 		http.Error(w, "Failed to store message", http.StatusInternalServerError)
@@ -503,14 +491,14 @@ func contactPostHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"status": "success", "message": "Message received"})
 }
 
-func checkAndIncrementRateLimit(ctx context.Context, ip, action string, limit int) (bool, error) {
+func incrementDailyCount(ctx context.Context, ip, action string, limit int) (bool, error) {
 	if contactDB == nil {
-		return false, fmt.Errorf("database not initialized")
+		return true, fmt.Errorf("database not initialized")
 	}
 	day := time.Now().UTC().Format("2006-01-02")
 	tx, err := contactDB.BeginTx(ctx, nil)
 	if err != nil {
-		return false, err
+		return true, err
 	}
 	_, err = tx.ExecContext(ctx, `
 		INSERT INTO rate_limits (ip, action, day, count)
@@ -519,17 +507,74 @@ func checkAndIncrementRateLimit(ctx context.Context, ip, action string, limit in
 	`, ip, action, day)
 	if err != nil {
 		tx.Rollback()
-		return false, err
+		return true, err
 	}
 	var count int
 	if err := tx.QueryRowContext(ctx, `SELECT count FROM rate_limits WHERE ip = ? AND action = ? AND day = ?`, ip, action, day).Scan(&count); err != nil {
 		tx.Rollback()
-		return false, err
+		return true, err
 	}
 	if err := tx.Commit(); err != nil {
-		return false, err
+		return true, err
 	}
 	return count <= limit, nil
+}
+
+func isBlacklisted(ctx context.Context, ip, action string) (bool, error) {
+	if contactDB == nil {
+		return false, fmt.Errorf("database not initialized")
+	}
+	var untilStr string
+	err := contactDB.QueryRowContext(ctx, `SELECT blocked_until FROM ip_blacklist WHERE ip = ? AND action = ?`, ip, action).Scan(&untilStr)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, nil
+		}
+		return false, err
+	}
+	until, err := time.Parse(time.RFC3339, untilStr)
+	if err != nil {
+		_, _ = contactDB.ExecContext(ctx, `DELETE FROM ip_blacklist WHERE ip = ? AND action = ?`, ip, action)
+		return false, nil
+	}
+	now := time.Now().UTC()
+	if now.Before(until) {
+		return true, nil
+	}
+	_, _ = contactDB.ExecContext(ctx, `DELETE FROM ip_blacklist WHERE ip = ? AND action = ?`, ip, action)
+	return false, nil
+}
+
+func blacklistIP(ctx context.Context, ip, action string, duration time.Duration) error {
+	if contactDB == nil {
+		return fmt.Errorf("database not initialized")
+	}
+	until := time.Now().UTC().Add(duration).Format(time.RFC3339)
+	_, err := contactDB.ExecContext(ctx, `
+		INSERT INTO ip_blacklist (ip, action, blocked_until)
+		VALUES (?, ?, ?)
+		ON CONFLICT(ip, action) DO UPDATE SET blocked_until = excluded.blocked_until
+	`, ip, action, until)
+	return err
+}
+
+func trackRecentRequest(ip, action string) (bool, time.Duration) {
+	now := time.Now().UTC()
+	key := ip + "|" + action
+	recentRequestsMu.Lock()
+	defer recentRequestsMu.Unlock()
+	window := time.Duration(0)
+	list := recentRequests[key]
+	list = append(list, now)
+	if len(list) > recentPoolSize {
+		list = list[len(list)-recentPoolSize:]
+	}
+	recentRequests[key] = list
+	if len(list) < recentPoolSize {
+		return false, window
+	}
+	window = now.Sub(list[0])
+	return window <= recentAbuseWindow, window
 }
 
 func initContactDB() (*sql.DB, error) {
@@ -561,6 +606,12 @@ func initContactDB() (*sql.DB, error) {
 		day TEXT NOT NULL,
 		count INTEGER NOT NULL,
 		PRIMARY KEY (ip, action, day)
+	);
+	CREATE TABLE IF NOT EXISTS ip_blacklist (
+		ip TEXT NOT NULL,
+		action TEXT NOT NULL,
+		blocked_until TEXT NOT NULL,
+		PRIMARY KEY (ip, action)
 	);`
 	if _, err := db.Exec(schema); err != nil {
 		db.Close()
@@ -587,7 +638,22 @@ func adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		renderAdminLogin(w, "")
 	case http.MethodPost:
-		if !enforceRateLimit(w, r, "admin_login", 3, rateLimitAdminLogin) {
+		ip := clientIP(r)
+		if ip == "" {
+			ip = "unknown"
+		}
+		if isBlocked, err := isBlacklisted(r.Context(), ip, "admin_login"); err != nil {
+			log.Printf("failed to check admin blacklist for %s: %v", ip, err)
+		} else if isBlocked {
+			rateLimitAdminLogin(w, r)
+			return
+		}
+		if abusive, window := trackRecentRequest(ip, "admin_login"); abusive {
+			if err := blacklistIP(r.Context(), ip, "admin_login", blacklistDuration); err != nil {
+				log.Printf("failed to blacklist %s: %v", ip, err)
+			}
+			log.Printf("blacklisted %s for admin_login abuse over %s", ip, window)
+			rateLimitAdminLogin(w, r)
 			return
 		}
 		if err := r.ParseForm(); err != nil {
@@ -597,6 +663,16 @@ func adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 		username := strings.TrimSpace(r.FormValue("username"))
 		password := strings.TrimSpace(r.FormValue("password"))
 		if !validateAdminCredentials(username, password) {
+			allowed, err := incrementDailyCount(r.Context(), ip, "admin_login_failed", dailyLimitAdminFailed)
+			if err != nil {
+				log.Printf("failed to update admin rate limit for %s: %v", ip, err)
+			} else if !allowed {
+				if err := blacklistIP(r.Context(), ip, "admin_login", blacklistDuration); err != nil {
+					log.Printf("failed to blacklist %s: %v", ip, err)
+				}
+				rateLimitAdminLogin(w, r)
+				return
+			}
 			w.WriteHeader(http.StatusUnauthorized)
 			renderAdminLogin(w, "Invalid credentials.")
 			return
