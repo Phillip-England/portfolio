@@ -85,9 +85,9 @@ func main() {
 	http.HandleFunc("/projects", projectsHandler)
 	http.HandleFunc("/blog", blogHandler)
 	http.HandleFunc("/blog/", blogPostHandler)
-	http.HandleFunc("/", rateLimitMiddleware("contact_message", 3, rateLimitJSON("Too many messages from this IP today."), indexHandler))
-	http.HandleFunc("/contact", rateLimitMiddleware("contact_message", 3, rateLimitJSON("Too many messages from this IP today."), contactHandler))
-	http.HandleFunc("/admin", rateLimitMiddleware("admin_login", 3, rateLimitAdminLogin, adminLoginHandler))
+	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/contact", contactHandler)
+	http.HandleFunc("/admin", adminLoginHandler)
 	http.HandleFunc("/admin/messages", adminMessagesHandler)
 	http.HandleFunc("/admin/messages/delete", adminDeleteMessageHandler)
 	http.HandleFunc("/admin/logout", adminLogoutHandler)
@@ -232,10 +232,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			AdminAuthenticated: isAdminAuthenticated(r),
 		}
 		templates["index.html"].Execute(w, data)
-	case http.MethodPost:
-		contactPostHandler(w, r)
 	default:
-		http.NotFound(w, r)
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 }
 
@@ -254,6 +252,9 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		templates["contact.html"].Execute(w, data)
 	case http.MethodPost:
+		if !enforceRateLimit(w, r, "contact_message", 3, rateLimitJSON("Too many messages from this IP today.")) {
+			return
+		}
 		contactPostHandler(w, r)
 	default:
 		http.NotFound(w, r)
@@ -417,6 +418,28 @@ func rateLimitMiddleware(action string, limit int, onLimit func(http.ResponseWri
 	}
 }
 
+func enforceRateLimit(w http.ResponseWriter, r *http.Request, action string, limit int, onLimit func(http.ResponseWriter, *http.Request)) bool {
+	ip := clientIP(r)
+	if ip == "" {
+		ip = "unknown"
+	}
+	allowed, err := checkAndIncrementRateLimit(r.Context(), ip, action, limit)
+	if err != nil {
+		log.Printf("rate limit check failed for %s: %v", ip, err)
+		http.Error(w, "Rate limit check failed", http.StatusInternalServerError)
+		return false
+	}
+	if !allowed {
+		if onLimit != nil {
+			onLimit(w, r)
+		} else {
+			http.Error(w, "Rate limit exceeded", http.StatusTooManyRequests)
+		}
+		return false
+	}
+	return true
+}
+
 func rateLimitJSON(message string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, message, http.StatusTooManyRequests)
@@ -564,6 +587,9 @@ func adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		renderAdminLogin(w, "")
 	case http.MethodPost:
+		if !enforceRateLimit(w, r, "admin_login", 3, rateLimitAdminLogin) {
+			return
+		}
 		if err := r.ParseForm(); err != nil {
 			renderAdminLogin(w, "Invalid form submission.")
 			return
