@@ -46,6 +46,9 @@ type BlogPost struct {
 
 type PageData struct {
 	Title          string
+	MetaDescription string
+	CanonicalURL   string
+	SocialImageURL string
 	GitHubUser     string
 	Projects       []Project
 	BlogPosts      []BlogPost
@@ -230,16 +233,41 @@ func getBlogPosts() []BlogPost {
 	}
 }
 
+func baseURL(r *http.Request) string {
+	scheme := "http"
+	if r.TLS != nil {
+		scheme = "https"
+	}
+	if forwarded := r.Header.Get("X-Forwarded-Proto"); forwarded != "" {
+		scheme = strings.TrimSpace(strings.Split(forwarded, ",")[0])
+	}
+	return scheme + "://" + r.Host
+}
+
+func absoluteURL(r *http.Request, path string) string {
+	if strings.HasPrefix(path, "http://") || strings.HasPrefix(path, "https://") {
+		return path
+	}
+	if !strings.HasPrefix(path, "/") {
+		path = "/" + path
+	}
+	return baseURL(r) + path
+}
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
+		profileImage := "/static/profile.jpeg"
 		data := PageData{
-			Title:        "Phillip England",
-			GitHubUser:   "phillip-england",
-			Projects:     getProjects(),
-			BlogPosts:    getBlogPosts(),
-			ProfileImage: "/static/profile.jpeg",
-			ActiveNav:    "home",
+			Title:           "Phillip England",
+			MetaDescription: "Portfolio of Phillip England, a Tulsa software engineer specializing in backend systems, compilers, and tooling. Explore projects and get in touch today.",
+			CanonicalURL:    baseURL(r) + r.URL.Path,
+			SocialImageURL:  absoluteURL(r, profileImage),
+			GitHubUser:      "phillip-england",
+			Projects:        getProjects(),
+			BlogPosts:       getBlogPosts(),
+			ProfileImage:    profileImage,
+			ActiveNav:       "home",
 			AdminAuthenticated: isAdminAuthenticated(r),
 		}
 		templates["index.html"].Execute(w, data)
