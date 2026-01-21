@@ -192,26 +192,13 @@
 
                     <section class="bg-[#111] border border-[#222] rounded-lg p-6 shadow-glow" aria-labelledby="contact-heading">
                         <h2 id="contact-heading" class="text-xs font-semibold text-[#ff6b6b] mb-4">Contact</h2>
-                        <form id="contactForm" class="space-y-3">
-                            <div>
-                                <label for="email" class="block text-xs text-[#555] mb-1">EMAIL_ADDRESS</label>
-                                <input type="email" id="email" name="email" required
-                                    class="w-full px-3 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg focus:ring-1 focus:ring-[#ff6b6b] focus:border-[#ff6b6b] outline-none transition-colors text-sm"
-                                    placeholder="you@example.com">
-                            </div>
-                            <div>
-                                <label for="message" class="block text-xs text-[#555] mb-1">MESSAGE_CONTENT (max 255)</label>
-                                <textarea id="message" name="message" required maxlength="255" rows="3"
-                                    class="w-full px-3 py-2 bg-[#0a0a0a] border border-[#333] rounded-lg focus:ring-1 focus:ring-[#ff6b6b] focus:border-[#ff6b6b] outline-none transition-colors text-sm resize-none"
-                                    placeholder="Your message here..."></textarea>
-                                <p class="text-xs text-[#555] mt-1"><span id="count">0</span>/255</p>
-                            </div>
-                            <button type="submit"
-                                class="w-full py-2 px-4 bg-[#ff6b6b] text-[#0a0a0a] font-semibold rounded-lg hover:bg-[#ff6b6b]/90 transition-colors text-sm">
-                                Submit
-                            </button>
-                            <p id="status" class="text-xs text-[#ff6b6b]" aria-live="polite"></p>
-                        </form>
+                        <p class="text-sm text-[#e0e0e0] leading-relaxed mb-4">
+                            Have a question or want to work together? Drop me a note and I will get back to you.
+                        </p>
+                        <a href="/contact"
+                            class="inline-flex items-center justify-center w-full py-2 px-4 bg-[#ff6b6b] text-[#0a0a0a] font-semibold rounded-lg hover:bg-[#ff6b6b]/90 transition-colors text-sm">
+                            Go to Contact Form
+                        </a>
                     </section>
                 </div>
 
@@ -256,7 +243,6 @@
     </footer>
 
     <script src="/static/site.js" defer></script>
-    <script src="/static/contact.js" defer></script>
     <script>
         (function(){
             const canvas = document.getElementById('matrix');

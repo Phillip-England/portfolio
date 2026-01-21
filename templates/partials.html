@@ -5,16 +5,51 @@
             <span class="w-2 h-2 bg-[#ff6b6b] rounded-full animate-pulse"></span>
             <a href="/" class="text-sm font-semibold tracking-wide text-[#e0e0e0]">~/phillip-england</a>
         </div>
-        <div class="flex flex-wrap items-center gap-1 text-xs">
+        <button type="button" class="md:hidden inline-flex items-center justify-center w-9 h-9 rounded border border-[#222] text-[#e0e0e0] hover:border-[#ff6b6b] transition-colors" aria-label="Open menu" data-mobile-menu-open>
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5 fill-current">
+                <path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z"/>
+            </svg>
+        </button>
+        <div class="hidden md:flex flex-wrap items-center gap-1 text-xs">
             <a href="/" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors {{if eq .ActiveNav "home"}}text-[#ff6b6b]{{else}}text-[#555] hover:text-[#ff6b6b]{{end}}">[HOME]</a>
             <a href="/projects" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors {{if eq .ActiveNav "projects"}}text-[#ff6b6b]{{else}}text-[#555] hover:text-[#ff6b6b]{{end}}">[PROJECTS]</a>
+            <a href="/services" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors {{if eq .ActiveNav "services"}}text-[#ff6b6b]{{else}}text-[#555] hover:text-[#ff6b6b]{{end}}">[SERVICES]</a>
             <a href="/blog" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors {{if eq .ActiveNav "blog"}}text-[#ff6b6b]{{else}}text-[#555] hover:text-[#ff6b6b]{{end}}">[BLOG]</a>
+            <a href="/contact" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors {{if eq .ActiveNav "contact"}}text-[#ff6b6b]{{else}}text-[#555] hover:text-[#ff6b6b]{{end}}">[CONTACT]</a>
         </div>
+        <div class="hidden md:flex items-center gap-2 text-xs">
+            {{if .AdminAuthenticated}}
+            <form method="POST" action="/admin/logout">
+                <button type="submit" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#ff6b6b]">[LOGOUT]</button>
+            </form>
+            {{end}}
+        </div>
+    </div>
+</nav>
+<div class="fixed inset-0 z-40 hidden" data-mobile-menu>
+    <div class="absolute inset-0 bg-black/70" data-mobile-menu-close></div>
+    <div class="absolute top-0 right-0 h-full w-72 bg-[#111] border-l border-[#222] px-5 py-6 flex flex-col gap-3">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-[#555]">menu</span>
+            <button type="button" class="w-8 h-8 inline-flex items-center justify-center rounded border border-[#222] text-[#e0e0e0] hover:border-[#ff6b6b] transition-colors" aria-label="Close menu" data-mobile-menu-close>
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 fill-current">
+                    <path d="M18.3 5.71 12 12l6.3 6.29-1.42 1.42L10.59 13.4 4.29 19.71 2.87 18.3 9.17 12 2.87 5.71 4.29 4.29l6.3 6.3 6.29-6.3z"/>
+                </svg>
+            </button>
+        </div>
+        <a href="/" class="px-3 py-2 rounded text-sm hover:bg-[#222] {{if eq .ActiveNav "home"}}text-[#ff6b6b]{{else}}text-[#e0e0e0]{{end}}">[HOME]</a>
+        <a href="/projects" class="px-3 py-2 rounded text-sm hover:bg-[#222] {{if eq .ActiveNav "projects"}}text-[#ff6b6b]{{else}}text-[#e0e0e0]{{end}}">[PROJECTS]</a>
+        <a href="/services" class="px-3 py-2 rounded text-sm hover:bg-[#222] {{if eq .ActiveNav "services"}}text-[#ff6b6b]{{else}}text-[#e0e0e0]{{end}}">[SERVICES]</a>
+        <a href="/blog" class="px-3 py-2 rounded text-sm hover:bg-[#222] {{if eq .ActiveNav "blog"}}text-[#ff6b6b]{{else}}text-[#e0e0e0]{{end}}">[BLOG]</a>
+        <a href="/contact" class="px-3 py-2 rounded text-sm hover:bg-[#222] {{if eq .ActiveNav "contact"}}text-[#ff6b6b]{{else}}text-[#e0e0e0]{{end}}">[CONTACT]</a>
         {{if .AdminAuthenticated}}
-        <form method="POST" action="/admin/logout" class="text-xs">
-            <button type="submit" class="px-3 py-1.5 rounded hover:bg-[#111] transition-colors text-[#555] hover:text-[#ff6b6b]">[LOGOUT]</button>
+        <form method="POST" action="/admin/logout" class="mt-2">
+            <button type="submit" class="w-full px-3 py-2 rounded text-sm text-[#e0e0e0] hover:bg-[#222]">[LOGOUT]</button>
         </form>
         {{end}}
     </div>
-</nav>
+</div>
+<a href="/contact" class="fixed bottom-6 right-6 z-50 rounded-full bg-[#ff6b6b] text-[#0a0a0a] font-semibold text-xs px-5 py-3 shadow-lg hover:bg-[#ff6b6b]/90 transition-colors" aria-label="Contact Me">
+    Contact Me
+</a>
 {{end}}

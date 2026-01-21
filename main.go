@@ -97,6 +97,7 @@ func main() {
 
 	http.HandleFunc("/project/", projectHandler)
 	http.HandleFunc("/projects", projectsHandler)
+	http.HandleFunc("/services", servicesHandler)
 	http.HandleFunc("/blog", blogHandler)
 	http.HandleFunc("/blog/", blogPostHandler)
 	http.HandleFunc("/", indexHandler)
@@ -170,6 +171,7 @@ func parseTemplates() map[string]*template.Template {
 	pages := []string{
 		"index.html",
 		"about.html",
+		"services.html",
 		"projects.html",
 		"project.html",
 		"blog.html",
@@ -355,6 +357,20 @@ func projectsHandler(w http.ResponseWriter, r *http.Request) {
 		AdminAuthenticated: isAdminAuthenticated(r),
 	}
 	templates["projects.html"].Execute(w, data)
+}
+
+func servicesHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/services" && r.URL.Path != "/services/" {
+		http.NotFound(w, r)
+		return
+	}
+	data := PageData{
+		Title:      "Services - Phillip England",
+		GitHubUser: "phillip-england",
+		ActiveNav:  "services",
+		AdminAuthenticated: isAdminAuthenticated(r),
+	}
+	templates["services.html"].Execute(w, data)
 }
 
 func blogHandler(w http.ResponseWriter, r *http.Request) {

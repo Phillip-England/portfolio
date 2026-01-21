@@ -45,6 +45,30 @@ document.head.appendChild(vt);
   });
 })();
 
+// Mobile nav toggle
+(function(){
+  const menu = document.querySelector('[data-mobile-menu]');
+  const openBtn = document.querySelector('[data-mobile-menu-open]');
+  if (!menu || !openBtn) return;
+
+  const closeTargets = menu.querySelectorAll('[data-mobile-menu-close]');
+  const open = () => {
+    menu.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  };
+  const close = () => {
+    menu.classList.add('hidden');
+    document.body.style.overflow = '';
+  };
+
+  openBtn.addEventListener('click', open);
+  closeTargets.forEach((el) => el.addEventListener('click', close));
+  menu.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href]');
+    if (link) close();
+  });
+})();
+
 // Home-only ASCII halo
 (function(){
   if(document.getElementById('asciiHalo')){
