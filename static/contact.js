@@ -7,6 +7,8 @@
   const message = document.getElementById('message');
   const count = document.getElementById('count');
   const status = document.getElementById('status');
+  const remainingEl = document.getElementById('contactRemaining');
+  const warningEl = document.getElementById('contactWarning');
   if(!form || !email || !message || !count || !status) return;
 
   const updateCount = () => {
@@ -46,12 +48,26 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+      const remainingHeader = res.headers.get('X-RateLimit-Remaining');
+      if (remainingHeader && remainingEl) {
+        const remaining = Math.max(0, Number(remainingHeader));
+        remainingEl.textContent = String(remaining);
+        if (warningEl) {
+          if (remaining <= 1) {
+            warningEl.classList.remove('hidden');
+          } else {
+            warningEl.classList.add('hidden');
+          }
+        }
+      }
       if (res.ok) {
         status.textContent = 'Message sent successfully!';
         form.reset();
         updateCount();
       } else if (res.status === 429) {
         status.textContent = 'Daily message limit reached. Please try again tomorrow.';
+        if (remainingEl) remainingEl.textContent = '0';
+        if (warningEl) warningEl.classList.remove('hidden');
       } else {
         status.textContent = 'Failed to send. Please try again.';
       }

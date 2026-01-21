@@ -103,10 +103,9 @@
                         <span class="text-xs text-[#555] ml-2">bash — 80x24</span>
                     </div>
                     <div class="space-y-3 font-mono text-sm mb-6">
-                        <div>
-                            <span class="text-[#ff6b6b]">➜</span> <span class="text-[#2dd4bf]">~</span> <span class="text-[#555]">mail -s "hello"</span>
-                        </div>
                         <p class="text-[#e0e0e0]">Drop a short message. I typically respond within 24-48 hours.</p>
+                        <p class="text-xs text-[#555]">Requests left today: <span id="contactRemaining">{{.ContactRemaining}}</span>/{{.ContactLimit}}</p>
+                        <p id="contactWarning" class="text-xs text-[#f59e0b] {{if not .ContactWarn}}hidden{{end}}">You're about to hit the daily limit.</p>
                     </div>
 
                     <form id="contactForm" class="space-y-4">

@@ -59,6 +59,12 @@ type PageData struct {
 	ActiveNav      string
 	AdminError     string
 	AdminAuthenticated bool
+	ContactRemaining int
+	ContactLimit     int
+	ContactWarn      bool
+	AdminRemaining   int
+	AdminLimit       int
+	AdminWarn        bool
 	Messages       []ContactMessage
 }
 
@@ -285,11 +291,23 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	switch r.Method {
 	case http.MethodGet:
+		ip := clientIP(r)
+		if ip == "" {
+			ip = "unknown"
+		}
+		remaining, err := remainingDailyLimit(r.Context(), ip, "contact_message", dailyLimitContact)
+		if err != nil {
+			log.Printf("failed to read contact rate limit for %s: %v", ip, err)
+			remaining = dailyLimitContact
+		}
 		data := PageData{
 			Title:      "Contact - Phillip England",
 			GitHubUser: "phillip-england",
 			ActiveNav:  "contact",
 			AdminAuthenticated: isAdminAuthenticated(r),
+			ContactRemaining: remaining,
+			ContactLimit:     dailyLimitContact,
+			ContactWarn:      remaining <= 1,
 		}
 		templates["contact.html"].Execute(w, data)
 	case http.MethodPost:
@@ -300,6 +318,7 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 		if isBlocked, err := isBlacklisted(r.Context(), ip, "contact_message"); err != nil {
 			log.Printf("failed to check blacklist for %s: %v", ip, err)
 		} else if isBlocked {
+			w.Header().Set("X-RateLimit-Remaining", "0")
 			rateLimitJSON("Too many messages from this IP today.")(w, r)
 			return
 		}
@@ -308,6 +327,7 @@ func contactHandler(w http.ResponseWriter, r *http.Request) {
 				log.Printf("failed to blacklist %s: %v", ip, err)
 			}
 			log.Printf("blacklisted %s for contact_message abuse over %s", ip, window)
+			w.Header().Set("X-RateLimit-Remaining", "0")
 			rateLimitJSON("Too many messages from this IP today.")(w, r)
 			return
 		}
@@ -470,7 +490,7 @@ func rateLimitJSON(message string) func(http.ResponseWriter, *http.Request) {
 
 func rateLimitAdminLogin(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTooManyRequests)
-	renderAdminLogin(w, "Too many login attempts. Try again tomorrow.")
+	renderAdminLoginWithRemaining(w, r, "Too many login attempts. Try again tomorrow.", 0)
 }
 
 func clientIP(r *http.Request) string {
@@ -515,15 +535,22 @@ func contactPostHandler(w http.ResponseWriter, r *http.Request, ip string) {
 		req.Date = time.Now().UTC().Format(time.RFC3339)
 	}
 
-	allowed, err := incrementDailyCount(r.Context(), ip, "contact_message", dailyLimitContact)
+	allowed, count, err := incrementDailyCount(r.Context(), ip, "contact_message", dailyLimitContact)
 	if err != nil {
 		log.Printf("failed to update contact rate limit for %s: %v", ip, err)
 	} else if !allowed {
 		if err := blacklistIP(r.Context(), ip, "contact_message", blacklistDuration); err != nil {
 			log.Printf("failed to blacklist %s: %v", ip, err)
 		}
+		w.Header().Set("X-RateLimit-Remaining", "0")
 		rateLimitJSON("Too many messages from this IP today.")(w, r)
 		return
+	} else {
+		remaining := dailyLimitContact - count
+		if remaining < 0 {
+			remaining = 0
+		}
+		w.Header().Set("X-RateLimit-Remaining", strconv.Itoa(remaining))
 	}
 	if err := insertContactMessage(r.Context(), req.Email, req.Message, req.Date); err != nil {
 		log.Printf("failed to store contact message: %v", err)
@@ -535,14 +562,14 @@ func contactPostHandler(w http.ResponseWriter, r *http.Request, ip string) {
 	json.NewEncoder(w).Encode(map[string]string{"status": "success", "message": "Message received"})
 }
 
-func incrementDailyCount(ctx context.Context, ip, action string, limit int) (bool, error) {
+func incrementDailyCount(ctx context.Context, ip, action string, limit int) (bool, int, error) {
 	if contactDB == nil {
-		return true, fmt.Errorf("database not initialized")
+		return true, 0, fmt.Errorf("database not initialized")
 	}
 	day := time.Now().UTC().Format("2006-01-02")
 	tx, err := contactDB.BeginTx(ctx, nil)
 	if err != nil {
-		return true, err
+		return true, 0, err
 	}
 	_, err = tx.ExecContext(ctx, `
 		INSERT INTO rate_limits (ip, action, day, count)
@@ -551,17 +578,17 @@ func incrementDailyCount(ctx context.Context, ip, action string, limit int) (boo
 	`, ip, action, day)
 	if err != nil {
 		tx.Rollback()
-		return true, err
+		return true, 0, err
 	}
 	var count int
 	if err := tx.QueryRowContext(ctx, `SELECT count FROM rate_limits WHERE ip = ? AND action = ? AND day = ?`, ip, action, day).Scan(&count); err != nil {
 		tx.Rollback()
-		return true, err
+		return true, 0, err
 	}
 	if err := tx.Commit(); err != nil {
-		return true, err
+		return true, 0, err
 	}
-	return count <= limit, nil
+	return count <= limit, count, nil
 }
 
 func isBlacklisted(ctx context.Context, ip, action string) (bool, error) {
@@ -600,6 +627,66 @@ func blacklistIP(ctx context.Context, ip, action string, duration time.Duration)
 		ON CONFLICT(ip, action) DO UPDATE SET blocked_until = excluded.blocked_until
 	`, ip, action, until)
 	return err
+}
+
+func getDailyCount(ctx context.Context, ip, action string) (int, error) {
+	if contactDB == nil {
+		return 0, fmt.Errorf("database not initialized")
+	}
+	day := time.Now().UTC().Format("2006-01-02")
+	var count int
+	err := contactDB.QueryRowContext(ctx, `SELECT count FROM rate_limits WHERE ip = ? AND action = ? AND day = ?`, ip, action, day).Scan(&count)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, nil
+		}
+		return 0, err
+	}
+	return count, nil
+}
+
+func remainingDailyLimit(ctx context.Context, ip, action string, limit int) (int, error) {
+	if ip == "" {
+		return limit, nil
+	}
+	isBlocked, err := isBlacklisted(ctx, ip, action)
+	if err != nil {
+		return 0, err
+	}
+	if isBlocked {
+		return 0, nil
+	}
+	count, err := getDailyCount(ctx, ip, action)
+	if err != nil {
+		return 0, err
+	}
+	remaining := limit - count
+	if remaining < 0 {
+		remaining = 0
+	}
+	return remaining, nil
+}
+
+func remainingAdminAttempts(ctx context.Context, ip string, limit int) (int, error) {
+	if ip == "" {
+		return limit, nil
+	}
+	isBlocked, err := isBlacklisted(ctx, ip, "admin_login")
+	if err != nil {
+		return 0, err
+	}
+	if isBlocked {
+		return 0, nil
+	}
+	count, err := getDailyCount(ctx, ip, "admin_login_failed")
+	if err != nil {
+		return 0, err
+	}
+	remaining := limit - count
+	if remaining < 0 {
+		remaining = 0
+	}
+	return remaining, nil
 }
 
 func trackRecentRequest(ip, action string) (bool, time.Duration) {
@@ -680,7 +767,7 @@ func adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		renderAdminLogin(w, "")
+		renderAdminLogin(w, r, "")
 	case http.MethodPost:
 		ip := clientIP(r)
 		if ip == "" {
@@ -701,13 +788,13 @@ func adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if err := r.ParseForm(); err != nil {
-			renderAdminLogin(w, "Invalid form submission.")
+			renderAdminLogin(w, r, "Invalid form submission.")
 			return
 		}
 		username := strings.TrimSpace(r.FormValue("username"))
 		password := strings.TrimSpace(r.FormValue("password"))
 		if !validateAdminCredentials(username, password) {
-			allowed, err := incrementDailyCount(r.Context(), ip, "admin_login_failed", dailyLimitAdminFailed)
+			allowed, count, err := incrementDailyCount(r.Context(), ip, "admin_login_failed", dailyLimitAdminFailed)
 			if err != nil {
 				log.Printf("failed to update admin rate limit for %s: %v", ip, err)
 			} else if !allowed {
@@ -718,7 +805,15 @@ func adminLoginHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			w.WriteHeader(http.StatusUnauthorized)
-			renderAdminLogin(w, "Invalid credentials.")
+			if err == nil {
+				remaining := dailyLimitAdminFailed - count
+				if remaining < 0 {
+					remaining = 0
+				}
+				renderAdminLoginWithRemaining(w, r, "Invalid credentials.", remaining)
+			} else {
+				renderAdminLogin(w, r, "Invalid credentials.")
+			}
 			return
 		}
 		setAdminCookie(w)
@@ -793,11 +888,28 @@ func adminLogoutHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 }
 
-func renderAdminLogin(w http.ResponseWriter, errMsg string) {
+func renderAdminLogin(w http.ResponseWriter, r *http.Request, errMsg string) {
+	ip := clientIP(r)
+	if ip == "" {
+		ip = "unknown"
+	}
+	remaining, err := remainingAdminAttempts(r.Context(), ip, dailyLimitAdminFailed)
+	if err != nil {
+		log.Printf("failed to read admin rate limit for %s: %v", ip, err)
+		remaining = dailyLimitAdminFailed
+	}
+	renderAdminLoginWithRemaining(w, r, errMsg, remaining)
+}
+
+func renderAdminLoginWithRemaining(w http.ResponseWriter, r *http.Request, errMsg string, remaining int) {
 	data := PageData{
 		Title:      "Admin Login - Phillip England",
 		AdminError: errMsg,
 		ActiveNav:  "admin",
+		AdminAuthenticated: isAdminAuthenticated(r),
+		AdminRemaining: remaining,
+		AdminLimit:     dailyLimitAdminFailed,
+		AdminWarn:      remaining <= 1,
 	}
 	templates["admin_login.html"].Execute(w, data)
 }
