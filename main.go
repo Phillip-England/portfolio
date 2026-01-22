@@ -244,11 +244,11 @@ func getProjects() []Project {
 func getSites() []Site {
 	return []Site{
 		{
-			Name:        "Drake's Detail Supply",
-			Description: "Service-forward marketing site with pricing, feature highlights, and call-to-action flow.",
+			Name:        "Auto Detailing Supply Co.",
+			Description: "Marketing site for a chemical supply partner focused on product education, service menus, and clear calls-to-action.",
 			URL:         "/sites/drakes_detail_supply",
-			Category:    "Auto Detailing",
-			Tags:        []string{"Lead Gen", "Branding", "Service Menu"},
+			Category:    "Chemical Supply",
+			Tags:        []string{"B2B", "Product Education", "Service Menu"},
 			Image:       "/sites/drakes_detail_supply/static/hero.webp",
 		},
 	}
