@@ -36,6 +36,15 @@ type Project struct {
 	Slug        string
 }
 
+type Site struct {
+	Name        string
+	Description string
+	URL         string
+	Category    string
+	Tags        []string
+	Image       string
+}
+
 type BlogPost struct {
 	Title   string
 	Slug    string
@@ -51,6 +60,7 @@ type PageData struct {
 	SocialImageURL string
 	GitHubUser     string
 	Projects       []Project
+	Sites          []Site
 	BlogPosts      []BlogPost
 	CurrentPost    BlogPost
 	CurrentProject Project
@@ -114,6 +124,7 @@ func main() {
 	http.HandleFunc("/admin/logout", adminLogoutHandler)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	http.Handle("/sites/", http.StripPrefix("/sites/", http.FileServer(http.Dir("./sites"))))
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -230,6 +241,19 @@ func getProjects() []Project {
 	}
 }
 
+func getSites() []Site {
+	return []Site{
+		{
+			Name:        "Drake's Detail Supply",
+			Description: "Service-forward marketing site with pricing, feature highlights, and call-to-action flow.",
+			URL:         "/sites/drakes_detail_supply",
+			Category:    "Auto Detailing",
+			Tags:        []string{"Lead Gen", "Branding", "Service Menu"},
+			Image:       "/sites/drakes_detail_supply/static/hero.webp",
+		},
+	}
+}
+
 func getBlogPosts() []BlogPost {
 	return []BlogPost{
 		{
@@ -273,6 +297,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			SocialImageURL:  absoluteURL(r, profileImage),
 			GitHubUser:      "phillip-england",
 			Projects:        getProjects(),
+			Sites:           getSites(),
 			BlogPosts:       getBlogPosts(),
 			ProfileImage:    profileImage,
 			ActiveNav:       "home",

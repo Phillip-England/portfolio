@@ -226,6 +226,48 @@
                     </section>
                 </aside>
             </section>
+
+            <section class="mt-10" aria-labelledby="sites-heading">
+                <div class="flex items-center gap-2 text-xs text-[#555]">
+                    <span>~/</span>
+                    <span class="text-[#ff6b6b]">sites</span>
+                    <span class="cursor-blink">_</span>
+                </div>
+                <div class="bg-[#111] border border-[#222] rounded-lg p-6 shadow-glow mt-3">
+                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h2 id="sites-heading" class="text-sm font-semibold text-[#2dd4bf]">Sites</h2>
+                            <p class="text-xs text-[#555] mt-1">Live client builds focused on clarity, conversion, and confident brand presence.</p>
+                        </div>
+                        <span class="text-xs text-[#555]">/sites/*</span>
+                    </div>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {{range .Sites}}
+                        <article class="border border-[#222] rounded-lg overflow-hidden bg-[#0d0d0d] group hover:border-[#ff6b6b] transition-colors">
+                            <div class="relative">
+                                <img src="{{.Image}}" alt="{{.Name}} preview" loading="lazy" class="w-full h-40 object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+                                <div class="absolute bottom-3 left-3 text-xs text-[#e0e0e0] bg-black/60 px-2 py-1 rounded">{{.Category}}</div>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-[#e0e0e0] group-hover:text-[#ff6b6b]">{{.Name}}</h3>
+                                    <p class="text-xs text-[#888] mt-1">{{.Description}}</p>
+                                </div>
+                                <div class="flex flex-wrap gap-2 text-[10px] uppercase tracking-wide text-[#555]">
+                                    {{range .Tags}}
+                                    <span class="border border-[#222] px-2 py-1 rounded">{{.}}</span>
+                                    {{end}}
+                                </div>
+                                <a href="{{.URL}}" class="inline-flex items-center gap-2 text-xs text-[#2dd4bf] hover:text-[#ff6b6b] transition-colors">
+                                    View site <span aria-hidden="true">-&gt;</span>
+                                </a>
+                            </div>
+                        </article>
+                        {{end}}
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 
