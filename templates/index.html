@@ -3,326 +3,892 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{.Title}} | Software Engineer Portfolio in Tulsa, OK</title>
-    <meta name="description" content="{{.MetaDescription}}">
-    <meta name="author" content="Phillip England">
-    <!-- Canonical link prevents duplicate-content confusion for crawlers. -->
-    <link rel="canonical" href="{{.CanonicalURL}}">
-    <!-- Open Graph tags improve link previews for social shares. -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{{.Title}} | Software Engineer Portfolio in Tulsa, OK">
-    <meta property="og:description" content="{{.MetaDescription}}">
-    <meta property="og:url" content="{{.CanonicalURL}}">
-    <meta property="og:image" content="{{.SocialImageURL}}">
-    <!-- Twitter Card tags ensure rich previews on Twitter/X. -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{.Title}} | Software Engineer Portfolio in Tulsa, OK">
-    <meta name="twitter:description" content="{{.MetaDescription}}">
-    <meta name="twitter:image" content="{{.SocialImageURL}}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap">
-    <!-- JSON-LD structured data helps Google generate rich results. -->
-    <script type="application/ld+json">
-        {
-          "@context": "https://schema.org",
-          "@type": "WebPage",
-          "name": "Phillip England | Software Engineer Portfolio in Tulsa, OK",
-          "description": "{{.MetaDescription}}",
-          "url": "{{.CanonicalURL}}",
-          "primaryImageOfPage": "{{.SocialImageURL}}",
-          "about": {
-            "@type": "Person",
-            "name": "Phillip England",
-            "jobTitle": "Software Engineer",
-            "homeLocation": "Tulsa, Oklahoma",
-            "url": "{{.CanonicalURL}}",
-            "sameAs": [
-              "https://github.com/phillip-england"
-            ]
-          }
-        }
-    </script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        bg: '#0a0a0a',
-                        panel: '#111111',
-                        border: '#222222',
-                        primary: '#ff6b6b',
-                        secondary: '#ff6b6b',
-                        accent: '#2dd4bf',
-                        dim: '#555555',
-                        text: '#e0e0e0',
-                        muted: '#888888',
-                    },
-                    fontFamily: {
-                        mono: ['"JetBrains Mono"', 'monospace'],
-                    },
-                    boxShadow: {
-                        'glow': '0 0 20px rgba(0, 255, 157, 0.15)',
-                        'glow-sm': '0 0 10px rgba(0, 255, 157, 0.1)',
-                    }
-                }
-            }
-        }
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Phillip England | Web Development</title>
     <style>
-        body { font-family: 'JetBrains Mono', monospace; }
-        .cursor-blink { animation: blink 1s step-end infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
-        .scanline {
-            background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.1) 51%);
-            background-size: 100% 4px;
+        :root, [data-theme="white"] {
+            --accent: #ffffff;
+            --accent-rgb: 255, 255, 255;
         }
-        .typing-effect {
-            overflow: hidden;
-            border-right: 2px solid #ff6b6b;
-            animation: typing 2s steps(30, end), blink 0.5s step-end infinite;
+        [data-theme="blue"] {
+            --accent: #4a9eff;
+            --accent-rgb: 74, 158, 255;
         }
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
+        [data-theme="green"] {
+            --accent: #4ae0a0;
+            --accent-rgb: 74, 224, 160;
         }
-        .scan-line {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: rgba(0, 255, 157, 0.1);
-            animation: scan 4s linear infinite;
-            pointer-events: none;
+        [data-theme="purple"] {
+            --accent: #a78bfa;
+            --accent-rgb: 167, 139, 250;
         }
-        @keyframes scan {
-            0% { top: 0%; opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { top: 100%; opacity: 0; }
+        [data-theme="red"] {
+            --accent: #ff6b6b;
+            --accent-rgb: 255, 107, 107;
         }
-        .matrix-rain {
+        [data-theme="gold"] {
+            --accent: #f0c040;
+            --accent-rgb: 240, 192, 64;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #mandelbrot {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            opacity: 0.03;
             z-index: 0;
+            opacity: 0.3;
         }
-        .grid-bg {
-            background-image: 
-                linear-gradient(rgba(0, 255, 157, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 157, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
         }
-        .panel-hover:hover {
-            box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
-            border-color: #ff6b6b;
+
+        .overlay {
+            position: relative;
+            z-index: 2;
         }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #111; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #ff6b6b; }
+
+        /* --- Nav --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 20;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 3rem;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-profile {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            filter: grayscale(100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+        }
+
+        .logo span {
+            color: #888;
+            font-weight: 300;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .theme-dots {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+        }
+
+        .theme-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .theme-dot:hover {
+            transform: scale(1.2);
+        }
+
+        .theme-dot.active {
+            border-color: rgba(255, 255, 255, 0.7);
+        }
+
+        nav a {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 0.03em;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        .icon-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ddd;
+            transition: transform 0.2s, border-color 0.2s, color 0.2s, background 0.2s;
+        }
+
+        .icon-link svg {
+            width: 28px;
+            height: 28px;
+            fill: currentColor;
+        }
+
+        .icon-link:hover {
+            color: var(--accent);
+            border-color: rgba(var(--accent-rgb), 0.8);
+            background: rgba(var(--accent-rgb), 0.08);
+            transform: translateY(-1px);
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* --- Page 1: Hero --- */
+        .page-hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding-top: 60px;
+        }
+
+        .hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 6rem 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #999;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .cta {
+            display: inline-block;
+            padding: 1rem 3rem;
+            border: 1px solid rgba(var(--accent-rgb), 0.4);
+            color: #0a0a0a;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            transition: all 0.3s;
+            background: var(--accent);
+            border-radius: 8px;
+        }
+
+        .cta:hover {
+            background: rgba(var(--accent-rgb), 0.85);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(var(--accent-rgb), 0.3);
+        }
+
+        /* --- Scroll spacers --- */
+        .scroll-spacer {
+            height: 100vh;
+        }
+
+        /* --- Page 2: About --- */
+        .page-about {
+            position: relative;
+            z-index: 3;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .about-inner {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 3rem 2.5rem;
+            background: rgba(10, 10, 10, 0.88);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-rgb), 0.25);
+            border-radius: 16px;
+            text-align: center;
+            box-shadow:
+                0 24px 60px rgba(0, 0, 0, 0.45),
+                0 6px 18px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                inset 0 -2px 8px rgba(0, 0, 0, 0.6);
+            transform: translateZ(0);
+        }
+
+        .about-inner .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            filter: grayscale(100%);
+            border: 2px solid rgba(var(--accent-rgb), 0.3);
+            margin-bottom: 1.5rem;
+        }
+
+        .about-inner h2 {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .about-inner p {
+            font-size: 1.05rem;
+            color: #999;
+            line-height: 1.7;
+        }
+
+        .about-col {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .about-col.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Page 3: Contact --- */
+        .page-contact {
+            position: relative;
+            z-index: 3;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contact-inner {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 3rem 2.5rem;
+            background: rgba(10, 10, 10, 0.88);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-rgb), 0.25);
+            border-radius: 16px;
+            box-shadow:
+                0 24px 60px rgba(0, 0, 0, 0.45),
+                0 6px 18px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                inset 0 -2px 8px rgba(0, 0, 0, 0.6);
+            transform: translateZ(0);
+        }
+
+        .form-col {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+        }
+
+        .form-col.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .form-col h2 {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            padding: 0.85rem 1rem;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+            border-radius: 8px;
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-color: rgba(var(--accent-rgb), 0.4);
+        }
+
+        .contact-form input::placeholder,
+        .contact-form textarea::placeholder {
+            color: #555;
+        }
+
+        .contact-form textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .contact-form button {
+            padding: 1rem 2.5rem;
+            border: 1px solid rgba(var(--accent-rgb), 0.4);
+            color: #0a0a0a;
+            background: var(--accent);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s;
+            align-self: stretch;
+            border-radius: 8px;
+        }
+
+        .contact-form button:hover {
+            background: rgba(var(--accent-rgb), 0.85);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(var(--accent-rgb), 0.3);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #555;
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(10, 10, 10, 0.8);
+            position: relative;
+            z-index: 3;
+        }
+
+        /* --- Fade-in on load --- */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .contact-inner,
+            .about-inner {
+                padding: 2rem 1.5rem;
+                margin: 0 1rem;
+            }
+            .about-inner .profile-img {
+                width: 110px;
+                height: 110px;
+            }
+            nav {
+                flex-wrap: wrap;
+                padding: 0.75rem 1.5rem;
+                gap: 0.5rem;
+            }
+            .logo-group {
+                order: 1;
+            }
+            .nav-right {
+                order: 3;
+                width: 100%;
+                flex-direction: row-reverse;
+                justify-content: space-between;
+                border-top: 1px solid rgba(255, 255, 255, 0.05);
+                padding-top: 0.5rem;
+            }
+            .nav-right ul {
+                gap: 1rem;
+            }
+            .page-hero {
+                padding-top: 90px;
+            }
+        }
     </style>
 </head>
-<body class="bg-[#0a0a0a] text-[#e0e0e0] min-h-screen antialiased selection:bg-[#ff6b6b] selection:text-[#0a0a0a]">
-    <canvas id="matrix" class="matrix-rain"></canvas>
-    <div class="scan-line"></div>
+<body>
+    <canvas id="mandelbrot"></canvas>
+    <canvas id="three-canvas"></canvas>
 
-    {{template "navbar" .}}
-
-    <main class="pt-28 sm:pt-20 pb-16 px-4 relative z-10 grid-bg min-h-screen">
-        <div class="max-w-6xl mx-auto">
-            <header class="mb-8">
-                <div class="flex items-center gap-2 text-xs text-[#555]">
-                    <span>~/</span>
-                    <span class="text-[#ff6b6b]">home</span>
-                    <span class="cursor-blink">_</span>
+    <div class="overlay">
+        <nav class="fade-in">
+            <div class="logo-group">
+                <img src="/static/profile.jpeg" alt="Phillip England" class="nav-profile">
+                <div class="logo">PHILLIP <span>ENGLAND</span></div>
+            </div>
+            <div class="nav-right">
+                <div class="theme-dots" id="theme-dots">
+                    <span class="theme-dot active" data-theme="white" style="background:#ffffff"></span>
+                    <span class="theme-dot" data-theme="blue" style="background:#4a9eff"></span>
+                    <span class="theme-dot" data-theme="green" style="background:#4ae0a0"></span>
+                    <span class="theme-dot" data-theme="purple" style="background:#a78bfa"></span>
+                    <span class="theme-dot" data-theme="red" style="background:#ff6b6b"></span>
+                    <span class="theme-dot" data-theme="gold" style="background:#f0c040"></span>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-semibold text-[#e0e0e0] mt-3">Phillip England</h1>
-                <p class="text-sm text-[#888] mt-2">Software Engineer in Tulsa, Oklahoma</p>
-            </header>
+                <ul>
+                    <li><a id="nav-home">Home</a></li>
+                    <li><a id="nav-about">About</a></li>
+                    <li><a id="nav-contact">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
 
-            <section class="grid lg:grid-cols-[1fr_300px] gap-8 mb-12">
-                <div class="space-y-8">
-                    <section class="bg-[#111] border border-[#222] rounded-lg p-6 shadow-glow" aria-labelledby="profile-heading">
-                        <h2 id="profile-heading" class="text-xs font-semibold text-[#2dd4bf] mb-4">Profile Snapshot</h2>
-                        <div class="flex items-center gap-4 mb-4">
-                            <img src="{{.ProfileImage}}" alt="Phillip England portrait" width="64" height="64" decoding="async" class="w-16 h-16 rounded-full object-cover border-2 border-[#ff6b6b]">
-                            <div>
-                                <h3 class="text-[#ff6b6b] font-semibold">Phillip England</h3>
-                                <p class="text-xs text-[#555]">Software Engineer</p>
-                            </div>
-                        </div>
-                        <div class="space-y-2 text-xs border-t border-[#222] pt-4">
-                            <div class="flex justify-between items-center">
-                                <span class="text-[#555]">Location</span>
-                                <span class="text-[#e0e0e0]">Tulsa, Oklahoma</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[#555]">Time</span>
-                                <span id="clock" class="text-[#ff6b6b]">--:--:--</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[#555]">GitHub</span>
-                                <a href="https://github.com/phillip-england" target="_blank" rel="noopener noreferrer"
-                                    class="inline-flex items-center gap-2 text-[#2dd4bf] hover:text-[#ff6b6b] transition-colors">
-                                    <svg viewBox="0 0 24 24" aria-hidden="true" class="w-4 h-4 fill-current">
-                                        <path d="M12 2C6.477 2 2 6.484 2 12.018c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.004.071 1.532 1.034 1.532 1.034.892 1.53 2.341 1.088 2.91.833.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.27.098-2.647 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.297 2.748-1.026 2.748-1.026.546 1.377.203 2.394.1 2.647.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.944.359.31.678.92.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.018C22 6.484 17.523 2 12 2Z"/>
-                                    </svg>
-                                    <span>phillip-england</span>
-                                </a>
-                            </div>
-                        </div>
-                    </section>
+        <!-- Page 1: Hero -->
+        <div class="page-hero" id="page-hero">
+            <section class="hero">
+                <h1 class="fade-in">Websites<br>Built Right</h1>
+                <p class="fade-in">Clean design, fast performance, and thoughtful development. From first sketch to live on the web.</p>
+                <a href="#contact" class="cta fade-in" id="cta-btn">Get In Touch</a>
+            </section>
+        </div>
 
-                    <section class="bg-[#111] border border-[#222] rounded-lg p-6 shadow-glow" aria-labelledby="about-heading">
-                        <h2 id="about-heading" class="text-xs font-semibold text-[#2dd4bf] mb-4">About Me</h2>
-                        <p class="text-sm text-[#e0e0e0] leading-relaxed">
-                            My name is Phillip England, and I love to learn. 7 years ago, I wanted to build a website, but I wanted it to be <span class="text-[#2dd4bf]">mine</span>. So, I stumbled upon HTML and down the rabbit hole I went.
-                        </p>
-                        <p class="text-sm text-[#e0e0e0] leading-relaxed mt-3">
-                            I value simplicity and specialize in backend technologies. I love building web applications, compilers, and DX-centric tooling.
-                        </p>
-                    </section>
+        <!-- Spacer 1: torus zoom (hero → about) -->
+        <div class="scroll-spacer" id="spacer-1"></div>
 
-                    <section class="bg-[#111] border border-[#222] rounded-lg p-6 shadow-glow" aria-labelledby="contact-heading">
-                        <h2 id="contact-heading" class="text-xs font-semibold text-[#ff6b6b] mb-4">Contact</h2>
-                        <p class="text-sm text-[#e0e0e0] leading-relaxed mb-4">
-                            Have a question or want to work together? Drop me a note and I will get back to you.
-                        </p>
-                        <a href="/contact"
-                            class="inline-flex items-center justify-center w-full py-2 px-4 bg-[#ff6b6b] text-[#0a0a0a] font-semibold rounded-lg hover:bg-[#ff6b6b]/90 transition-colors text-sm">
-                            Go to Contact Form
+        <!-- Page 2: About -->
+        <section class="page-about" id="about">
+            <div class="about-inner">
+                <div class="about-col">
+                    <img src="/static/profile.jpeg" alt="Phillip England" class="profile-img">
+                    <h2>About Me</h2>
+                    <p>I'm Phillip — a web developer from Tulsa, Oklahoma. I build fast, clean websites that work for real people and real businesses. No fluff, no bloat, just solid work.</p>
+                    <p>
+                        <a class="icon-link" href="https://github.com/phillip-england" target="_blank" rel="noopener noreferrer" aria-label="Phillip England on GitHub">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 2c-5.52 0-10 4.58-10 10.24 0 4.53 2.86 8.37 6.84 9.73.5.1.68-.22.68-.49 0-.24-.01-1.04-.02-1.88-2.78.62-3.37-1.23-3.37-1.23-.45-1.2-1.1-1.52-1.1-1.52-.9-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.58 2.37 1.12 2.95.86.09-.67.35-1.12.64-1.38-2.22-.26-4.56-1.15-4.56-5.1 0-1.13.39-2.05 1.03-2.77-.1-.26-.45-1.3.1-2.71 0 0 .84-.27 2.75 1.06a9.2 9.2 0 0 1 2.5-.35c.85 0 1.7.12 2.5.35 1.9-1.33 2.74-1.06 2.74-1.06.55 1.4.2 2.45.1 2.71.64.72 1.03 1.64 1.03 2.77 0 3.96-2.35 4.84-4.59 5.1.36.32.69.96.69 1.94 0 1.4-.01 2.53-.01 2.87 0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.24C22 6.58 17.52 2 12 2z"/>
+                            </svg>
+                            <span class="sr-only">github.com/phillip-england</span>
                         </a>
-                    </section>
+                    </p>
                 </div>
+            </div>
+        </section>
 
-                <aside class="space-y-6" aria-labelledby="projects-heading">
-                    <div class="flex items-center gap-2 text-xs text-[#555]">
-                        <span>~/</span>
-                        <span class="text-[#ff6b6b]">projects</span>
-                        <span class="cursor-blink">_</span>
-                    </div>
-                    <section class="bg-[#111] border border-[#222] rounded-lg p-5 panel-hover transition-all">
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="text-[#ff6b6b]">●</span>
-                            <h2 id="projects-heading" class="text-sm font-semibold">Projects</h2>
-                        </div>
-                        <ul class="space-y-3 text-xs">
-                            {{range .Projects}}
-                            <li>
-                                <a href="/project/{{.Slug}}" class="flex flex-col p-2 rounded hover:bg-[#222] transition-colors group">
-                                    <span class="text-[#e0e0e0] group-hover:text-[#ff6b6b]">{{.Name}}</span>
-                                    <span class="text-[#555] mt-0.5 group-hover:text-[#888]">{{.Description}}</span>
-                                </a>
-                            </li>
-                            {{end}}
-                        </ul>
-                    </section>
-                </aside>
-            </section>
+        <!-- Spacer 2: tetrahedron zoom (about → contact) -->
+        <div class="scroll-spacer" id="spacer-2"></div>
 
-            <section class="mt-10" aria-labelledby="sites-heading">
-                <div class="flex items-center gap-2 text-xs text-[#555]">
-                    <span>~/</span>
-                    <span class="text-[#ff6b6b]">sites</span>
-                    <span class="cursor-blink">_</span>
+        <!-- Page 3: Contact -->
+        <section class="page-contact" id="contact">
+            <div class="contact-inner">
+                <div class="form-col">
+                    <h2>Get In Touch</h2>
+                    <form class="contact-form">
+                        <input type="email" name="email" placeholder="Email" required>
+                        <textarea name="message" placeholder="Tell me about your project..." required></textarea>
+                        <button type="submit">Send Message</button>
+                    </form>
                 </div>
-                <div class="bg-[#111] border border-[#222] rounded-lg p-6 shadow-glow mt-3">
-                    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-                        <div>
-                            <h2 id="sites-heading" class="text-sm font-semibold text-[#2dd4bf]">Sites</h2>
-                            <p class="text-xs text-[#555] mt-1">Live client builds focused on clarity, conversion, and confident brand presence.</p>
-                        </div>
-                        <span class="text-xs text-[#555]">/sites/*</span>
-                    </div>
-                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {{range .Sites}}
-                        <article class="border border-[#222] rounded-lg overflow-hidden bg-[#0d0d0d] group hover:border-[#ff6b6b] transition-colors">
-                            <div class="relative">
-                                <img src="{{.Image}}" alt="{{.Name}} preview" loading="lazy" class="w-full h-40 object-cover">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
-                                <div class="absolute bottom-3 left-3 text-xs text-[#e0e0e0] bg-black/60 px-2 py-1 rounded">{{.Category}}</div>
-                            </div>
-                            <div class="p-4 space-y-3">
-                                <div>
-                                    <h3 class="text-sm font-semibold text-[#e0e0e0] group-hover:text-[#ff6b6b]">{{.Name}}</h3>
-                                    <p class="text-xs text-[#888] mt-1">{{.Description}}</p>
-                                </div>
-                                <div class="flex flex-wrap gap-2 text-[10px] uppercase tracking-wide text-[#555]">
-                                    {{range .Tags}}
-                                    <span class="border border-[#222] px-2 py-1 rounded">{{.}}</span>
-                                    {{end}}
-                                </div>
-                                <a href="{{.URL}}" class="inline-flex items-center gap-2 text-xs text-[#2dd4bf] hover:text-[#ff6b6b] transition-colors">
-                                    View site <span aria-hidden="true">-&gt;</span>
-                                </a>
-                            </div>
-                        </article>
-                        {{end}}
-                    </div>
-                </div>
-            </section>
-        </div>
-    </main>
+            </div>
+        </section>
 
-    <footer class="border-t border-[#222] py-6 mt-12 bg-[#0a0a0a]">
-        <div class="max-w-6xl mx-auto px-4 text-center">
-            <p class="text-xs text-[#555]">
-                <span class="text-[#ff6b6b]">© 2026</span> Phillip England 
-                <span class="text-[#333] mx-2">|</span> 
-                <span class="text-[#555]">Built with</span> 
-                <span class="text-[#2dd4bf]">Go</span> 
-                <span class="text-[#555]">+</span> 
-                <span class="text-[#ff6b6b]">Tailwind</span>
-            </p>
-        </div>
-    </footer>
+        <footer>
+            &copy; 2026 Phillip England
+        </footer>
+    </div>
 
-    <script src="/static/site.js" defer></script>
     <script>
-        (function(){
-            const canvas = document.getElementById('matrix');
-            const ctx = canvas.getContext('2d');
+        document.querySelectorAll('.fade-in').forEach((el, i) => {
+            setTimeout(() => el.classList.add('visible'), 150 + i * 120);
+        });
+
+        function smoothScrollTo(id) {
+            const el = document.getElementById(id);
+            const y = el.getBoundingClientRect().top + window.scrollY + window.innerHeight * 0.05;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+
+        document.getElementById('cta-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            smoothScrollTo('contact');
+        });
+        document.getElementById('nav-home').addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        document.getElementById('nav-about').addEventListener('click', function() {
+            smoothScrollTo('about');
+        });
+        document.getElementById('nav-contact').addEventListener('click', function() {
+            smoothScrollTo('contact');
+        });
+
+        // Theme switcher
+        const themeColors = {
+            white: 0xffffff,
+            blue: 0x4a9eff,
+            green: 0x4ae0a0,
+            purple: 0xa78bfa,
+            red: 0xff6b6b,
+            gold: 0xf0c040,
+        };
+
+        const dots = document.querySelectorAll('.theme-dot');
+        const saved = localStorage.getItem('theme');
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            window.__themeHex = themeColors[theme];
+            dots.forEach(d => d.classList.toggle('active', d.dataset.theme === theme));
+        }
+
+        if (saved && themeColors[saved]) {
+            setTheme(saved);
+        }
+
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => setTheme(dot.dataset.theme));
+        });
+
+        window.__themeHex = themeColors[saved || 'white'];
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        const canvas = document.getElementById('mandelbrot');
+        const ctx = canvas.getContext('2d');
+
+        const baseMaxIter = 80;
+        const centerX = -0.75;
+        const centerY = 0;
+        const startZoom = 2.5;
+        let lastFrame = 0;
+        let lastRender = 0;
+        let animT = 0;
+        const bufferScale = 0.55;
+        let bufferW = 0;
+        let bufferH = 0;
+        const offscreen = document.createElement('canvas');
+        const offCtx = offscreen.getContext('2d');
+
+        function hexToRgb(hex) {
+            return {
+                r: (hex >> 16) & 255,
+                g: (hex >> 8) & 255,
+                b: hex & 255,
+            };
+        }
+
+        function mbResize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-            const fontSize = 14;
-            const columns = canvas.width / fontSize;
-            const drops = Array(Math.floor(columns)).fill(1);
-            function draw() {
-                ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#ff6b6b';
-                ctx.font = fontSize + 'px monospace';
-                for(let i = 0; i < drops.length; i++) {
-                    const char = chars[Math.floor(Math.random() * chars.length)];
-                    ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-                    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                    drops[i]++;
+            bufferW = Math.max(220, Math.floor(canvas.width * bufferScale));
+            bufferH = Math.max(220, Math.floor(canvas.height * bufferScale));
+            offscreen.width = bufferW;
+            offscreen.height = bufferH;
+        }
+
+        function mandelbrot(cx, cy, maxIter) {
+            let x = 0, y = 0;
+            let i = 0;
+            while (x * x + y * y <= 4 && i < maxIter) {
+                const tmp = x * x - y * y + cx;
+                y = 2 * x * y + cy;
+                x = tmp;
+                i++;
+            }
+            return i;
+        }
+
+        function render(zoom, maxIter, driftX, driftY, t, accentRgb) {
+            const w = bufferW;
+            const h = bufferH;
+            const img = offCtx.createImageData(w, h);
+            const aspect = w / h;
+
+            for (let py = 0; py < h; py++) {
+                for (let px = 0; px < w; px++) {
+                    const wobble = Math.sin(px * 0.02 + t * 0.9) * Math.sin(py * 0.02 + t * 0.7) * zoom * 0.0011;
+                    const cx = centerX + driftX + (px / w - 0.5) * zoom * aspect + wobble;
+                    const cy = centerY + driftY + (py / h - 0.5) * zoom + wobble;
+                    const iter = mandelbrot(cx, cy, maxIter);
+
+                    let v = 0;
+                    if (iter < maxIter) {
+                        v = Math.floor((iter / maxIter) * 200);
+                    }
+
+                    const idx = (py * w + px) * 4;
+                    const tint = 0.12;
+                    img.data[idx]     = Math.min(255, v + accentRgb.r * tint);
+                    img.data[idx + 1] = Math.min(255, v + accentRgb.g * tint);
+                    img.data[idx + 2] = Math.min(255, v + accentRgb.b * tint);
+                    img.data[idx + 3] = 255;
                 }
             }
-            setInterval(draw, 50);
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+
+            offCtx.putImageData(img, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.imageSmoothingEnabled = true;
+            ctx.drawImage(offscreen, 0, 0, canvas.width, canvas.height);
+        }
+
+        function getScrollProgress() {
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            if (maxScroll <= 0) return 0;
+            return Math.min(1, Math.max(0, window.scrollY / maxScroll));
+        }
+
+        function animateMandelbrot(ts) {
+            if (!lastFrame) lastFrame = ts;
+            const delta = ts - lastFrame;
+            lastFrame = ts;
+            animT += delta * 0.001;
+
+            const scrollProgress = getScrollProgress();
+            const eased = scrollProgress * (0.85 + 0.15 * scrollProgress);
+            const endKick = Math.max(0, scrollProgress - 0.75) / 0.25;
+            const scrollZoom = startZoom * (1 - (eased + endKick * 0.06) * 0.5);
+            const jitterX = Math.sin(animT * 1.6) * scrollZoom * 0.007;
+            const jitterY = Math.cos(animT * 1.3) * scrollZoom * 0.006;
+            const accentRgb = hexToRgb(window.__themeHex || 0xffffff);
+
+            if (ts - lastRender > 60) {
+                render(scrollZoom, baseMaxIter, jitterX, jitterY, animT, accentRgb);
+                lastRender = ts;
+            }
+            requestAnimationFrame(animateMandelbrot);
+        }
+
+        mbResize();
+        requestAnimationFrame(animateMandelbrot);
+
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                mbResize();
+                const accentRgb = hexToRgb(window.__themeHex || 0xffffff);
+                render(startZoom, baseMaxIter, 0, 0, animT, accentRgb);
+            }, 200);
+        });
+    </script>
+
+    <script>
+        (function() {
+            const threeCanvas = document.getElementById('three-canvas');
+            const spacer1 = document.getElementById('spacer-1');
+            const spacer2 = document.getElementById('spacer-2');
+            const pageHero = document.getElementById('page-hero');
+            const aboutCol = document.querySelector('.about-col');
+            const formCol = document.querySelector('.form-col');
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.z = 6;
+
+            const renderer = new THREE.WebGLRenderer({ canvas: threeCanvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setClearColor(0x000000, 0);
+
+            // Torus
+            const torusGeo = new THREE.TorusGeometry(0.8, 0.25, 48, 100);
+            const torusMat = new THREE.MeshStandardMaterial({
+                color: 0xffffff, roughness: 0.5, metalness: 0.7,
+                wireframe: true, transparent: true, opacity: 0,
             });
-        })();
-        (function(){
-            function updateClock() {
-                const el = document.getElementById('clock');
-                if(el) {
-                    const now = new Date();
-                    el.textContent = now.toLocaleTimeString('en-US', {hour12: false});
-                }
+            const torus = new THREE.Mesh(torusGeo, torusMat);
+            torus.visible = false;
+            scene.add(torus);
+
+            // Pyramid
+            const knotGeo = new THREE.ConeGeometry(1, 1.4, 4, 16, false);
+            const knotMat = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                wireframe: true, transparent: true, opacity: 0, depthWrite: true,
+            });
+            const knot = new THREE.Mesh(knotGeo, knotMat);
+            knot.visible = false;
+            scene.add(knot);
+
+            // Lighting
+            const ambient = new THREE.AmbientLight(0xffffff, 0.2);
+            scene.add(ambient);
+            const point = new THREE.PointLight(0xffffff, 0.6, 80);
+            point.position.set(0, 15, 35);
+            scene.add(point);
+            const hemi = new THREE.HemisphereLight(0xffffff, 0x222222, 0.35);
+            scene.add(hemi);
+
+            // Scroll progress helpers
+            function getProgress(spacer) {
+                const rect = spacer.getBoundingClientRect();
+                const viewH = window.innerHeight;
+                const raw = (viewH - rect.top) / (rect.height + viewH);
+                return Math.max(0, Math.min(1, raw));
             }
-            updateClock();
-            setInterval(updateClock, 1000);
+
+            let aboutRevealed = false;
+            let contactRevealed = false;
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                const p1 = getProgress(spacer1); // hero → about
+                const p2 = getProgress(spacer2); // about → contact
+
+                const hex = window.__themeHex;
+                torusMat.color.set(hex);
+                knotMat.color.set(hex);
+
+                // --- Torus (hero → about) ---
+                torus.rotation.x += 0.005;
+                torus.rotation.y += 0.008;
+
+                let torusOpacity;
+                if (p1 < 0.15) {
+                    torusOpacity = p1 / 0.15;
+                } else if (p1 > 0.5) {
+                    torusOpacity = 1 - (p1 - 0.5) / 0.2;
+                } else {
+                    torusOpacity = 1;
+                }
+                torusMat.opacity = Math.max(0, Math.min(1, torusOpacity));
+                torus.visible = torusMat.opacity > 0.01;
+
+                const torusZoom = Math.max((p1 - 0.1) / 0.8, 0);
+                const torusScale = 1 + torusZoom * 12;
+                torus.scale.set(torusScale, torusScale, torusScale);
+
+                // Hero fades out
+                const heroOpacity = 1 - Math.min(p1 / 0.25, 1);
+                pageHero.style.opacity = heroOpacity;
+                pageHero.style.pointerEvents = heroOpacity < 0.1 ? 'none' : '';
+
+                // About reveal
+                if (p1 > 0.5 && !aboutRevealed) {
+                    aboutRevealed = true;
+                    aboutCol.classList.add('visible');
+                } else if (p1 < 0.35 && aboutRevealed) {
+                    aboutRevealed = false;
+                    aboutCol.classList.remove('visible');
+                }
+
+                // --- Torus Knot (about → contact) ---
+                knot.rotation.x += 0.004;
+                knot.rotation.y += 0.007;
+                knot.rotation.z += 0.002;
+
+                let knotOpacity;
+                if (p2 < 0.55) {
+                    knotOpacity = p2 / 0.55;
+                } else if (p2 > 0.9) {
+                    knotOpacity = Math.pow(1 - (p2 - 0.9) / 0.1, 2);
+                } else {
+                    knotOpacity = 1;
+                }
+                let pyramidOpacity = Math.max(0, Math.min(1, knotOpacity)) * 0.55;
+                if (p2 > 0.5) {
+                    const contactFade = 1 - Math.min((p2 - 0.5) / 0.35, 1);
+                    pyramidOpacity *= contactFade;
+                }
+                knotMat.opacity = pyramidOpacity;
+                knot.visible = knotMat.opacity > 0.01;
+
+                const knotZoom = Math.max((p2 - 0.01) / 0.99, 0);
+                const knotScale = 0.6 + knotZoom * 5;
+                knot.scale.set(knotScale, knotScale, knotScale);
+
+                // About fades out during tetra transition
+                if (p2 > 0) {
+                    const aboutFade = 1 - Math.min(p2 / 0.25, 1);
+                    document.getElementById('about').style.opacity = aboutFade;
+                }
+
+                // Contact reveal
+                if (p2 > 0.5 && !contactRevealed) {
+                    contactRevealed = true;
+                    formCol.classList.add('visible');
+                } else if (p2 < 0.35 && contactRevealed) {
+                    contactRevealed = false;
+                    formCol.classList.remove('visible');
+                }
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
         })();
     </script>
 </body>
