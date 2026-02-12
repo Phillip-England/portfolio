@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phillip England | Web Development</title>
     <style>
-        :root, [data-theme="white"] {
+        :root, [data-theme="blue"] {
             --accent: #ffffff;
             --accent-rgb: 255, 255, 255;
         }
@@ -183,6 +183,26 @@
             border-color: rgba(var(--accent-rgb), 0.8);
             background: rgba(var(--accent-rgb), 0.08);
             transform: translateY(-1px);
+        }
+
+        .github-link {
+            width: 72px;
+            height: 72px;
+            margin-top: 1.5rem;
+            border: 2px solid rgba(var(--accent-rgb), 0.4);
+            color: var(--accent);
+            background: rgba(var(--accent-rgb), 0.06);
+            box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.1);
+        }
+
+        .github-link svg {
+            width: 36px;
+            height: 36px;
+        }
+
+        .github-link:hover {
+            box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.25);
+            transform: translateY(-3px);
         }
 
         .sr-only {
@@ -413,11 +433,48 @@
             border-radius: 8px;
         }
 
-        .contact-form button:hover {
+        .contact-form button:hover:not(:disabled) {
             background: rgba(var(--accent-rgb), 0.85);
             border-color: var(--accent);
             transform: translateY(-2px);
             box-shadow: 0 4px 20px rgba(var(--accent-rgb), 0.3);
+        }
+
+        .contact-form button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .char-counter {
+            font-size: 0.75rem;
+            color: #555;
+            text-align: right;
+            margin-top: -0.5rem;
+        }
+
+        .char-counter.warn {
+            color: #ff6b6b;
+        }
+
+        .form-feedback {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .form-feedback.success {
+            display: block;
+            background: rgba(74, 224, 160, 0.1);
+            border: 1px solid rgba(74, 224, 160, 0.3);
+            color: #4ae0a0;
+        }
+
+        .form-feedback.error {
+            display: block;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
         }
 
         footer {
@@ -493,8 +550,8 @@
             </div>
             <div class="nav-right">
                 <div class="theme-dots" id="theme-dots">
-                    <span class="theme-dot active" data-theme="white" style="background:#ffffff"></span>
-                    <span class="theme-dot" data-theme="blue" style="background:#4a9eff"></span>
+                    <span class="theme-dot" data-theme="white" style="background:#ffffff"></span>
+                    <span class="theme-dot active" data-theme="blue" style="background:#4a9eff"></span>
                     <span class="theme-dot" data-theme="green" style="background:#4ae0a0"></span>
                     <span class="theme-dot" data-theme="purple" style="background:#a78bfa"></span>
                     <span class="theme-dot" data-theme="red" style="background:#ff6b6b"></span>
@@ -528,7 +585,7 @@
                     <h2>About Me</h2>
                     <p>I'm Phillip — a web developer from Tulsa, Oklahoma. I build fast, clean websites that work for real people and real businesses. No fluff, no bloat, just solid work.</p>
                     <p>
-                        <a class="icon-link" href="https://github.com/phillip-england" target="_blank" rel="noopener noreferrer" aria-label="Phillip England on GitHub">
+                        <a class="icon-link github-link" href="https://github.com/phillip-england" target="_blank" rel="noopener noreferrer" aria-label="Phillip England on GitHub">
                             <svg viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M12 2c-5.52 0-10 4.58-10 10.24 0 4.53 2.86 8.37 6.84 9.73.5.1.68-.22.68-.49 0-.24-.01-1.04-.02-1.88-2.78.62-3.37-1.23-3.37-1.23-.45-1.2-1.1-1.52-1.1-1.52-.9-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.58 2.37 1.12 2.95.86.09-.67.35-1.12.64-1.38-2.22-.26-4.56-1.15-4.56-5.1 0-1.13.39-2.05 1.03-2.77-.1-.26-.45-1.3.1-2.71 0 0 .84-.27 2.75 1.06a9.2 9.2 0 0 1 2.5-.35c.85 0 1.7.12 2.5.35 1.9-1.33 2.74-1.06 2.74-1.06.55 1.4.2 2.45.1 2.71.64.72 1.03 1.64 1.03 2.77 0 3.96-2.35 4.84-4.59 5.1.36.32.69.96.69 1.94 0 1.4-.01 2.53-.01 2.87 0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.24C22 6.58 17.52 2 12 2z"/>
                             </svg>
@@ -547,10 +604,12 @@
             <div class="contact-inner">
                 <div class="form-col">
                     <h2>Get In Touch</h2>
-                    <form class="contact-form">
-                        <input type="email" name="email" placeholder="Email" required>
-                        <textarea name="message" placeholder="Tell me about your project..." required></textarea>
-                        <button type="submit">Send Message</button>
+                    <form class="contact-form" id="contact-form">
+                        <div class="form-feedback" id="form-feedback"></div>
+                        <input type="text" name="email" placeholder="Email" id="contact-email">
+                        <textarea name="message" placeholder="Tell me about your project..." maxlength="255" id="contact-message"></textarea>
+                        <div class="char-counter" id="char-counter">0 / 255</div>
+                        <button type="submit" id="contact-submit">Send Message</button>
                     </form>
                 </div>
             </div>
@@ -606,15 +665,111 @@
             dots.forEach(d => d.classList.toggle('active', d.dataset.theme === theme));
         }
 
-        if (saved && themeColors[saved]) {
-            setTheme(saved);
-        }
+        setTheme((saved && themeColors[saved]) ? saved : 'blue');
 
         dots.forEach(dot => {
             dot.addEventListener('click', () => setTheme(dot.dataset.theme));
         });
 
-        window.__themeHex = themeColors[saved || 'white'];
+        window.__themeHex = themeColors[saved || 'blue'];
+
+        // Contact form
+        (function() {
+            const form = document.getElementById('contact-form');
+            const emailInput = document.getElementById('contact-email');
+            const messageInput = document.getElementById('contact-message');
+            const charCounter = document.getElementById('char-counter');
+            const feedback = document.getElementById('form-feedback');
+            const submitBtn = document.getElementById('contact-submit');
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            function showError(msg) {
+                feedback.className = 'form-feedback error';
+                feedback.style.display = '';
+                feedback.textContent = msg;
+            }
+
+            function showSuccess(msg) {
+                feedback.className = 'form-feedback success';
+                feedback.style.display = '';
+                feedback.textContent = msg;
+            }
+
+            function clearFeedback() {
+                feedback.className = 'form-feedback';
+                feedback.textContent = '';
+            }
+
+            function lockForm(msg) {
+                emailInput.disabled = true;
+                messageInput.disabled = true;
+                submitBtn.disabled = true;
+                showError(msg);
+            }
+
+            messageInput.addEventListener('input', function() {
+                const len = this.value.length;
+                charCounter.textContent = len + ' / 255';
+                charCounter.classList.toggle('warn', len > 230);
+            });
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                clearFeedback();
+
+                const email = emailInput.value.trim();
+                const message = messageInput.value.trim();
+
+                if (!email) {
+                    showError('Please enter your email address.');
+                    emailInput.focus();
+                    return;
+                }
+                if (!emailPattern.test(email)) {
+                    showError('That doesn\'t look like a valid email address.');
+                    emailInput.focus();
+                    return;
+                }
+                if (!message) {
+                    showError('Please enter a message.');
+                    messageInput.focus();
+                    return;
+                }
+                if (message.length > 255) {
+                    showError('Message must be 255 characters or fewer.');
+                    messageInput.focus();
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Sending...';
+
+                try {
+                    const resp = await fetch('/api/contact', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: email, message: message }),
+                    });
+                    const data = await resp.json();
+                    if (data.ok) {
+                        showSuccess(data.message);
+                        form.reset();
+                        charCounter.textContent = '0 / 255';
+                        charCounter.classList.remove('warn');
+                    } else if (resp.status === 429) {
+                        lockForm(data.message);
+                        return;
+                    } else {
+                        showError(data.message);
+                    }
+                } catch (err) {
+                    showError('Something went wrong. Please try again.');
+                }
+
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Message';
+            });
+        })();
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -633,8 +788,6 @@
         const bufferScale = 0.55;
         let bufferW = 0;
         let bufferH = 0;
-        const offscreen = document.createElement('canvas');
-        const offCtx = offscreen.getContext('2d');
 
         function hexToRgb(hex) {
             return {
@@ -644,64 +797,74 @@
             };
         }
 
+        // Web Worker for off-main-thread mandelbrot computation
+        const workerCode = `
+            self.onmessage = function(e) {
+                const { w, h, zoom, maxIter, driftX, driftY, t, accentRgb, centerX, centerY } = e.data;
+                const buf = new Uint8ClampedArray(w * h * 4);
+                const aspect = w / h;
+                const tint = 0.12;
+                for (let py = 0; py < h; py++) {
+                    for (let px = 0; px < w; px++) {
+                        const wobble = Math.sin(px * 0.02 + t * 0.9) * Math.sin(py * 0.02 + t * 0.7) * zoom * 0.0011;
+                        const cx = centerX + driftX + (px / w - 0.5) * zoom * aspect + wobble;
+                        const cy = centerY + driftY + (py / h - 0.5) * zoom + wobble;
+                        let x = 0, y = 0, i = 0;
+                        while (x * x + y * y <= 4 && i < maxIter) {
+                            const tmp = x * x - y * y + cx;
+                            y = 2 * x * y + cy;
+                            x = tmp;
+                            i++;
+                        }
+                        let v = 0;
+                        if (i < maxIter) v = Math.floor((i / maxIter) * 200);
+                        const idx = (py * w + px) * 4;
+                        buf[idx]     = Math.min(255, v + accentRgb.r * tint);
+                        buf[idx + 1] = Math.min(255, v + accentRgb.g * tint);
+                        buf[idx + 2] = Math.min(255, v + accentRgb.b * tint);
+                        buf[idx + 3] = 255;
+                    }
+                }
+                self.postMessage({ buf: buf.buffer, w, h }, [buf.buffer]);
+            };
+        `;
+        const mbWorker = new Worker(URL.createObjectURL(new Blob([workerCode], { type: 'application/javascript' })));
+        let workerBusy = false;
+
+        mbWorker.onmessage = function(e) {
+            const { buf, w, h } = e.data;
+            const img = new ImageData(new Uint8ClampedArray(buf), w, h);
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            ctx.imageSmoothingEnabled = true;
+            const tmp = document.createElement('canvas');
+            tmp.width = w;
+            tmp.height = h;
+            tmp.getContext('2d').putImageData(img, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(tmp, 0, 0, canvas.width, canvas.height);
+            workerBusy = false;
+        };
+
         function mbResize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             bufferW = Math.max(220, Math.floor(canvas.width * bufferScale));
             bufferH = Math.max(220, Math.floor(canvas.height * bufferScale));
-            offscreen.width = bufferW;
-            offscreen.height = bufferH;
-        }
-
-        function mandelbrot(cx, cy, maxIter) {
-            let x = 0, y = 0;
-            let i = 0;
-            while (x * x + y * y <= 4 && i < maxIter) {
-                const tmp = x * x - y * y + cx;
-                y = 2 * x * y + cy;
-                x = tmp;
-                i++;
-            }
-            return i;
-        }
-
-        function render(zoom, maxIter, driftX, driftY, t, accentRgb) {
-            const w = bufferW;
-            const h = bufferH;
-            const img = offCtx.createImageData(w, h);
-            const aspect = w / h;
-
-            for (let py = 0; py < h; py++) {
-                for (let px = 0; px < w; px++) {
-                    const wobble = Math.sin(px * 0.02 + t * 0.9) * Math.sin(py * 0.02 + t * 0.7) * zoom * 0.0011;
-                    const cx = centerX + driftX + (px / w - 0.5) * zoom * aspect + wobble;
-                    const cy = centerY + driftY + (py / h - 0.5) * zoom + wobble;
-                    const iter = mandelbrot(cx, cy, maxIter);
-
-                    let v = 0;
-                    if (iter < maxIter) {
-                        v = Math.floor((iter / maxIter) * 200);
-                    }
-
-                    const idx = (py * w + px) * 4;
-                    const tint = 0.12;
-                    img.data[idx]     = Math.min(255, v + accentRgb.r * tint);
-                    img.data[idx + 1] = Math.min(255, v + accentRgb.g * tint);
-                    img.data[idx + 2] = Math.min(255, v + accentRgb.b * tint);
-                    img.data[idx + 3] = 255;
-                }
-            }
-
-            offCtx.putImageData(img, 0, 0);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.imageSmoothingEnabled = true;
-            ctx.drawImage(offscreen, 0, 0, canvas.width, canvas.height);
         }
 
         function getScrollProgress() {
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
             if (maxScroll <= 0) return 0;
             return Math.min(1, Math.max(0, window.scrollY / maxScroll));
+        }
+
+        function requestRender(zoom, maxIter, driftX, driftY, t, accentRgb) {
+            if (workerBusy) return;
+            workerBusy = true;
+            mbWorker.postMessage({
+                w: bufferW, h: bufferH, zoom, maxIter, driftX, driftY, t, accentRgb, centerX, centerY,
+            });
         }
 
         function animateMandelbrot(ts) {
@@ -719,7 +882,7 @@
             const accentRgb = hexToRgb(window.__themeHex || 0xffffff);
 
             if (ts - lastRender > 60) {
-                render(scrollZoom, baseMaxIter, jitterX, jitterY, animT, accentRgb);
+                requestRender(scrollZoom, baseMaxIter, jitterX, jitterY, animT, accentRgb);
                 lastRender = ts;
             }
             requestAnimationFrame(animateMandelbrot);
@@ -733,8 +896,6 @@
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => {
                 mbResize();
-                const accentRgb = hexToRgb(window.__themeHex || 0xffffff);
-                render(startZoom, baseMaxIter, 0, 0, animT, accentRgb);
             }, 200);
         });
     </script>
