@@ -3,7 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phillip England | Web Development</title>
+    <title>Phillip England | Web Developer in Tulsa, Oklahoma</title>
+    <meta name="description" content="Phillip England is a web developer in Tulsa, Oklahoma building fast, clean, affordable websites for small businesses. Custom static sites from $200, hosting from $40/mo.">
+    <meta name="keywords" content="web developer Tulsa, website developer Tulsa Oklahoma, Phillip England, web design Tulsa, affordable websites Oklahoma, small business websites Tulsa">
+    <link rel="canonical" href="https://phillipengland.com/">
+    <link rel="icon" type="image/x-icon" href="/static/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="/static/favicon/site.webmanifest">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Phillip England | Web Developer in Tulsa, Oklahoma">
+    <meta property="og:description" content="Fast, clean, affordable websites for small businesses in Tulsa, Oklahoma. Custom sites from $200 with hosting and support.">
+    <meta property="og:url" content="https://phillipengland.com/">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Phillip England Web Development">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Phillip England | Web Developer in Tulsa, Oklahoma">
+    <meta name="twitter:description" content="Fast, clean, affordable websites for small businesses in Tulsa, Oklahoma. Custom sites from $200.">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": "Phillip England Web Development",
+        "description": "Custom website development for small businesses in Tulsa, Oklahoma. Fast, clean, affordable static sites with hosting and support.",
+        "url": "https://phillipengland.com",
+        "telephone": "",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Tulsa",
+            "addressRegion": "OK",
+            "addressCountry": "US"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 36.1540,
+            "longitude": -95.9928
+        },
+        "areaServed": {
+            "@type": "City",
+            "name": "Tulsa",
+            "containedInPlace": {
+                "@type": "State",
+                "name": "Oklahoma"
+            }
+        },
+        "founder": {
+            "@type": "Person",
+            "name": "Phillip England",
+            "jobTitle": "Web Developer",
+            "url": "https://phillipengland.com",
+            "sameAs": [
+                "https://github.com/phillip-england"
+            ]
+        },
+        "priceRange": "$200-$500",
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Web Development Services",
+            "itemListElement": [
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Custom Website Build",
+                        "description": "Custom static website with email contact form"
+                    },
+                    "priceSpecification": {
+                        "@type": "PriceSpecification",
+                        "minPrice": "200",
+                        "maxPrice": "500",
+                        "priceCurrency": "USD"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Monthly Website Hosting",
+                        "description": "Website hosting with 3 minor updates per month included"
+                    },
+                    "priceSpecification": {
+                        "@type": "PriceSpecification",
+                        "price": "40",
+                        "priceCurrency": "USD",
+                        "billingDuration": "P1M"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Additional Development Work",
+                        "description": "Website updates, new pages, redesigns, and feature additions"
+                    },
+                    "priceSpecification": {
+                        "@type": "PriceSpecification",
+                        "price": "120",
+                        "priceCurrency": "USD",
+                        "unitText": "HOUR"
+                    }
+                }
+            ]
+        }
+    }
+    </script>
     <style>
         :root, [data-theme="blue"] {
             --accent: #ffffff;
@@ -477,6 +587,103 @@
             color: #ff6b6b;
         }
 
+        /* --- Page 3: Pricing --- */
+        .page-pricing {
+            position: relative;
+            z-index: 3;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .pricing-col {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .pricing-col.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .pricing-col h2 {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .pricing-cards {
+            display: flex;
+            gap: 1.25rem;
+            align-items: stretch;
+        }
+
+        .pricing-card {
+            flex: 1;
+            padding: 2rem 1.75rem;
+            background: rgba(10, 10, 10, 0.88);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(var(--accent-rgb), 0.25);
+            border-radius: 16px;
+            box-shadow:
+                0 24px 60px rgba(0, 0, 0, 0.45),
+                0 6px 18px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                inset 0 -2px 8px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .pricing-card-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #999;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+
+        .pricing-card-price {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 1.25rem;
+        }
+
+        .pricing-card-divider {
+            width: 40px;
+            height: 1px;
+            background: rgba(var(--accent-rgb), 0.3);
+            margin: 0 auto 1.25rem;
+        }
+
+        .pricing-card-details {
+            font-size: 0.88rem;
+            color: #777;
+            line-height: 1.7;
+            list-style: none;
+            text-align: left;
+        }
+
+        .pricing-card-details li {
+            padding-left: 1.2em;
+            position: relative;
+            margin-bottom: 0.35rem;
+        }
+
+        .pricing-card-details li::before {
+            content: '—';
+            position: absolute;
+            left: 0;
+            color: rgba(var(--accent-rgb), 0.5);
+        }
+
         footer {
             text-align: center;
             padding: 2rem;
@@ -508,6 +715,12 @@
             .about-inner {
                 padding: 2rem 1.5rem;
                 margin: 0 1rem;
+            }
+            .pricing-cards {
+                flex-direction: column;
+            }
+            .page-pricing {
+                padding: 2rem 1rem;
             }
             .about-inner .profile-img {
                 width: 110px;
@@ -543,7 +756,7 @@
     <canvas id="three-canvas"></canvas>
 
     <div class="overlay">
-        <nav class="fade-in">
+        <nav class="fade-in" aria-label="Main navigation">
             <div class="logo-group">
                 <img src="/static/profile.jpeg" alt="Phillip England" class="nav-profile">
                 <div class="logo">PHILLIP <span>ENGLAND</span></div>
@@ -558,18 +771,20 @@
                     <span class="theme-dot" data-theme="gold" style="background:#f0c040"></span>
                 </div>
                 <ul>
-                    <li><a id="nav-home">Home</a></li>
-                    <li><a id="nav-about">About</a></li>
-                    <li><a id="nav-contact">Contact</a></li>
+                    <li><a href="#home" id="nav-home">Home</a></li>
+                    <li><a href="#about" id="nav-about">About</a></li>
+                    <li><a href="#pricing" id="nav-pricing">Pricing</a></li>
+                    <li><a href="#contact" id="nav-contact">Contact</a></li>
                 </ul>
             </div>
         </nav>
 
+        <main>
         <!-- Page 1: Hero -->
-        <div class="page-hero" id="page-hero">
+        <div class="page-hero" id="home">
             <section class="hero">
                 <h1 class="fade-in">Websites<br>Built Right</h1>
-                <p class="fade-in">Clean design, fast performance, and thoughtful development. From first sketch to live on the web.</p>
+                <p class="fade-in">Web developer in Tulsa, Oklahoma. Clean design, fast performance, and thoughtful development for small businesses.</p>
                 <a href="#contact" class="cta fade-in" id="cta-btn">Get In Touch</a>
             </section>
         </div>
@@ -581,9 +796,9 @@
         <section class="page-about" id="about">
             <div class="about-inner">
                 <div class="about-col">
-                    <img src="/static/profile.jpeg" alt="Phillip England" class="profile-img">
+                    <img src="/static/profile.jpeg" alt="Phillip England, web developer in Tulsa, Oklahoma" class="profile-img">
                     <h2>About Me</h2>
-                    <p>I'm Phillip — a web developer from Tulsa, Oklahoma. I build fast, clean websites that work for real people and real businesses. No fluff, no bloat, just solid work.</p>
+                    <p>I'm Phillip England — a web developer based in Tulsa, Oklahoma. I build fast, clean websites for small businesses and real people. No fluff, no bloat — just solid, affordable web development.</p>
                     <p>
                         <a class="icon-link github-link" href="https://github.com/phillip-england" target="_blank" rel="noopener noreferrer" aria-label="Phillip England on GitHub">
                             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -596,10 +811,55 @@
             </div>
         </section>
 
-        <!-- Spacer 2: tetrahedron zoom (about → contact) -->
+        <!-- Spacer 2: octahedron zoom (about → pricing) -->
         <div class="scroll-spacer" id="spacer-2"></div>
 
-        <!-- Page 3: Contact -->
+        <!-- Page 3: Pricing -->
+        <section class="page-pricing" id="pricing">
+            <div class="pricing-col">
+                <h2>Web Development Pricing</h2>
+                <div class="pricing-cards">
+
+                    <div class="pricing-card">
+                        <div class="pricing-card-name">Website Build</div>
+                        <div class="pricing-card-price">$200 – $500</div>
+                        <div class="pricing-card-divider"></div>
+                        <ul class="pricing-card-details">
+                            <li>Custom static site, built to your needs</li>
+                            <li>Price based on pages and content complexity</li>
+                            <li>Email contact form included</li>
+                        </ul>
+                    </div>
+
+                    <div class="pricing-card">
+                        <div class="pricing-card-name">Monthly Hosting</div>
+                        <div class="pricing-card-price">$40 / mo</div>
+                        <div class="pricing-card-divider"></div>
+                        <ul class="pricing-card-details">
+                            <li>Reliable hosting and upkeep</li>
+                            <li>3 minor updates per month included</li>
+                            <li>Minor = under 10 minutes of work</li>
+                        </ul>
+                    </div>
+
+                    <div class="pricing-card">
+                        <div class="pricing-card-name">Additional Work</div>
+                        <div class="pricing-card-price">$120 / hr</div>
+                        <div class="pricing-card-divider"></div>
+                        <ul class="pricing-card-details">
+                            <li>Anything beyond included minor updates</li>
+                            <li>New pages, redesigns, feature additions</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Spacer 3: pyramid zoom (pricing → contact) -->
+        <div class="scroll-spacer" id="spacer-3"></div>
+
+        <!-- Page 4: Contact -->
         <section class="page-contact" id="contact">
             <div class="contact-inner">
                 <div class="form-col">
@@ -615,6 +875,7 @@
             </div>
         </section>
 
+        </main>
         <footer>
             &copy; 2026 Phillip England
         </footer>
@@ -640,6 +901,9 @@
         });
         document.getElementById('nav-about').addEventListener('click', function() {
             smoothScrollTo('about');
+        });
+        document.getElementById('nav-pricing').addEventListener('click', function() {
+            smoothScrollTo('pricing');
         });
         document.getElementById('nav-contact').addEventListener('click', function() {
             smoothScrollTo('contact');
@@ -905,8 +1169,10 @@
             const threeCanvas = document.getElementById('three-canvas');
             const spacer1 = document.getElementById('spacer-1');
             const spacer2 = document.getElementById('spacer-2');
-            const pageHero = document.getElementById('page-hero');
+            const spacer3 = document.getElementById('spacer-3');
+            const pageHero = document.getElementById('home');
             const aboutCol = document.querySelector('.about-col');
+            const pricingCol = document.querySelector('.pricing-col');
             const formCol = document.querySelector('.form-col');
 
             const scene = new THREE.Scene();
@@ -929,7 +1195,7 @@
             scene.add(torus);
 
             // Pyramid
-            const knotGeo = new THREE.ConeGeometry(1, 1.4, 4, 16, false);
+            const knotGeo = new THREE.ConeGeometry(1, 1.4, 3, 20, false);
             const knotMat = new THREE.MeshBasicMaterial({
                 color: 0xffffff,
                 wireframe: true, transparent: true, opacity: 0, depthWrite: true,
@@ -937,6 +1203,16 @@
             const knot = new THREE.Mesh(knotGeo, knotMat);
             knot.visible = false;
             scene.add(knot);
+
+            // Octahedron (pricing → contact)
+            const octoGeo = new THREE.SphereGeometry(0.9, 48, 48);
+            const octoMat = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                wireframe: true, transparent: true, opacity: 0, depthWrite: true,
+            });
+            const octo = new THREE.Mesh(octoGeo, octoMat);
+            octo.visible = false;
+            scene.add(octo);
 
             // Lighting
             const ambient = new THREE.AmbientLight(0xffffff, 0.2);
@@ -956,17 +1232,20 @@
             }
 
             let aboutRevealed = false;
+            let pricingRevealed = false;
             let contactRevealed = false;
 
             function animate() {
                 requestAnimationFrame(animate);
 
                 const p1 = getProgress(spacer1); // hero → about
-                const p2 = getProgress(spacer2); // about → contact
+                const p2 = getProgress(spacer2); // about → pricing
+                const p3 = getProgress(spacer3); // pricing → contact
 
                 const hex = window.__themeHex;
                 torusMat.color.set(hex);
                 knotMat.color.set(hex);
+                octoMat.color.set(hex);
 
                 // --- Torus (hero → about) ---
                 torus.rotation.x += 0.005;
@@ -1001,7 +1280,7 @@
                     aboutCol.classList.remove('visible');
                 }
 
-                // --- Torus Knot (about → contact) ---
+                // --- Pyramid (about → pricing) ---
                 knot.rotation.x += 0.004;
                 knot.rotation.y += 0.007;
                 knot.rotation.z += 0.002;
@@ -1016,8 +1295,8 @@
                 }
                 let pyramidOpacity = Math.max(0, Math.min(1, knotOpacity)) * 0.55;
                 if (p2 > 0.5) {
-                    const contactFade = 1 - Math.min((p2 - 0.5) / 0.35, 1);
-                    pyramidOpacity *= contactFade;
+                    const pricingFade = 1 - Math.min((p2 - 0.5) / 0.35, 1);
+                    pyramidOpacity *= pricingFade;
                 }
                 knotMat.opacity = pyramidOpacity;
                 knot.visible = knotMat.opacity > 0.01;
@@ -1026,17 +1305,57 @@
                 const knotScale = 0.6 + knotZoom * 5;
                 knot.scale.set(knotScale, knotScale, knotScale);
 
-                // About fades out during tetra transition
+                // About fades out during pyramid transition
                 if (p2 > 0) {
                     const aboutFade = 1 - Math.min(p2 / 0.25, 1);
                     document.getElementById('about').style.opacity = aboutFade;
                 }
 
+                // Pricing reveal
+                if (p2 > 0.5 && !pricingRevealed) {
+                    pricingRevealed = true;
+                    pricingCol.classList.add('visible');
+                } else if (p2 < 0.35 && pricingRevealed) {
+                    pricingRevealed = false;
+                    pricingCol.classList.remove('visible');
+                }
+
+                // --- Octahedron (pricing → contact) ---
+                octo.rotation.x += 0.003;
+                octo.rotation.y += 0.006;
+                octo.rotation.z += 0.004;
+
+                let octoOpacity;
+                if (p3 < 0.55) {
+                    octoOpacity = p3 / 0.55;
+                } else if (p3 > 0.9) {
+                    octoOpacity = Math.pow(1 - (p3 - 0.9) / 0.1, 2);
+                } else {
+                    octoOpacity = 1;
+                }
+                let octaOpacity = Math.max(0, Math.min(1, octoOpacity)) * 0.55;
+                if (p3 > 0.5) {
+                    const contactFade = 1 - Math.min((p3 - 0.5) / 0.35, 1);
+                    octaOpacity *= contactFade;
+                }
+                octoMat.opacity = octaOpacity;
+                octo.visible = octoMat.opacity > 0.01;
+
+                const octoZoom = Math.max((p3 - 0.01) / 0.99, 0);
+                const octoScale = 0.6 + octoZoom * 5;
+                octo.scale.set(octoScale, octoScale, octoScale);
+
+                // Pricing fades out during octahedron transition
+                if (p3 > 0) {
+                    const priceFade = 1 - Math.min(p3 / 0.25, 1);
+                    document.getElementById('pricing').style.opacity = priceFade;
+                }
+
                 // Contact reveal
-                if (p2 > 0.5 && !contactRevealed) {
+                if (p3 > 0.5 && !contactRevealed) {
                     contactRevealed = true;
                     formCol.classList.add('visible');
-                } else if (p2 < 0.35 && contactRevealed) {
+                } else if (p3 < 0.35 && contactRevealed) {
                     contactRevealed = false;
                     formCol.classList.remove('visible');
                 }
