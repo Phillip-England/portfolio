@@ -270,6 +270,43 @@
             color: var(--accent);
         }
 
+        /* --- Hamburger (hidden on desktop) --- */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 25;
+        }
+
+        .hamburger-line {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #ccc;
+            margin: 4px 0;
+            border-radius: 2px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .hamburger.active .hamburger-line:nth-child(1) {
+            transform: translateY(6px) rotate(45deg);
+        }
+
+        .hamburger.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active .hamburger-line:nth-child(3) {
+            transform: translateY(-6px) rotate(-45deg);
+        }
+
+        /* --- Mobile Menu (hidden on desktop) --- */
+        .mobile-menu {
+            display: none;
+        }
+
         .icon-link {
             display: inline-flex;
             align-items: center;
@@ -727,23 +764,57 @@
                 height: 110px;
             }
             nav {
-                flex-wrap: wrap;
                 padding: 0.75rem 1.5rem;
-                gap: 0.5rem;
-            }
-            .logo-group {
-                order: 1;
             }
             .nav-right {
-                order: 3;
-                width: 100%;
-                flex-direction: row-reverse;
-                justify-content: space-between;
-                border-top: 1px solid rgba(255, 255, 255, 0.05);
-                padding-top: 0.5rem;
+                display: none;
             }
-            .nav-right ul {
-                gap: 1rem;
+            .hamburger {
+                display: block;
+            }
+            .mobile-menu {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 260px;
+                height: 100vh;
+                z-index: 19;
+                background: rgba(10, 10, 10, 0.95);
+                backdrop-filter: blur(16px);
+                border-left: 1px solid rgba(255, 255, 255, 0.06);
+                padding: 5rem 2rem 2rem;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            }
+            .mobile-menu.open {
+                transform: translateX(0);
+            }
+            .mobile-menu ul {
+                list-style: none;
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+            .mobile-menu ul li a {
+                display: block;
+                padding: 0.75rem 0;
+                color: #aaa;
+                text-decoration: none;
+                font-size: 1rem;
+                letter-spacing: 0.03em;
+                transition: color 0.2s;
+            }
+            .mobile-menu ul li a:hover {
+                color: var(--accent);
+            }
+            .mobile-theme-dots {
+                display: flex;
+                gap: 0.5rem;
+                margin-top: 1.5rem;
+                padding-top: 1.5rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.06);
             }
             .page-hero {
                 padding-top: 90px;
@@ -761,6 +832,11 @@
                 <img src="/static/profile.jpeg" alt="Phillip England" class="nav-profile">
                 <div class="logo">PHILLIP <span>ENGLAND</span></div>
             </div>
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
             <div class="nav-right">
                 <div class="theme-dots" id="theme-dots">
                     <span class="theme-dot" data-theme="white" style="background:#ffffff"></span>
@@ -778,6 +854,22 @@
                 </ul>
             </div>
         </nav>
+        <div class="mobile-menu" id="mobile-menu">
+            <ul>
+                <li><a href="#home" class="mobile-nav-link" data-target="home">Home</a></li>
+                <li><a href="#about" class="mobile-nav-link" data-target="about">About</a></li>
+                <li><a href="#pricing" class="mobile-nav-link" data-target="pricing">Pricing</a></li>
+                <li><a href="#contact" class="mobile-nav-link" data-target="contact">Contact</a></li>
+            </ul>
+            <div class="mobile-theme-dots">
+                <span class="theme-dot" data-theme="white" style="background:#ffffff"></span>
+                <span class="theme-dot" data-theme="blue" style="background:#4a9eff"></span>
+                <span class="theme-dot" data-theme="green" style="background:#4ae0a0"></span>
+                <span class="theme-dot" data-theme="purple" style="background:#a78bfa"></span>
+                <span class="theme-dot" data-theme="red" style="background:#ff6b6b"></span>
+                <span class="theme-dot" data-theme="gold" style="background:#f0c040"></span>
+            </div>
+        </div>
 
         <main>
         <!-- Page 1: Hero -->
@@ -888,7 +980,8 @@
 
         function smoothScrollTo(id) {
             const el = document.getElementById(id);
-            const y = el.getBoundingClientRect().top + window.scrollY + window.innerHeight * 0.05;
+            const navHeight = document.querySelector('nav').offsetHeight;
+            const y = el.getBoundingClientRect().top + window.scrollY - navHeight;
             window.scrollTo({ top: y, behavior: 'smooth' });
         }
 
@@ -911,6 +1004,31 @@
         document.getElementById('nav-contact').addEventListener('click', function(e) {
             e.preventDefault();
             smoothScrollTo('contact');
+        });
+
+        // Mobile menu
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('open');
+            hamburger.setAttribute('aria-expanded', mobileMenu.classList.contains('open'));
+        });
+
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('open');
+                hamburger.setAttribute('aria-expanded', 'false');
+                const target = this.dataset.target;
+                if (target === 'home') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    smoothScrollTo(target);
+                }
+            });
         });
 
         // Theme switcher
