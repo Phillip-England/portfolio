@@ -896,16 +896,20 @@
             e.preventDefault();
             smoothScrollTo('contact');
         });
-        document.getElementById('nav-home').addEventListener('click', function() {
+        document.getElementById('nav-home').addEventListener('click', function(e) {
+            e.preventDefault();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
-        document.getElementById('nav-about').addEventListener('click', function() {
+        document.getElementById('nav-about').addEventListener('click', function(e) {
+            e.preventDefault();
             smoothScrollTo('about');
         });
-        document.getElementById('nav-pricing').addEventListener('click', function() {
+        document.getElementById('nav-pricing').addEventListener('click', function(e) {
+            e.preventDefault();
             smoothScrollTo('pricing');
         });
-        document.getElementById('nav-contact').addEventListener('click', function() {
+        document.getElementById('nav-contact').addEventListener('click', function(e) {
+            e.preventDefault();
             smoothScrollTo('contact');
         });
 
