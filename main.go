@@ -13,6 +13,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
@@ -331,6 +332,37 @@ func cmdServe(port string) {
 
 		limiter.reset()
 		json.NewEncoder(w).Encode(contactResponse{OK: true, Message: "All rate-limited IPs have been reset"})
+	})
+
+	// Music page
+	http.HandleFunc("/music", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if err := tmpl.ExecuteTemplate(w, "music.html", nil); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
+	// Music file server (filesystem-based, not embedded — wav files are too large)
+	http.Handle("/music/", http.StripPrefix("/music/", http.FileServer(http.Dir("music"))))
+
+	// Song list API
+	http.HandleFunc("/api/music/list", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		var songs []string
+		entries, err := os.ReadDir("music")
+		if err != nil {
+			json.NewEncoder(w).Encode(songs)
+			return
+		}
+		for _, e := range entries {
+			if !e.IsDir() && strings.ToLower(filepath.Ext(e.Name())) == ".wav" {
+				songs = append(songs, e.Name())
+			}
+		}
+		if songs == nil {
+			songs = []string{}
+		}
+		json.NewEncoder(w).Encode(songs)
 	})
 
 	addr := ":" + port
