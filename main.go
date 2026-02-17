@@ -334,31 +334,59 @@ func cmdServe(port string) {
 		json.NewEncoder(w).Encode(contactResponse{OK: true, Message: "All rate-limited IPs have been reset"})
 	})
 
-	// Music page
+	// Helper: read song names from music/ directory
+	readSongs := func() []string {
+		var songs []string
+		entries, err := os.ReadDir("music")
+		if err != nil {
+			return songs
+		}
+		for _, e := range entries {
+			if !e.IsDir() && strings.ToLower(filepath.Ext(e.Name())) == ".wav" {
+				songs = append(songs, strings.TrimSuffix(e.Name(), filepath.Ext(e.Name())))
+			}
+		}
+		return songs
+	}
+
+	// Music index page
 	http.HandleFunc("/music", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		if err := tmpl.ExecuteTemplate(w, "music.html", nil); err != nil {
+		if err := tmpl.ExecuteTemplate(w, "music.html", readSongs()); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
 
-	// Music file server (filesystem-based, not embedded — wav files are too large)
-	http.Handle("/music/", http.StripPrefix("/music/", http.FileServer(http.Dir("music"))))
+	// Individual song pages + music file server
+	http.HandleFunc("/music/", func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/music/")
+		// Serve .wav files directly from the music/ directory
+		if strings.HasSuffix(strings.ToLower(path), ".wav") {
+			http.ServeFile(w, r, filepath.Join("music", filepath.Base(path)))
+			return
+		}
+		// Individual song page: /music/{songname}
+		songName := path
+		if songName == "" {
+			http.Redirect(w, r, "/music", http.StatusFound)
+			return
+		}
+		// Verify the song exists
+		wavPath := filepath.Join("music", songName+".wav")
+		if _, err := os.Stat(wavPath); os.IsNotExist(err) {
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if err := tmpl.ExecuteTemplate(w, "song.html", songName); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
 
 	// Song list API
 	http.HandleFunc("/api/music/list", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		var songs []string
-		entries, err := os.ReadDir("music")
-		if err != nil {
-			json.NewEncoder(w).Encode(songs)
-			return
-		}
-		for _, e := range entries {
-			if !e.IsDir() && strings.ToLower(filepath.Ext(e.Name())) == ".wav" {
-				songs = append(songs, e.Name())
-			}
-		}
+		songs := readSongs()
 		if songs == nil {
 			songs = []string{}
 		}
