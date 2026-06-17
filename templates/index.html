@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phillip England | Software and Technical Services in Tulsa, Oklahoma</title>
-    <meta name="description" content="Phillip England provides simple software solutions and technical services for small businesses in Tulsa, Oklahoma. Custom websites starting at $300, hosting from $40/mo, and focused software consultations.">
+    <meta name="description" content="Phillip England builds websites, custom software, automation, and technical services for small businesses in Tulsa, Oklahoma. Starter websites from $300, business websites from $750, managed hosting, and custom software from $1,500.">
     <meta name="keywords" content="software services Tulsa, technical services Tulsa Oklahoma, Phillip England, web developer Tulsa, small business software solutions, website developer Tulsa Oklahoma">
     <link rel="canonical" href="https://phillipengland.com/">
     <link rel="icon" type="image/x-icon" href="/static/favicon/favicon.ico">
@@ -16,7 +16,7 @@
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="Phillip England | Software and Technical Services in Tulsa, Oklahoma">
-    <meta property="og:description" content="Simple, focused software solutions and technical services for small businesses in Tulsa, Oklahoma.">
+    <meta property="og:description" content="Websites, custom software, automation, and technical services designed to solve real business problems for small businesses in Tulsa, Oklahoma.">
     <meta property="og:url" content="https://phillipengland.com/">
     <meta property="og:locale" content="en_US">
     <meta property="og:site_name" content="Phillip England Software and Technical Services">
@@ -27,7 +27,7 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Phillip England | Software and Technical Services in Tulsa, Oklahoma">
-    <meta name="twitter:description" content="Simple, focused software solutions and technical services for small businesses in Tulsa, Oklahoma.">
+    <meta name="twitter:description" content="Websites, custom software, automation, and technical services designed to solve real business problems for small businesses in Tulsa, Oklahoma.">
     <meta name="twitter:image" content="https://phillipengland.com/static/og-image.png">
 
     <!-- Structured Data -->
@@ -36,7 +36,7 @@
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
         "name": "Phillip England Software and Technical Services",
-        "description": "Simple software solutions, technical services, static websites, and hosting for small businesses in Tulsa, Oklahoma.",
+        "description": "Websites, custom software, automation, and technical services for small businesses in Tulsa, Oklahoma.",
         "url": "https://phillipengland.com",
         "telephone": "",
         "address": {
@@ -67,7 +67,7 @@
                 "https://github.com/phillip-england"
             ]
         },
-        "priceRange": "$300+",
+        "priceRange": "$300-$1,500+",
         "hasOfferCatalog": {
             "@type": "OfferCatalog",
             "name": "Software and Technical Services",
@@ -76,12 +76,13 @@
                     "@type": "Offer",
                     "itemOffered": {
                         "@type": "Service",
-                        "name": "Custom Website",
-                        "description": "Custom website builds starting at $300. Price varies based on complexity."
+                        "name": "Starter Website",
+                        "description": "Professional static websites for small businesses and individuals."
                     },
                     "priceSpecification": {
                         "@type": "PriceSpecification",
                         "minPrice": "300",
+                        "maxPrice": "500",
                         "priceCurrency": "USD"
                     }
                 },
@@ -89,8 +90,22 @@
                     "@type": "Offer",
                     "itemOffered": {
                         "@type": "Service",
-                        "name": "Personalized Hosting",
-                        "description": "Website hosting to keep your site online, available, and secure"
+                        "name": "Business Website",
+                        "description": "Multi-page business websites with enhanced functionality and SEO."
+                    },
+                    "priceSpecification": {
+                        "@type": "PriceSpecification",
+                        "minPrice": "750",
+                        "maxPrice": "1500",
+                        "priceCurrency": "USD"
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Managed Hosting",
+                        "description": "Hosting, monitoring, backups, SSL, and maintenance."
                     },
                     "priceSpecification": {
                         "@type": "PriceSpecification",
@@ -103,14 +118,14 @@
                     "@type": "Offer",
                     "itemOffered": {
                         "@type": "Service",
-                        "name": "Software Solutions Consultation",
-                        "description": "Free consultation for focused software solutions and technical services"
+                        "name": "Custom Software Development",
+                        "description": "Business software, internal tools, dashboards, and automation solutions."
                     },
                     "priceSpecification": {
                         "@type": "PriceSpecification",
-                        "price": "0",
+                        "minPrice": "1500",
                         "priceCurrency": "USD",
-                        "description": "Free consultation"
+                        "description": "Starting at $1,500"
                     }
                 }
             ]
@@ -689,7 +704,7 @@
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.8s ease, transform 0.8s ease;
-            width: min(100%, 760px);
+            width: min(100%, 980px);
             margin: 0 auto;
             display: flex;
             flex-direction: column;
@@ -718,6 +733,8 @@
         }
 
         .pricing-card {
+            position: relative;
+            overflow: hidden;
             padding: 2rem 1.75rem;
             background: rgba(10, 10, 10, 0.88);
             backdrop-filter: blur(10px);
@@ -730,7 +747,40 @@
                 inset 0 -2px 8px rgba(0, 0, 0, 0.6);
             display: flex;
             flex-direction: column;
-            text-align: center;
+            text-align: left;
+            transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+        }
+
+        .pricing-card:hover {
+            border-color: rgba(var(--accent-rgb), 0.68);
+            transform: translateY(-6px) scale(1.015);
+            box-shadow:
+                0 30px 72px rgba(0, 0, 0, 0.55),
+                0 0 32px rgba(var(--accent-rgb), 0.18),
+                0 0 0 1px rgba(var(--accent-rgb), 0.28),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12),
+                inset 0 -2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .pricing-card.featured {
+            border-color: rgba(var(--accent-rgb), 0.5);
+            background:
+                linear-gradient(145deg, rgba(var(--accent-rgb), 0.12), rgba(10, 10, 10, 0.92) 36%),
+                rgba(10, 10, 10, 0.9);
+        }
+
+        .pricing-badge {
+            align-self: flex-start;
+            margin-bottom: 1rem;
+            padding: 0.35rem 0.6rem;
+            border: 1px solid rgba(var(--accent-rgb), 0.45);
+            border-radius: 999px;
+            background: rgba(var(--accent-rgb), 0.12);
+            color: var(--accent);
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         .pricing-card-name {
@@ -749,6 +799,14 @@
             margin-bottom: 1.25rem;
         }
 
+        .pricing-card-price span {
+            display: inline-block;
+            margin-top: 0.35rem;
+            color: #cfcfcf;
+            font-size: 0.95rem;
+            line-height: 1.3;
+        }
+
         .pricing-card-divider {
             width: 40px;
             height: 1px;
@@ -757,11 +815,36 @@
         }
 
         .pricing-card-description {
+            flex: 1;
             font-size: 0.92rem;
             color: #888;
             line-height: 1.65;
-            text-align: center;
+            text-align: left;
             margin: 0;
+        }
+
+        .pricing-card-description p {
+            margin: 0;
+        }
+
+        .pricing-card-description strong {
+            display: block;
+            color: #cfcfcf;
+            font-size: 0.78rem;
+            letter-spacing: 0.08em;
+            line-height: 1.2;
+            margin: 1.15rem 0 0.65rem;
+            text-transform: uppercase;
+        }
+
+        .pricing-card-description ul {
+            margin: 0;
+            padding-left: 1.1rem;
+            color: #aaa;
+        }
+
+        .pricing-card-description li + li {
+            margin-top: 0.35rem;
         }
 
         .pricing-card .cta {
@@ -769,6 +852,7 @@
             padding: 0.8rem 1.25rem;
             font-size: 0.85rem;
             letter-spacing: 0.03em;
+            align-self: flex-start;
         }
 
         footer {
@@ -927,8 +1011,8 @@
         <!-- Page 1: Hero -->
         <div class="page-hero" id="home">
             <section class="hero">
-                <h1 class="fade-in">Software &amp;<br>Technical Services</h1>
-                <p class="fade-in">Simple, focused software solutions and technical services for small businesses. Stationed in Tulsa, Oklahoma.</p>
+                <h1 class="fade-in">Software Solutions for Small Businesses</h1>
+                <p class="fade-in">Websites, custom software, automation, and technical services designed to solve real business problems.</p>
                 <a href="#contact" class="cta fade-in" id="cta-btn">Get In Touch</a>
             </section>
         </div>
@@ -942,7 +1026,7 @@
                 <div class="about-col">
                     <img src="/static/profile.jpeg" alt="Phillip England, software consultant and web developer in Tulsa, Oklahoma" class="profile-img">
                     <h2>About Me</h2>
-                    <p>I'm Phillip England, a software consultant and web developer based in Tulsa, Oklahoma. I help small businesses use technology better with simple websites, focused software solutions, and practical technical services built around real business tasks.</p>
+                    <p>I'm Phillip England, a software consultant and web developer based in Tulsa, Oklahoma. I help small businesses solve real problems using software. Whether you need a professional website, a custom internal tool, business automation, or ongoing technical support, I focus on practical solutions that provide measurable value.</p>
                     <p>
                         <a class="icon-link github-link" href="https://github.com/phillip-england" target="_blank" rel="noopener noreferrer" aria-label="Phillip England on GitHub">
                             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -965,32 +1049,79 @@
                 <div class="pricing-cards">
 
                     <div class="pricing-card">
-                        <div class="pricing-card-name">Custom Website</div>
-                        <div class="pricing-card-price">Starting at $300</div>
+                        <div class="pricing-card-name">Starter Website</div>
+                        <div class="pricing-card-price">$300-$500</div>
                         <div class="pricing-card-divider"></div>
-                        <p class="pricing-card-description">I'll build your custom website. Price varies based on complexity.</p>
+                        <div class="pricing-card-description">
+                            <p>Perfect for individuals, startups, and small businesses that need a polished static site without extra service setup.</p>
+                            <strong>Includes</strong>
+                            <ul>
+                                <li>Landing pages</li>
+                                <li>Direct email or phone links</li>
+                                <li>Mobile-friendly design</li>
+                                <li>Basic SEO</li>
+                                <li>Fast static websites</li>
+                                <li>No backend APIs or email services</li>
+                            </ul>
+                        </div>
+                        <a href="#contact" class="cta pricing-contact-link">Start Simple</a>
                     </div>
 
                     <div class="pricing-card">
-                        <div class="pricing-card-name">Personalized Hosting</div>
-                        <div class="pricing-card-price">$40 / mo</div>
+                        <div class="pricing-card-name">Business Website</div>
+                        <div class="pricing-card-price">$750-$1,500</div>
                         <div class="pricing-card-divider"></div>
-                        <p class="pricing-card-description">I'll keep your site online, available, and secure.</p>
+                        <div class="pricing-card-description">
+                            <p>Designed for growing businesses that need multiple pages and a stronger web presence.</p>
+                            <strong>Includes</strong>
+                            <ul>
+                                <li>Multiple pages</li>
+                                <li>Service listings</li>
+                                <li>Team pages</li>
+                                <li>Blog capability</li>
+                                <li>Enhanced design</li>
+                                <li>Search engine optimization</li>
+                            </ul>
+                        </div>
+                        <a href="#contact" class="cta pricing-contact-link">Request Quote</a>
                     </div>
 
                     <div class="pricing-card">
-                        <div class="pricing-card-name">Contract Work</div>
-                        <div class="pricing-card-price">$100 / hr</div>
+                        <div class="pricing-card-name">Managed Hosting</div>
+                        <div class="pricing-card-price">$40/mo</div>
                         <div class="pricing-card-divider"></div>
-                        <p class="pricing-card-description">How can I assist you and your development team?</p>
+                        <div class="pricing-card-description">
+                            <p>Keep your website online, secure, and maintained without worrying about technical details.</p>
+                            <strong>Includes</strong>
+                            <ul>
+                                <li>Hosting</li>
+                                <li>SSL certificates</li>
+                                <li>Backups</li>
+                                <li>Uptime monitoring</li>
+                                <li>Minor content updates</li>
+                            </ul>
+                        </div>
+                        <a href="#contact" class="cta pricing-contact-link">Learn More</a>
                     </div>
 
-                    <div class="pricing-card">
-                        <div class="pricing-card-name">Software Solutions</div>
-                        <div class="pricing-card-price">Free Consultation</div>
+                    <div class="pricing-card featured">
+                        <div class="pricing-card-name">Custom Software</div>
+                        <div class="pricing-card-price">Starting at $1,500<br><span>$100/hr Consulting</span></div>
                         <div class="pricing-card-divider"></div>
-                        <p class="pricing-card-description">See how my technical skills can help you and your business.</p>
-                        <a href="#contact" class="cta pricing-contact-link" id="pricing-contact-link">Start a Conversation</a>
+                        <div class="pricing-card-description">
+                            <p>Custom software solutions built around your business processes.</p>
+                            <strong>Examples</strong>
+                            <ul>
+                                <li>Inventory systems</li>
+                                <li>Employee scheduling</li>
+                                <li>Time tracking</li>
+                                <li>Internal dashboards</li>
+                                <li>Business automation</li>
+                                <li>Reporting tools</li>
+                                <li>Custom web applications</li>
+                            </ul>
+                        </div>
+                        <a href="#contact" class="cta pricing-contact-link">Start a Conversation</a>
                     </div>
 
                 </div>
@@ -1038,9 +1169,11 @@
             e.preventDefault();
             smoothScrollTo('contact');
         });
-        document.getElementById('pricing-contact-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            smoothScrollTo('contact');
+        document.querySelectorAll('.pricing-contact-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                smoothScrollTo('contact');
+            });
         });
         document.getElementById('nav-home').addEventListener('click', function(e) {
             e.preventDefault();
