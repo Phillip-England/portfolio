@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} | Phillip England</title>
+    {{if .Description}}<meta name="description" content="{{.Description}}">{{end}}
+    <link rel="icon" type="image/x-icon" href="/static/favicon/favicon.ico">
+    <style>
+        :root, [data-theme="blue"] {
+            --accent: #4a9eff;
+            --accent-rgb: 74, 158, 255;
+        }
+        [data-theme="white"] {
+            --accent: #ffffff;
+            --accent-rgb: 255, 255, 255;
+        }
+        [data-theme="green"] {
+            --accent: #4ae0a0;
+            --accent-rgb: 74, 224, 160;
+        }
+        [data-theme="purple"] {
+            --accent: #a78bfa;
+            --accent-rgb: 167, 139, 250;
+        }
+        [data-theme="red"] {
+            --accent: #ff6b6b;
+            --accent-rgb: 255, 107, 107;
+        }
+        [data-theme="gold"] {
+            --accent: #f0c040;
+            --accent-rgb: 240, 192, 64;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 20% 0%, rgba(var(--accent-rgb), 0.15), transparent 30rem),
+                #08090d;
+            color: #e7e7ea;
+            font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        }
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem clamp(1rem, 4vw, 3rem);
+            background: rgba(8, 9, 13, 0.84);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(14px);
+        }
+        .brand {
+            color: var(--accent);
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+        }
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+        .nav-link {
+            color: #b8b8c2;
+            font-size: 0.92rem;
+            text-decoration: none;
+        }
+        .nav-link:hover {
+            color: var(--accent);
+        }
+        .theme-dots {
+            display: flex;
+            gap: 0.42rem;
+        }
+        .theme-dot {
+            width: 18px;
+            height: 18px;
+            border: 2px solid transparent;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .theme-dot.active {
+            border-color: rgba(255, 255, 255, 0.72);
+        }
+        main {
+            width: min(860px, calc(100% - 2rem));
+            margin: 0 auto;
+            padding: clamp(3rem, 8vw, 6rem) 0;
+        }
+        article {
+            padding: clamp(1.25rem, 4vw, 2.5rem);
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(var(--accent-rgb), 0.22);
+            border-radius: 8px;
+        }
+        header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+        }
+        h1 {
+            margin: 0 0 0.85rem;
+            color: #f6f6f8;
+            font-size: clamp(2.15rem, 7vw, 4.2rem);
+            line-height: 1;
+        }
+        .date {
+            color: var(--accent);
+            font-size: 0.84rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .content {
+            color: #d7d7dc;
+            font-size: 1.05rem;
+            line-height: 1.78;
+        }
+        .content h2,
+        .content h3,
+        .content h4 {
+            margin: 2.1rem 0 0.7rem;
+            color: #f4f4f6;
+            line-height: 1.2;
+        }
+        .content p,
+        .content ul,
+        .content ol,
+        .content blockquote {
+            margin: 0 0 1.15rem;
+        }
+        .content a {
+            color: var(--accent);
+        }
+        .content blockquote {
+            padding-left: 1rem;
+            border-left: 3px solid var(--accent);
+            color: #bdbdc7;
+        }
+        .content code {
+            padding: 0.14rem 0.3rem;
+            background: #282a36;
+            border-radius: 5px;
+            color: #f8f8f2;
+            font-size: 0.92em;
+        }
+        .content pre {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #282a36;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+        .content pre code {
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
+        }
+        @media (max-width: 640px) {
+            nav {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+            .nav-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav aria-label="Post navigation">
+        <a class="brand" href="/blog">BLOG</a>
+        <div class="nav-actions">
+            <div class="theme-dots" id="theme-dots" aria-label="Theme colors">
+                <span class="theme-dot" data-theme="white" style="background:#ffffff"></span>
+                <span class="theme-dot active" data-theme="blue" style="background:#4a9eff"></span>
+                <span class="theme-dot" data-theme="green" style="background:#4ae0a0"></span>
+                <span class="theme-dot" data-theme="purple" style="background:#a78bfa"></span>
+                <span class="theme-dot" data-theme="red" style="background:#ff6b6b"></span>
+                <span class="theme-dot" data-theme="gold" style="background:#f0c040"></span>
+            </div>
+            <a class="nav-link" href="/blog">All Posts</a>
+            <a class="nav-link" href="/">Main Site</a>
+        </div>
+    </nav>
+    <main>
+        <article>
+            <header>
+                {{if .Date}}<div class="date">{{.Date}}</div>{{end}}
+                <h1>{{.Title}}</h1>
+            </header>
+            <div class="content">
+                {{.HTML}}
+            </div>
+        </article>
+    </main>
+    <script>
+        const themeColors = {
+            white: true,
+            blue: true,
+            green: true,
+            purple: true,
+            red: true,
+            gold: true,
+        };
+        const dots = document.querySelectorAll('.theme-dot');
+        const saved = localStorage.getItem('theme');
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            dots.forEach(dot => dot.classList.toggle('active', dot.dataset.theme === theme));
+        }
+        setTheme((saved && themeColors[saved]) ? saved : 'blue');
+        dots.forEach(dot => dot.addEventListener('click', () => setTheme(dot.dataset.theme)));
+    </script>
+</body>
+</html>

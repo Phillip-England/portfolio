@@ -13,11 +13,16 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/yuin/goldmark"
+	highlighting "github.com/yuin/goldmark-highlighting/v2"
+	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
 )
 
 //go:embed templates/*
@@ -25,6 +30,9 @@ var templatesFS embed.FS
 
 //go:embed static/*
 var staticFS embed.FS
+
+//go:embed blog/*.md
+var blogFS embed.FS
 
 // --- .env loader ---
 
@@ -173,6 +181,14 @@ type contactResponse struct {
 	Message string `json:"message"`
 }
 
+type blogPost struct {
+	Slug        string
+	Title       string
+	Date        string
+	Description string
+	HTML        template.HTML
+}
+
 func sendPostmarkEmail(apiKey, from, to, subject, body string) error {
 	payload := map[string]string{
 		"From":     from,
@@ -202,6 +218,106 @@ func sendPostmarkEmail(apiKey, from, to, subject, body string) error {
 	return nil
 }
 
+func markdownRenderer() goldmark.Markdown {
+	return goldmark.New(
+		goldmark.WithExtensions(
+			extension.GFM,
+			highlighting.NewHighlighting(
+				highlighting.WithStyle("dracula"),
+			),
+		),
+		goldmark.WithParserOptions(
+			parser.WithAutoHeadingID(),
+		),
+	)
+}
+
+func parseFrontMatter(src []byte) (map[string]string, []byte) {
+	meta := make(map[string]string)
+	text := strings.TrimPrefix(string(src), "\ufeff")
+	if !strings.HasPrefix(text, "---\n") {
+		return meta, []byte(text)
+	}
+	rest := text[len("---\n"):]
+	end := strings.Index(rest, "\n---")
+	if end < 0 {
+		return meta, []byte(text)
+	}
+	for _, line := range strings.Split(rest[:end], "\n") {
+		key, value, ok := strings.Cut(line, ":")
+		if !ok {
+			continue
+		}
+		meta[strings.ToLower(strings.TrimSpace(key))] = strings.Trim(strings.TrimSpace(value), `"'`)
+	}
+	body := strings.TrimLeft(rest[end+len("\n---"):], "\r\n")
+	return meta, []byte(body)
+}
+
+func titleFromMarkdown(src []byte, fallback string) string {
+	scanner := bufio.NewScanner(bytes.NewReader(src))
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if strings.HasPrefix(line, "# ") {
+			return strings.TrimSpace(strings.TrimPrefix(line, "# "))
+		}
+	}
+	return fallback
+}
+
+func loadBlogPosts() ([]blogPost, map[string]blogPost, error) {
+	entries, err := fs.ReadDir(blogFS, "blog")
+	if err != nil {
+		return nil, nil, err
+	}
+
+	md := markdownRenderer()
+	posts := make([]blogPost, 0, len(entries))
+	bySlug := make(map[string]blogPost)
+
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".md") {
+			continue
+		}
+
+		raw, err := blogFS.ReadFile("blog/" + entry.Name())
+		if err != nil {
+			return nil, nil, err
+		}
+
+		slug := strings.TrimSuffix(entry.Name(), ".md")
+		meta, body := parseFrontMatter(raw)
+		var rendered bytes.Buffer
+		if err := md.Convert(body, &rendered); err != nil {
+			return nil, nil, err
+		}
+
+		title := meta["title"]
+		if title == "" {
+			title = titleFromMarkdown(body, slug)
+		}
+
+		post := blogPost{
+			Slug:        slug,
+			Title:       title,
+			Date:        meta["date"],
+			Description: meta["description"],
+			HTML:        template.HTML(rendered.String()),
+		}
+		posts = append(posts, post)
+		bySlug[slug] = post
+	}
+
+	sort.Slice(posts, func(i, j int) bool {
+		if posts[i].Date == posts[j].Date {
+			return posts[i].Title < posts[j].Title
+		}
+		return posts[i].Date > posts[j].Date
+	})
+
+	return posts, bySlug, nil
+}
+
 // --- CLI commands ---
 
 func printUsage() {
@@ -227,6 +343,10 @@ func cmdServe(port string) {
 	limiter := newRateLimiter()
 
 	tmpl := template.Must(template.ParseFS(templatesFS, "templates/*.html"))
+	blogPosts, blogBySlug, err := loadBlogPosts()
+	if err != nil {
+		log.Fatalf("Failed to load blog posts: %v", err)
+	}
 
 	staticSub, err := fs.Sub(staticFS, "static")
 	if err != nil {
@@ -241,6 +361,41 @@ func cmdServe(port string) {
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		if err := tmpl.ExecuteTemplate(w, "index.html", nil); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
+	http.HandleFunc("/blog", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/blog" {
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		data := struct {
+			Posts []blogPost
+		}{Posts: blogPosts}
+		if err := tmpl.ExecuteTemplate(w, "blog.html", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
+	http.HandleFunc("/blog/", func(w http.ResponseWriter, r *http.Request) {
+		slug := strings.Trim(strings.TrimPrefix(r.URL.Path, "/blog/"), "/")
+		if slug == "" {
+			http.Redirect(w, r, "/blog", http.StatusMovedPermanently)
+			return
+		}
+		if strings.Contains(slug, "/") {
+			http.NotFound(w, r)
+			return
+		}
+		post, ok := blogBySlug[slug]
+		if !ok {
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if err := tmpl.ExecuteTemplate(w, "post.html", post); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
@@ -332,65 +487,6 @@ func cmdServe(port string) {
 
 		limiter.reset()
 		json.NewEncoder(w).Encode(contactResponse{OK: true, Message: "All rate-limited IPs have been reset"})
-	})
-
-	// Helper: read song names from music/ directory
-	readSongs := func() []string {
-		var songs []string
-		entries, err := os.ReadDir("music")
-		if err != nil {
-			return songs
-		}
-		for _, e := range entries {
-			if !e.IsDir() && strings.ToLower(filepath.Ext(e.Name())) == ".wav" {
-				songs = append(songs, strings.TrimSuffix(e.Name(), filepath.Ext(e.Name())))
-			}
-		}
-		return songs
-	}
-
-	// Music index page
-	http.HandleFunc("/music", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		if err := tmpl.ExecuteTemplate(w, "music.html", readSongs()); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	})
-
-	// Individual song pages + music file server
-	http.HandleFunc("/music/", func(w http.ResponseWriter, r *http.Request) {
-		path := strings.TrimPrefix(r.URL.Path, "/music/")
-		// Serve .wav files directly from the music/ directory
-		if strings.HasSuffix(strings.ToLower(path), ".wav") {
-			http.ServeFile(w, r, filepath.Join("music", filepath.Base(path)))
-			return
-		}
-		// Individual song page: /music/{songname}
-		songName := path
-		if songName == "" {
-			http.Redirect(w, r, "/music", http.StatusFound)
-			return
-		}
-		// Verify the song exists
-		wavPath := filepath.Join("music", songName+".wav")
-		if _, err := os.Stat(wavPath); os.IsNotExist(err) {
-			http.NotFound(w, r)
-			return
-		}
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		if err := tmpl.ExecuteTemplate(w, "song.html", songName); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	})
-
-	// Song list API
-	http.HandleFunc("/api/music/list", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		songs := readSongs()
-		if songs == nil {
-			songs = []string{}
-		}
-		json.NewEncoder(w).Encode(songs)
 	})
 
 	addr := ":" + port
