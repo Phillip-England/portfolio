@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Name}} | Phillip England</title>
+    <meta name="description" content="{{.Description}}">
+    <link rel="canonical" href="https://phillipengland.com/services/{{.Slug}}">
+    <link rel="icon" type="image/x-icon" href="/static/favicon/favicon.ico">
+    <style>
+        :root, [data-theme="blue"] { --accent: #4a9eff; --accent-rgb: 74, 158, 255; }
+        [data-theme="white"] { --accent: #ffffff; --accent-rgb: 255, 255, 255; }
+        [data-theme="green"] { --accent: #4ae0a0; --accent-rgb: 74, 224, 160; }
+        [data-theme="purple"] { --accent: #a78bfa; --accent-rgb: 167, 139, 250; }
+        [data-theme="red"] { --accent: #ff6b6b; --accent-rgb: 255, 107, 107; }
+        [data-theme="gold"] { --accent: #f0c040; --accent-rgb: 240, 192, 64; }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at 20% 0%, rgba(var(--accent-rgb), 0.16), transparent 32rem), #08090d;
+            color: #e7e7ea;
+            font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        }
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem clamp(1rem, 4vw, 3rem);
+            background: rgba(8, 9, 13, 0.86);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(14px);
+        }
+        .brand { color: var(--accent); font-weight: 800; letter-spacing: 0.05em; text-decoration: none; }
+        .nav-actions, .theme-dots { display: flex; align-items: center; gap: 0.5rem; }
+        .nav-actions { gap: 1.25rem; }
+        .nav-link { color: #b8b8c2; font-size: 0.92rem; text-decoration: none; }
+        .nav-link:hover { color: var(--accent); }
+        .theme-dot { width: 18px; height: 18px; border: 2px solid transparent; border-radius: 50%; cursor: pointer; }
+        .theme-dot.active { border-color: rgba(255, 255, 255, 0.72); }
+        main { width: min(1000px, calc(100% - 2rem)); margin: 0 auto; padding: clamp(3rem, 8vw, 6rem) 0; }
+        .eyebrow { margin: 0 0 0.85rem; color: var(--accent); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+        h1 { margin: 0; color: #f7f7f8; font-size: clamp(2.6rem, 8vw, 5rem); line-height: 1; }
+        .lede { max-width: 760px; margin: 1.25rem 0 2.5rem; color: #b4b4bd; font-size: clamp(1.05rem, 2vw, 1.25rem); line-height: 1.7; }
+        .content-grid { display: grid; grid-template-columns: 1.45fr 0.8fr; gap: 1.25rem; align-items: start; }
+        .panel { padding: clamp(1.35rem, 4vw, 2.25rem); background: rgba(255, 255, 255, 0.045); border: 1px solid rgba(var(--accent-rgb), 0.22); border-radius: 12px; }
+        .panel + .panel { margin-top: 1.25rem; }
+        h2 { margin: 0 0 1rem; color: #f2f2f4; font-size: 1.3rem; }
+        p { color: #c1c1c8; line-height: 1.72; }
+        .intro { margin: 0; font-size: 1.03rem; }
+        ul { margin: 0; padding-left: 1.2rem; color: #c1c1c8; line-height: 1.65; }
+        li + li { margin-top: 0.55rem; }
+        .price { margin: 0 0 0.75rem; color: var(--accent); font-size: 1.35rem; font-weight: 750; line-height: 1.35; }
+        .price-note { margin: 0; color: #9d9da7; font-size: 0.92rem; }
+        .cta { display: inline-block; margin-top: 1.4rem; padding: 0.85rem 1.2rem; border-radius: 7px; background: var(--accent); color: #08090d; font-weight: 750; text-decoration: none; }
+        .back { display: inline-block; margin-top: 2rem; color: #aaaab4; text-decoration: none; }
+        .back:hover { color: var(--accent); }
+        @media (max-width: 760px) {
+            nav { align-items: flex-start; flex-direction: column; }
+            .nav-actions { width: 100%; justify-content: space-between; }
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav aria-label="Service navigation">
+        <a class="brand" href="/">PHILLIP ENGLAND</a>
+        <div class="nav-actions">
+            <div class="theme-dots" aria-label="Theme colors">
+                <span class="theme-dot" data-theme="white" style="background:#ffffff"></span>
+                <span class="theme-dot active" data-theme="blue" style="background:#4a9eff"></span>
+                <span class="theme-dot" data-theme="green" style="background:#4ae0a0"></span>
+                <span class="theme-dot" data-theme="purple" style="background:#a78bfa"></span>
+                <span class="theme-dot" data-theme="red" style="background:#ff6b6b"></span>
+                <span class="theme-dot" data-theme="gold" style="background:#f0c040"></span>
+            </div>
+            <a class="nav-link" href="/#services">All Services</a>
+            <a class="nav-link" href="/#contact">Contact</a>
+        </div>
+    </nav>
+    <main>
+        <p class="eyebrow">{{.Eyebrow}}</p>
+        <h1>{{.Name}}</h1>
+        <p class="lede">{{.Description}}</p>
+        <div class="content-grid">
+            <div>
+                <section class="panel">
+                    <h2>What to Expect</h2>
+                    <p class="intro">{{.Intro}}</p>
+                </section>
+                <section class="panel">
+                    <h2>What This Can Include</h2>
+                    <ul>{{range .Includes}}<li>{{.}}</li>{{end}}</ul>
+                </section>
+            </div>
+            <aside>
+                <section class="panel">
+                    <h2>Starting Guidance</h2>
+                    <p class="price">{{.StartingAt}}</p>
+                    <p class="price-note">{{.PriceNote}}</p>
+                    <a class="cta" href="/#contact">Discuss Your Needs</a>
+                </section>
+                <section class="panel">
+                    <h2>A Good Fit For</h2>
+                    <ul>{{range .BestFor}}<li>{{.}}</li>{{end}}</ul>
+                </section>
+            </aside>
+        </div>
+        <a class="back" href="/#services">&larr; Back to all services</a>
+    </main>
+    <script>
+        const themes = { white: true, blue: true, green: true, purple: true, red: true, gold: true };
+        const dots = document.querySelectorAll('.theme-dot');
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            dots.forEach(dot => dot.classList.toggle('active', dot.dataset.theme === theme));
+        }
+        const saved = localStorage.getItem('theme');
+        setTheme(saved && themes[saved] ? saved : 'blue');
+        dots.forEach(dot => dot.addEventListener('click', () => setTheme(dot.dataset.theme)));
+    </script>
+</body>
+</html>

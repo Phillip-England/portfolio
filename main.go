@@ -189,6 +189,53 @@ type blogPost struct {
 	HTML        template.HTML
 }
 
+type servicePage struct {
+	Slug        string
+	Name        string
+	Eyebrow     string
+	Description string
+	Intro       string
+	StartingAt  string
+	PriceNote   string
+	BestFor     []string
+	Includes    []string
+}
+
+var services = []servicePage{
+	{
+		Slug: "basic-websites", Name: "Basic Websites", Eyebrow: "A focused, professional web presence",
+		Description: "Fast, mobile-friendly websites for individuals and small organizations that need a clear, credible place online.",
+		Intro:       "A basic website keeps the scope focused: present who you are, explain what you do, and make it easy for people to contact you. The final scope depends on the amount of content and any special design needs.",
+		StartingAt:  "Projects typically start around $300", PriceNote: "This is an initial reference point, not a fixed package price. Additional pages, content work, integrations, or custom design can change the estimate.",
+		BestFor:  []string{"Individuals and independent professionals", "New businesses establishing an online presence", "Simple landing pages and informational sites"},
+		Includes: []string{"Responsive, mobile-friendly design", "Clear calls to action and contact links", "Basic search engine setup", "Fast, accessible static pages", "Deployment support"},
+	},
+	{
+		Slug: "business-websites", Name: "Business-Class Websites", Eyebrow: "A stronger site for a growing business",
+		Description: "Multi-page websites with the structure, polish, and features needed to support an established or growing organization.",
+		Intro:       "Business-class websites are planned around your customers and operations. They can support richer content, multiple services, lead capture, team information, publishing, and integrations without forcing every project into the same package.",
+		StartingAt:  "Projects typically start around $750", PriceNote: "Your estimate will reflect page count, content readiness, design requirements, and integrations. More involved sites are quoted after a short discovery conversation.",
+		BestFor:  []string{"Service businesses with several offerings", "Organizations that have outgrown a basic site", "Teams that need a maintainable content structure"},
+		Includes: []string{"Multi-page information architecture", "Custom responsive design", "Contact or lead-capture workflows", "On-page SEO foundations", "Analytics and third-party integrations as needed"},
+	},
+	{
+		Slug: "web-applications", Name: "Web Applications", Eyebrow: "Software shaped around your workflow",
+		Description: "Custom internal tools, customer portals, dashboards, automation, and browser-based software built for a specific business need.",
+		Intro:       "Web applications go beyond presenting information. They can collect and organize data, automate repetitive work, connect existing systems, or give customers and staff a purpose-built tool. These projects begin with discovery so the first release solves the right problem.",
+		StartingAt:  "Small application projects typically start around $1,500", PriceNote: "Application scope varies widely. Data complexity, user accounts, integrations, security requirements, and ongoing support are evaluated before a project estimate is provided.",
+		BestFor:  []string{"Replacing spreadsheets or repetitive manual work", "Internal dashboards and reporting", "Customer portals and specialized business tools"},
+		Includes: []string{"Requirements and workflow discovery", "Purpose-built interface and application logic", "Database and API work where appropriate", "Testing and deployment", "A practical plan for future improvements"},
+	},
+	{
+		Slug: "managed-hosting", Name: "Managed Hosting", Eyebrow: "Hosting without the technical overhead",
+		Description: "Managed deployment, SSL, monitoring, backups, maintenance, and support to keep your website reliable after launch.",
+		Intro:       "Hosting is available as an ongoing service for sites I build and, after review, some existing sites. I handle the underlying deployment and routine technical work so you have one point of contact when the site needs attention.",
+		StartingAt:  "Managed hosting typically starts around $40 per month", PriceNote: "The monthly amount depends on traffic, application resources, backup needs, maintenance expectations, and third-party services. Domain registration and paid external services may be separate.",
+		BestFor:  []string{"Business owners who do not want to manage servers", "Sites that need monitoring and routine maintenance", "Clients who prefer one contact for the site and its hosting"},
+		Includes: []string{"Secure hosting and deployment", "SSL certificate setup", "Uptime monitoring", "Backups appropriate to the project", "Routine maintenance and minor support"},
+	},
+}
+
 func sendPostmarkEmail(apiKey, from, to, subject, body string) error {
 	payload := map[string]string{
 		"From":     from,
@@ -375,6 +422,27 @@ func cmdServe(port string) {
 			Posts []blogPost
 		}{Posts: blogPosts}
 		if err := tmpl.ExecuteTemplate(w, "blog.html", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
+	serviceBySlug := make(map[string]servicePage, len(services))
+	for _, service := range services {
+		serviceBySlug[service.Slug] = service
+	}
+	http.HandleFunc("/services/", func(w http.ResponseWriter, r *http.Request) {
+		slug := strings.Trim(strings.TrimPrefix(r.URL.Path, "/services/"), "/")
+		if slug == "" || strings.Contains(slug, "/") {
+			http.NotFound(w, r)
+			return
+		}
+		service, ok := serviceBySlug[slug]
+		if !ok {
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if err := tmpl.ExecuteTemplate(w, "service.html", service); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
