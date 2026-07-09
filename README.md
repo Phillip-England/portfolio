@@ -8,6 +8,25 @@ go run . serve 8080
 
 Open `http://localhost:8080`.
 
+## Projects
+
+Projects shown on the homepage live in `projects.json`. Add another object to the
+array and restart the site:
+
+```json
+{
+  "name": "Project name",
+  "description": "What it does and why it matters.",
+  "tags": ["Go", "JavaScript"],
+  "url": "https://github.com/your-name/project",
+  "linkLabel": "View project",
+  "featured": false
+}
+```
+
+Use an empty `url` to show a project without a link. Set `featured` to `true` to
+give a project extra visual emphasis.
+
 ## Blog
 
 The blog is powered by markdown files in the `blog/` directory. To add a post, create a new `.md` file:

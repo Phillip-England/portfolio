@@ -7,29 +7,9 @@
     {{if .Description}}<meta name="description" content="{{.Description}}">{{end}}
     <link rel="icon" type="image/x-icon" href="/static/favicon/favicon.ico">
     <style>
-        :root, [data-theme="blue"] {
-            --accent: #4a9eff;
-            --accent-rgb: 74, 158, 255;
-        }
-        [data-theme="white"] {
-            --accent: #ffffff;
-            --accent-rgb: 255, 255, 255;
-        }
-        [data-theme="green"] {
-            --accent: #4ae0a0;
-            --accent-rgb: 74, 224, 160;
-        }
-        [data-theme="purple"] {
-            --accent: #a78bfa;
-            --accent-rgb: 167, 139, 250;
-        }
-        [data-theme="red"] {
-            --accent: #ff6b6b;
-            --accent-rgb: 255, 107, 107;
-        }
-        [data-theme="gold"] {
-            --accent: #f0c040;
-            --accent-rgb: 240, 192, 64;
+        :root {
+            --accent: #f0444f;
+            --accent-rgb: 240, 68, 79;
         }
         * {
             box-sizing: border-box;
@@ -75,20 +55,6 @@
         }
         .nav-link:hover {
             color: var(--accent);
-        }
-        .theme-dots {
-            display: flex;
-            gap: 0.42rem;
-        }
-        .theme-dot {
-            width: 18px;
-            height: 18px;
-            border: 2px solid transparent;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        .theme-dot.active {
-            border-color: rgba(255, 255, 255, 0.72);
         }
         main {
             width: min(860px, calc(100% - 2rem));
@@ -182,14 +148,6 @@
     <nav aria-label="Post navigation">
         <a class="brand" href="/blog">BLOG</a>
         <div class="nav-actions">
-            <div class="theme-dots" id="theme-dots" aria-label="Theme colors">
-                <span class="theme-dot" data-theme="white" style="background:#ffffff"></span>
-                <span class="theme-dot active" data-theme="blue" style="background:#4a9eff"></span>
-                <span class="theme-dot" data-theme="green" style="background:#4ae0a0"></span>
-                <span class="theme-dot" data-theme="purple" style="background:#a78bfa"></span>
-                <span class="theme-dot" data-theme="red" style="background:#ff6b6b"></span>
-                <span class="theme-dot" data-theme="gold" style="background:#f0c040"></span>
-            </div>
             <a class="nav-link" href="/blog">All Posts</a>
             <a class="nav-link" href="/">Main Site</a>
         </div>
@@ -205,24 +163,5 @@
             </div>
         </article>
     </main>
-    <script>
-        const themeColors = {
-            white: true,
-            blue: true,
-            green: true,
-            purple: true,
-            red: true,
-            gold: true,
-        };
-        const dots = document.querySelectorAll('.theme-dot');
-        const saved = localStorage.getItem('theme');
-        function setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-            dots.forEach(dot => dot.classList.toggle('active', dot.dataset.theme === theme));
-        }
-        setTheme((saved && themeColors[saved]) ? saved : 'blue');
-        dots.forEach(dot => dot.addEventListener('click', () => setTheme(dot.dataset.theme)));
-    </script>
 </body>
 </html>
