@@ -18,14 +18,19 @@ array and restart the site:
   "name": "Project name",
   "description": "What it does and why it matters.",
   "tags": ["Go", "JavaScript"],
-  "url": "https://github.com/your-name/project",
-  "linkLabel": "View project",
+  "image": "/static/project-images/project-name.png",
+  "imageAlt": "Project name website preview",
+  "sourceUrl": "https://github.com/your-name/project",
+  "sourceLabel": "View source",
+  "docsUrl": "https://docs.example.com/",
+  "docsLabel": "View docs",
   "featured": false
 }
 ```
 
-Use an empty `url` to show a project without a link. Set `featured` to `true` to
-give a project extra visual emphasis.
+Use an empty link field to omit that link. The older `url` and `linkLabel` fields
+still work for projects with a single link. Set `featured` to `true` to give a
+project extra visual emphasis.
 
 ## Blog
 

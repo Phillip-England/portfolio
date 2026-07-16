@@ -196,8 +196,14 @@ type project struct {
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
 	Tags        []string `json:"tags"`
+	Image       string   `json:"image"`
+	ImageAlt    string   `json:"imageAlt"`
 	URL         string   `json:"url"`
 	LinkLabel   string   `json:"linkLabel"`
+	SourceURL   string   `json:"sourceUrl"`
+	SourceLabel string   `json:"sourceLabel"`
+	DocsURL     string   `json:"docsUrl"`
+	DocsLabel   string   `json:"docsLabel"`
 	Featured    bool     `json:"featured"`
 }
 

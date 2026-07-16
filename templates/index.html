@@ -990,6 +990,48 @@
                 rgba(10, 10, 10, 0.9);
         }
 
+        .project-preview {
+            display: block;
+            position: relative;
+            height: 260px;
+            margin: -0.75rem -0.5rem 1.35rem;
+            overflow: hidden;
+            border: 1px solid rgba(var(--accent-rgb), 0.24);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                0 14px 32px rgba(0, 0, 0, 0.28);
+        }
+
+        .project-preview::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                linear-gradient(to bottom, rgba(10, 10, 10, 0.45), rgba(10, 10, 10, 0) 18%),
+                linear-gradient(to top, rgba(10, 10, 10, 0.68), rgba(10, 10, 10, 0) 24%);
+        }
+
+        .project-preview img {
+            display: block;
+            width: 100%;
+            height: auto;
+            min-height: 100%;
+            object-fit: cover;
+            object-position: top center;
+            transform: translateY(0);
+            transition: transform 8s ease;
+        }
+
+        .project-preview:hover img,
+        .project-preview:focus-visible img,
+        .pricing-card:hover .project-preview img {
+            transform: translateY(calc(-100% + 260px));
+        }
+
         .pricing-badge {
             align-self: flex-start;
             margin-bottom: 1rem;
@@ -1072,6 +1114,30 @@
             font-size: 0.85rem;
             letter-spacing: 0.03em;
             align-self: flex-start;
+        }
+
+        .project-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin-top: 1.5rem;
+        }
+
+        .pricing-card .project-links .cta {
+            margin-top: 0;
+        }
+
+        .pricing-card .cta.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.18);
+            color: #ddd;
+            box-shadow: none;
+        }
+
+        .pricing-card .cta.secondary:hover {
+            border-color: rgba(var(--accent-rgb), 0.64);
+            color: #fff;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
         }
 
         .project-tags {
@@ -1199,6 +1265,14 @@
             .page-pricing {
                 padding: 2rem 1rem;
             }
+            .project-preview {
+                height: 220px;
+            }
+            .project-preview:hover img,
+            .project-preview:focus-visible img,
+            .pricing-card:hover .project-preview img {
+                transform: translateY(calc(-100% + 220px));
+            }
             .about-inner .profile-img {
                 width: 76px;
                 height: 76px;
@@ -1306,6 +1380,14 @@
         @media (prefers-reduced-motion: reduce) {
             .story-step::after {
                 animation: none;
+            }
+            .project-preview img {
+                transition: none;
+            }
+            .project-preview:hover img,
+            .project-preview:focus-visible img,
+            .pricing-card:hover .project-preview img {
+                transform: none;
             }
         }
     </style>
@@ -1462,13 +1544,24 @@
                     {{range .Projects}}
                     <article class="pricing-card{{if .Featured}} featured{{end}}">
                         {{if .Featured}}<div class="pricing-badge">Featured</div>{{end}}
+                        {{if .Image}}
+                        <a href="{{if .DocsURL}}{{.DocsURL}}{{else if .URL}}{{.URL}}{{else if .SourceURL}}{{.SourceURL}}{{else}}{{.Image}}{{end}}" class="project-preview"{{if (or (hasPrefix .DocsURL "http://") (hasPrefix .DocsURL "https://") (hasPrefix .URL "http://") (hasPrefix .URL "https://") (hasPrefix .SourceURL "http://") (hasPrefix .SourceURL "https://"))}} target="_blank" rel="noopener noreferrer"{{end}}>
+                            <img src="{{.Image}}" alt="{{if .ImageAlt}}{{.ImageAlt}}{{else}}{{.Name}} preview{{end}}" loading="lazy">
+                        </a>
+                        {{end}}
                         <div class="pricing-card-name">{{.Name}}</div>
                         <div class="pricing-card-divider"></div>
                         <div class="pricing-card-description">
                             <p>{{.Description}}</p>
                         </div>
                         {{if .Tags}}<div class="project-tags">{{range .Tags}}<span class="project-tag">{{.}}</span>{{end}}</div>{{end}}
-                        {{if .URL}}<a href="{{.URL}}" class="cta"{{if (or (hasPrefix .URL "http://") (hasPrefix .URL "https://"))}} target="_blank" rel="noopener noreferrer"{{end}}>{{.LinkLabel}}</a>{{end}}
+                        {{if or .DocsURL .SourceURL .URL}}
+                        <div class="project-links">
+                            {{if .DocsURL}}<a href="{{.DocsURL}}" class="cta"{{if (or (hasPrefix .DocsURL "http://") (hasPrefix .DocsURL "https://"))}} target="_blank" rel="noopener noreferrer"{{end}}>{{if .DocsLabel}}{{.DocsLabel}}{{else}}View docs{{end}}</a>{{end}}
+                            {{if .SourceURL}}<a href="{{.SourceURL}}" class="cta secondary"{{if (or (hasPrefix .SourceURL "http://") (hasPrefix .SourceURL "https://"))}} target="_blank" rel="noopener noreferrer"{{end}}>{{if .SourceLabel}}{{.SourceLabel}}{{else}}View source{{end}}</a>{{end}}
+                            {{if and .URL (not .DocsURL) (not .SourceURL)}}<a href="{{.URL}}" class="cta"{{if (or (hasPrefix .URL "http://") (hasPrefix .URL "https://"))}} target="_blank" rel="noopener noreferrer"{{end}}>{{.LinkLabel}}</a>{{end}}
+                        </div>
+                        {{end}}
                     </article>
                     {{end}}
                 </div>

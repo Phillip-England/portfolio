@@ -8,11 +8,15 @@
     "featured": true
   },
   {
-    "name": "GovDocs",
-    "description": "A project for organizing and working with government documents in a more searchable, usable way.",
-    "tags": ["Go", "Documents", "Search"],
-    "url": "https://github.com/phillip-england/govdocs",
-    "linkLabel": "View on GitHub",
-    "featured": false
+    "name": "Receipt Upload",
+    "description": "A receipt capture and documentation workflow for uploading purchase records, keeping them organized, and making the process easier to use from the web.",
+    "tags": ["Go", "Receipts", "Web App"],
+    "image": "/static/project-images/receipt-upload.png",
+    "imageAlt": "Receipt Upload website preview",
+    "sourceUrl": "https://github.com/phillip-england/receipt-upload",
+    "sourceLabel": "View on GitHub",
+    "docsUrl": "https://www.receiptupload.online/",
+    "docsLabel": "View docs",
+    "featured": true
   }
 ]
