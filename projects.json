@@ -18,5 +18,15 @@
     "docsUrl": "https://www.receiptupload.online/",
     "docsLabel": "View docs",
     "featured": true
+  },
+  {
+    "name": "CFASuite HR",
+    "description": "An HR management tool for Chick-fil-A locations that imports employee bio spreadsheets, manages location-specific roles and departments, and exposes active employee data through a token-protected API.",
+    "tags": ["Go", "SQLite", "HR Tools"],
+    "image": "/static/project-images/cfasuite-hr.png",
+    "imageAlt": "CFASuite HR website preview",
+    "sourceUrl": "https://github.com/phillip-england/cfasuite-hr",
+    "sourceLabel": "View on GitHub",
+    "featured": true
   }
 ]
