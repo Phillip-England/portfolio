@@ -1,13 +1,5 @@
 [
   {
-    "name": "This Portfolio",
-    "description": "This site is built in Go and keeps changing as I learn. It has the Mandelbrot background, scroll animations, a Markdown blog, and a small server-backed contact form.",
-    "tags": ["Go", "JavaScript", "WebGL"],
-    "url": "https://github.com/phillip-england",
-    "linkLabel": "View on GitHub",
-    "featured": true
-  },
-  {
     "name": "Receipt Upload",
     "description": "A receipt capture and documentation workflow for uploading purchase records, keeping them organized, and making the process easier to use from the web.",
     "tags": ["Go", "Receipts", "Web App"],
@@ -17,16 +9,6 @@
     "sourceLabel": "View on GitHub",
     "docsUrl": "https://www.receiptupload.online/",
     "docsLabel": "View docs",
-    "featured": true
-  },
-  {
-    "name": "CFASuite HR",
-    "description": "An HR management tool for Chick-fil-A locations that imports employee bio spreadsheets, manages location-specific roles and departments, and exposes active employee data through a token-protected API.",
-    "tags": ["Go", "SQLite", "HR Tools"],
-    "image": "/static/project-images/cfasuite-hr.png",
-    "imageAlt": "CFASuite HR website preview",
-    "sourceUrl": "https://github.com/phillip-england/cfasuite-hr",
-    "sourceLabel": "View on GitHub",
     "featured": true
   }
 ]
