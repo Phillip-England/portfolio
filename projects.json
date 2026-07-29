@@ -3,12 +3,24 @@
     "name": "Receipt Upload",
     "description": "A receipt capture and documentation workflow for uploading purchase records, keeping them organized, and making the process easier to use from the web.",
     "tags": ["Go", "Receipts", "Web App"],
-    "image": "/static/project-images/receipt-upload.png",
+    "image": "/static/project-images/receipt-uploader.webp",
     "imageAlt": "Receipt Upload website preview",
     "sourceUrl": "https://github.com/phillip-england/receipt-upload",
     "sourceLabel": "View on GitHub",
     "docsUrl": "https://www.receiptupload.online/",
     "docsLabel": "View docs",
+    "featured": true
+  },
+  {
+    "name": "Webfit",
+    "description": "A quick web asset resizing tool for preparing images and other media for websites without slowing down the build process.",
+    "tags": ["Web App", "Image Tools", "Assets"],
+    "image": "/static/project-images/webfit.webp",
+    "imageAlt": "Webfit website preview",
+    "sourceUrl": "https://github.com/phillip-england/webfit",
+    "sourceLabel": "View on GitHub",
+    "docsUrl": "https://webfit.phillip-england.com/",
+    "docsLabel": "Visit site",
     "featured": true
   }
 ]

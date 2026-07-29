@@ -3,10 +3,33 @@
 ## Run
 
 ```sh
-go run . serve 8080
+go run . init
+go run . serve 8080 config/.env
 ```
 
 Open `http://localhost:8080`.
+
+The `init` command creates `config/.env` and prepares the `data/` directory. The
+environment file is required at startup and contains:
+
+```env
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=change-me-now
+SESSION_SECRET=<random-secret>
+DB_PATH=../data/main.sqlite
+```
+
+Change `ADMIN_PASSWORD` before deploying. The SQLite database stores contact
+messages and the IP-based login-failure ledger.
+
+## Admin
+
+The contact form saves messages internally instead of sending email. Log in at
+`/login` and read messages at `/admin`.
+
+Failed admin login attempts are tracked by remote IP in SQLite. An IP is blocked
+after 5 failed attempts within 24 hours. Old login-failure rows are purged during
+normal login checks and failure inserts.
 
 ## Projects
 
@@ -31,31 +54,3 @@ array and restart the site:
 Use an empty link field to omit that link. The older `url` and `linkLabel` fields
 still work for projects with a single link. Set `featured` to `true` to give a
 project extra visual emphasis.
-
-## Blog
-
-The blog is powered by markdown files in the `blog/` directory. To add a post, create a new `.md` file:
-
-```text
-blog/my-new-post.md
-```
-
-Use this format:
-
-````md
----
-title: My New Post
-date: 2026-06-17
-description: Short summary shown on the blog index.
----
-
-Write the post in markdown.
-
-```go
-fmt.Println("code blocks use the Dracula theme")
-```
-````
-
-The filename becomes the URL slug. For example, `blog/my-new-post.md` is available at `/blog/my-new-post`.
-
-The blog index is at `/blog`, and every blog page includes a link back to the main site.
