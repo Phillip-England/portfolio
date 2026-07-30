@@ -1,5 +1,17 @@
 [
   {
+    "name": "Trait",
+    "description": "A markdown-based trait library for collecting and sharing application patterns described in plain English.",
+    "tags": ["Markdown", "Patterns", "Web App"],
+    "image": "/static/project-images/trait.webp",
+    "imageAlt": "Trait application preview",
+    "sourceUrl": "https://github.com/phillip-england/trait",
+    "sourceLabel": "View on GitHub",
+    "docsUrl": "https://trait.phillip-england.com/",
+    "docsLabel": "Visit site",
+    "featured": true
+  },
+  {
     "name": "Receipt Upload",
     "description": "A receipt capture and documentation workflow for uploading purchase records, keeping them organized, and making the process easier to use from the web.",
     "tags": ["Go", "Receipts", "Web App"],
