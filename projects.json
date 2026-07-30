@@ -22,5 +22,15 @@
     "docsUrl": "https://webfit.phillip-england.com/",
     "docsLabel": "Visit site",
     "featured": true
+  },
+  {
+    "name": "htimg",
+    "description": "A tool for converting HTML and CSS into images, with support for targeting a live webpage by URL and rendering it as an image.",
+    "tags": ["Go", "HTML", "Image Tools"],
+    "image": "/static/project-images/htimg.webp",
+    "imageAlt": "htimg project preview",
+    "sourceUrl": "https://github.com/phillip-england/htimg",
+    "sourceLabel": "View on GitHub",
+    "featured": true
   }
 ]
