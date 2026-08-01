@@ -92,7 +92,7 @@ func loadConfig(envPath string) (appConfig, error) {
 		AdminUsername: values["ADMIN_USERNAME"],
 		AdminPassword: values["ADMIN_PASSWORD"],
 		SessionSecret: values["SESSION_SECRET"],
-		DBPath:        values["DB_PATH"],
+		DBPath:        filepath.Join("data", "main.sqlite"),
 	}
 
 	missing := make([]string, 0)
@@ -100,7 +100,6 @@ func loadConfig(envPath string) (appConfig, error) {
 		"ADMIN_USERNAME": cfg.AdminUsername,
 		"ADMIN_PASSWORD": cfg.AdminPassword,
 		"SESSION_SECRET": cfg.SessionSecret,
-		"DB_PATH":        cfg.DBPath,
 	} {
 		if strings.TrimSpace(value) == "" {
 			missing = append(missing, key)
@@ -110,9 +109,6 @@ func loadConfig(envPath string) (appConfig, error) {
 		return appConfig{}, fmt.Errorf("env file missing required value(s): %s", strings.Join(missing, ", "))
 	}
 
-	if !filepath.IsAbs(cfg.DBPath) {
-		cfg.DBPath = filepath.Join(filepath.Dir(envPath), cfg.DBPath)
-	}
 	cfg.DBPath = filepath.Clean(cfg.DBPath)
 
 	return cfg, nil
@@ -152,8 +148,7 @@ func cmdInit(envPath string) {
 		os.Exit(1)
 	}
 
-	dbPath := filepath.ToSlash(filepath.Join("..", "data", "main.sqlite"))
-	content := fmt.Sprintf("ADMIN_USERNAME=admin\nADMIN_PASSWORD=change-me-now\nSESSION_SECRET=%s\nDB_PATH=%s\n", secret, dbPath)
+	content := fmt.Sprintf("ADMIN_USERNAME=admin\nADMIN_PASSWORD=change-me-now\nSESSION_SECRET=%s\n", secret)
 	if err := os.WriteFile(envPath, []byte(content), 0600); err != nil {
 		fmt.Fprintf(os.Stderr, "Error writing env file: %v\n", err)
 		os.Exit(1)
@@ -412,7 +407,7 @@ func printUsage() {
 
 Commands:
   init [env-file]              Create config/.env and data/ by default
-  serve <port> <env-file>      Start the server with an explicit environment file`)
+  serve <port> [env-file]      Start the server with config/.env by default`)
 }
 
 func cmdServe(port, envPath string) {
@@ -630,12 +625,16 @@ func main() {
 		cmdInit(envPath)
 
 	case "serve":
-		if len(args) < 3 {
-			fmt.Fprintln(os.Stderr, "Error: serve requires a port and env file")
-			fmt.Fprintln(os.Stderr, "Usage: portfolio serve <port> <env-file>")
+		if len(args) < 2 {
+			fmt.Fprintln(os.Stderr, "Error: serve requires a port")
+			fmt.Fprintln(os.Stderr, "Usage: portfolio serve <port> [env-file]")
 			os.Exit(1)
 		}
-		cmdServe(args[1], args[2])
+		envPath := filepath.Join("config", ".env")
+		if len(args) > 2 {
+			envPath = args[2]
+		}
+		cmdServe(args[1], envPath)
 
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown command: %s\n\n", args[0])

@@ -4,19 +4,19 @@
 
 ```sh
 go run . init
-go run . serve 8080 config/.env
+go run . serve 8080
 ```
 
 Open `http://localhost:8080`.
 
 The `init` command creates `config/.env` and prepares the `data/` directory. The
-environment file is required at startup and contains:
+server reads `config/.env` by default and stores SQLite data at
+`data/main.sqlite`. The environment file is required at startup and contains:
 
 ```env
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=change-me-now
 SESSION_SECRET=<random-secret>
-DB_PATH=../data/main.sqlite
 ```
 
 Change `ADMIN_PASSWORD` before deploying. The SQLite database stores contact

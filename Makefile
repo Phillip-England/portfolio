@@ -1,5 +1,5 @@
 run:
-	go run main.go serve 8080 ./config/.env
+	go run main.go serve 8080
 
 docker:
 	docker build -t portfolio . && docker run --rm \
@@ -8,4 +8,3 @@ docker:
                 -v $(CURDIR)/data:/app/data \
 		portfolio
                 
-
