@@ -38,3 +38,6 @@ data/*.sqlite-*
 
 # Finder (MacOS) folder config
 .DS_Store
+# uppr: never commit local configuration or application data
+/config/
+/data/
