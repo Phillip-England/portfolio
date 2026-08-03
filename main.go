@@ -403,9 +403,11 @@ func formatTime(t time.Time) string {
 }
 
 func printUsage() {
-	fmt.Println(`Usage: portfolio <command>
+	fmt.Println(`Usage: portfolio [command]
 
 Commands:
+
+  portfolio                    Start the server on port 8112
   init [env-file]              Create config/.env and data/ by default
   serve <port> [env-file]      Start the server with config/.env by default`)
 }
@@ -612,8 +614,8 @@ func cmdServe(port, envPath string) {
 func main() {
 	args := os.Args[1:]
 	if len(args) == 0 {
-		printUsage()
-		os.Exit(1)
+		cmdServe("8112", filepath.Join("config", ".env"))
+		return
 	}
 
 	switch args[0] {

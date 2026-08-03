@@ -1,5 +1,5 @@
 run:
-	go run main.go serve 8080
+	go run main.go
 
 docker:
 	docker build -t portfolio . && docker run --rm \

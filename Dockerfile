@@ -6,4 +6,4 @@ RUN apt-get update \
 COPY . .
 RUN go build -o /usr/local/bin/portfolio .
 EXPOSE 8112
-CMD ["portfolio", "serve", "8112"]
+CMD ["portfolio"]
