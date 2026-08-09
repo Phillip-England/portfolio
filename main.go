@@ -376,24 +376,21 @@ type contactResponse struct {
 }
 
 type project struct {
+	Number      int      `json:"-"`
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
 	Tags        []string `json:"tags"`
-	Image       string   `json:"image"`
-	ImageAlt    string   `json:"imageAlt"`
-	URL         string   `json:"url"`
-	LinkLabel   string   `json:"linkLabel"`
+	SiteURL     string   `json:"siteUrl"`
 	SourceURL   string   `json:"sourceUrl"`
-	SourceLabel string   `json:"sourceLabel"`
-	DocsURL     string   `json:"docsUrl"`
-	DocsLabel   string   `json:"docsLabel"`
-	Featured    bool     `json:"featured"`
 }
 
 func loadProjects() ([]project, error) {
 	var projects []project
 	if err := json.Unmarshal(projectsJSON, &projects); err != nil {
 		return nil, fmt.Errorf("parse projects.json: %w", err)
+	}
+	for i := range projects {
+		projects[i].Number = i + 1
 	}
 	return projects, nil
 }
@@ -427,7 +424,6 @@ func cmdServe(port, envPath string) {
 	sessions := newSessionStore(cfg.SessionSecret)
 
 	tmpl := template.Must(template.New("").Funcs(template.FuncMap{
-		"hasPrefix":  strings.HasPrefix,
 		"formatTime": formatTime,
 	}).ParseFS(templatesFS, "templates/*.html"))
 

@@ -1,48 +1,21 @@
 [
   {
-    "name": "Trait",
-    "description": "A markdown-based trait library for collecting and sharing application patterns described in plain English.",
-    "tags": ["Markdown", "Patterns", "Web App"],
-    "image": "/static/project-images/trait.webp",
-    "imageAlt": "Trait application preview",
-    "sourceUrl": "https://github.com/phillip-england/trait",
-    "sourceLabel": "View on GitHub",
-    "docsUrl": "https://trait.phillip-england.com/",
-    "docsLabel": "Visit site",
-    "featured": true
+    "name": "uppr",
+    "description": "A Go-based deployment control plane for managing applications and Git repositories across self-hosted Linux infrastructure. It generates Docker Compose, Caddy, and runtime configuration, then verifies deployments and proxy reloads.",
+    "tags": ["Go", "Docker", "Caddy", "Linux"],
+    "siteUrl": "https://uppr.phillip-england.com",
+    "sourceUrl": "https://github.com/phillip-england/uppr"
   },
   {
-    "name": "Receipt Upload",
-    "description": "A receipt capture and documentation workflow for uploading purchase records, keeping them organized, and making the process easier to use from the web.",
-    "tags": ["Go", "Receipts", "Web App"],
-    "image": "/static/project-images/receipt-uploader.webp",
-    "imageAlt": "Receipt Upload website preview",
-    "sourceUrl": "https://github.com/phillip-england/receipt-upload",
-    "sourceLabel": "View on GitHub",
-    "docsUrl": "https://www.receiptupload.online/",
-    "docsLabel": "View docs",
-    "featured": true
+    "name": "Artif4ct",
+    "description": "A single-binary, AI-native knowledge platform for publishing markdown-backed documents, forms, quizzes, and chat experiences with persistent artifact context, portable backups, and usage tracking.",
+    "tags": ["Go", "SQLite", "LLM APIs", "Web"],
+    "siteUrl": "https://artif4ct.com"
   },
   {
-    "name": "Webfit",
-    "description": "A quick web asset resizing tool for preparing images and other media for websites without slowing down the build process.",
-    "tags": ["Web App", "Image Tools", "Assets"],
-    "image": "/static/project-images/webfit.webp",
-    "imageAlt": "Webfit website preview",
-    "sourceUrl": "https://github.com/phillip-england/webfit",
-    "sourceLabel": "View on GitHub",
-    "docsUrl": "https://webfit.phillip-england.com/",
-    "docsLabel": "Visit site",
-    "featured": true
-  },
-  {
-    "name": "htimg",
-    "description": "A tool for converting HTML and CSS into images, with support for targeting a live webpage by URL and rendering it as an image.",
-    "tags": ["Go", "HTML", "Image Tools"],
-    "image": "/static/project-images/htimg.webp",
-    "imageAlt": "htimg project preview",
-    "sourceUrl": "https://github.com/phillip-england/htimg",
-    "sourceLabel": "View on GitHub",
-    "featured": true
+    "name": "Finli",
+    "description": "A financial document automation system used across two restaurant operations. It sorts receipts, creates location-specific invoices, and merges PDFs through configurable CLI and local web workflows.",
+    "tags": ["Go", "Web", "PDF Processing"],
+    "sourceUrl": "https://github.com/phillip-england/finli"
   }
 ]
