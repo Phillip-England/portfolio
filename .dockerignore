@@ -1,6 +1,7 @@
 .git
 .env
-data
+config/
+data/
 bin
 dist
 tmp
