@@ -55,8 +55,10 @@
     .skill h3 { margin:0 0 8px; font-size:1rem; color:var(--green); }
     .skill p { margin:0; color:var(--muted); }
     .project-grid { display:grid; gap:20px; }
-    .project { display:grid; grid-template-columns:72px 1fr; gap:8px 24px; padding:34px; border:1px solid var(--line); background:var(--panel); backdrop-filter:blur(12px); }
-    .project-number { grid-row:1/5; color:var(--green); font:700 .8rem ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .project { display:grid; grid-template-columns:72px minmax(0,1fr) minmax(260px,420px); gap:8px 24px; align-items:start; padding:34px; border:1px solid var(--line); background:var(--panel); backdrop-filter:blur(12px); }
+    .project-number { grid-row:1/6; color:var(--green); font:700 .8rem ui-monospace,SFMono-Regular,Menlo,monospace; }
+    .project-media { grid-column:3; grid-row:1/6; width:100%; min-height:250px; margin:0; display:flex; align-items:center; justify-content:center; border:1px solid var(--line); background:rgba(5,10,8,.42); overflow:hidden; }
+    .project-media img { display:block; width:100%; height:100%; max-height:330px; object-fit:contain; }
     .project h3 { margin:0; font-size:clamp(1.7rem,3vw,2.5rem); letter-spacing:-.04em; }
     .project p { max-width:780px; margin:8px 0 4px; color:#bcc6bf; }
     .tags { display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 16px; }
@@ -95,6 +97,8 @@
       .skills { grid-template-columns:1fr; }
       .project { grid-template-columns:1fr; padding:25px; }
       .project-number { grid-row:auto; }
+      .project-media { grid-column:auto; grid-row:auto; min-height:220px; order:2; }
+      .project h3,.project p,.project .tags,.project .project-links { order:3; }
       .roles { border-left:0; border-top:1px solid var(--line); padding:28px 0 0; }
       .role-head { display:block; }
       .footer-inner { flex-direction:column; }
@@ -133,7 +137,7 @@
         <div class="section-heading" data-reveal><span class="eyebrow">Selected projects</span><h2>Systems built to be used.</h2></div>
         <div class="project-grid">
           {{range .Projects}}<article class="project" data-reveal>
-            <span class="project-number">{{printf "%02d" .Number}}</span><h3>{{.Name}}</h3><p>{{.Description}}</p>
+            <span class="project-number">{{printf "%02d" .Number}}</span>{{if .ImageURL}}<figure class="project-media"><img src="{{.ImageURL}}" alt="{{.Name}} project screenshot" loading="lazy" decoding="async"></figure>{{end}}<h3>{{.Name}}</h3><p>{{.Description}}</p>
             {{if .Tags}}<div class="tags">{{range .Tags}}<span class="tag">{{.}}</span>{{end}}</div>{{end}}
             {{if or .SiteURL .SourceURL}}<div class="project-links">{{if .SiteURL}}<a class="button" href="{{.SiteURL}}" target="_blank" rel="noopener noreferrer">Visit project</a>{{end}}{{if .SourceURL}}<a class="button secondary" href="{{.SourceURL}}" target="_blank" rel="noopener noreferrer">Source code</a>{{end}}</div>{{end}}
           </article>{{end}}

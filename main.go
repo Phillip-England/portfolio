@@ -380,6 +380,7 @@ type project struct {
 	Name        string   `json:"name"`
 	Description string   `json:"description"`
 	Tags        []string `json:"tags"`
+	ImageURL    string   `json:"imageUrl"`
 	SiteURL     string   `json:"siteUrl"`
 	SourceURL   string   `json:"sourceUrl"`
 }
