@@ -1,6 +1,41 @@
 const revealElements = [...document.querySelectorAll('[data-reveal]')];
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+const navToggle = document.querySelector('.nav-toggle');
+const primaryNavigation = document.querySelector('#primary-navigation');
+
+const closeNavigation = () => {
+  if (!navToggle || !primaryNavigation) return;
+  navToggle.setAttribute('aria-expanded', 'false');
+  navToggle.setAttribute('aria-label', 'Open navigation menu');
+  primaryNavigation.classList.remove('is-open');
+};
+
+navToggle?.addEventListener('click', () => {
+  const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
+  navToggle.setAttribute('aria-expanded', String(!isOpen));
+  navToggle.setAttribute('aria-label', isOpen ? 'Open navigation menu' : 'Close navigation menu');
+  primaryNavigation?.classList.toggle('is-open', !isOpen);
+});
+
+primaryNavigation?.addEventListener('click', (event) => {
+  if (event.target.closest('a')) closeNavigation();
+});
+
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('.nav')) closeNavigation();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || navToggle?.getAttribute('aria-expanded') !== 'true') return;
+  closeNavigation();
+  navToggle.focus();
+});
+
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 620) closeNavigation();
+});
+
 if (!reducedMotion && 'IntersectionObserver' in window) {
   const reveal = (element) => element.classList.add('visible');
   const isInitiallyVisible = (element) => {

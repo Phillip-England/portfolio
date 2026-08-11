@@ -126,6 +126,47 @@
     .nav-links a:hover,
     .nav-links a[aria-current="true"] { color: var(--ink); }
 
+    .nav-toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .nav-toggle-icon,
+    .nav-toggle-icon::before,
+    .nav-toggle-icon::after {
+      display: block;
+      width: 20px;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+      transition: transform 180ms ease, opacity 180ms ease;
+    }
+
+    .nav-toggle-icon { position: relative; }
+
+    .nav-toggle-icon::before,
+    .nav-toggle-icon::after {
+      content: "";
+      position: absolute;
+      left: 0;
+    }
+
+    .nav-toggle-icon::before { transform: translateY(-6px); }
+    .nav-toggle-icon::after { transform: translateY(6px); }
+
+    .nav-toggle[aria-expanded="true"] .nav-toggle-icon { background: transparent; }
+    .nav-toggle[aria-expanded="true"] .nav-toggle-icon::before { transform: rotate(45deg); }
+    .nav-toggle[aria-expanded="true"] .nav-toggle-icon::after { transform: rotate(-45deg); }
+
     main { display: block; }
 
     .hero {
@@ -478,11 +519,36 @@
     @media (max-width: 620px) {
       .shell { width: min(calc(100% - 30px), var(--max)); }
       .nav {
+        position: relative;
         min-height: 68px;
         gap: 16px;
       }
-      .nav-links { display: none; }
-      .nav-links a { font-size: 0.9rem; }
+      .nav-toggle { display: inline-flex; }
+      .nav-links {
+        position: absolute;
+        top: calc(100% + 1px);
+        right: 0;
+        left: 0;
+        display: none;
+        align-items: stretch;
+        flex-direction: column;
+        gap: 0;
+        padding: 8px;
+        border: 1px solid var(--line);
+        border-top: 0;
+        border-radius: 0 0 12px 12px;
+        background: rgba(6, 8, 7, 0.98);
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.34);
+      }
+      .nav-links.is-open { display: flex; }
+      .nav-links a {
+        display: block;
+        padding: 12px 14px;
+        border-radius: 6px;
+        font-size: 1rem;
+      }
+      .nav-links a:hover,
+      .nav-links a:focus-visible { background: var(--panel-soft); }
       .brand { font-size: 0.98rem; }
       .hero {
         padding-top: 34px;
@@ -531,7 +597,10 @@
   <header class="site-header" data-reveal style="--reveal-delay: 80ms">
     <nav class="nav shell" aria-label="Main navigation">
       <a class="brand" href="#top">Phillip England</a>
-      <ul class="nav-links">
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation menu">
+        <span class="nav-toggle-icon" aria-hidden="true"></span>
+      </button>
+      <ul class="nav-links" id="primary-navigation">
         <li><a href="#about">About</a></li>
         <li><a href="/static/resume.pdf" target="_blank" rel="noopener noreferrer">Resume</a></li>
         <li><a href="https://apps.phillip-england.com" target="_blank" rel="noopener noreferrer">Apps</a></li>
