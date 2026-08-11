@@ -33,14 +33,13 @@ var templatesFS embed.FS
 //go:embed static/*
 var staticFS embed.FS
 
-//go:embed projects.json
-var projectsJSON []byte
-
 const (
-	sessionCookieName = "portfolio_session"
-	sessionLifetime   = 12 * time.Hour
-	loginWindow       = 24 * time.Hour
-	maxLoginFailures  = 5
+	sessionCookieName  = "portfolio_session"
+	sessionLifetime    = 12 * time.Hour
+	loginWindow        = 24 * time.Hour
+	maxLoginFailures   = 5
+	contactWindow      = 24 * time.Hour
+	maxContactMessages = 5
 )
 
 // --- Config ---
@@ -180,11 +179,12 @@ CREATE TABLE IF NOT EXISTS contact_messages (
   email TEXT NOT NULL,
   message TEXT NOT NULL,
   ip TEXT NOT NULL,
-  created_at INTEGER NOT NULL,
-  read_at INTEGER
+  created_at INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_contact_messages_created
-ON contact_messages (created_at DESC);`); err != nil {
+ON contact_messages (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_contact_messages_ip_created
+ON contact_messages (ip, created_at);`); err != nil {
 		db.Close()
 		return nil, err
 	}
@@ -221,7 +221,6 @@ type contactMessage struct {
 	Message   string
 	IP        string
 	CreatedAt time.Time
-	ReadAt    sql.NullInt64
 }
 
 func insertContactMessage(db *sql.DB, email, message, ip string) error {
@@ -235,8 +234,14 @@ func insertContactMessage(db *sql.DB, email, message, ip string) error {
 	return err
 }
 
+func contactMessageCount(db *sql.DB, ip string, now int64) (int, error) {
+	var count int
+	err := db.QueryRow(`SELECT COUNT(*) FROM contact_messages WHERE ip = ? AND created_at >= ?`, ip, now-int64(contactWindow.Seconds())).Scan(&count)
+	return count, err
+}
+
 func loadContactMessages(db *sql.DB) ([]contactMessage, error) {
-	rows, err := db.Query(`SELECT id, email, message, ip, created_at, read_at FROM contact_messages ORDER BY created_at DESC LIMIT 200`)
+	rows, err := db.Query(`SELECT id, email, message, ip, created_at FROM contact_messages ORDER BY created_at DESC LIMIT 200`)
 	if err != nil {
 		return nil, err
 	}
@@ -246,7 +251,7 @@ func loadContactMessages(db *sql.DB) ([]contactMessage, error) {
 	for rows.Next() {
 		var msg contactMessage
 		var created int64
-		if err := rows.Scan(&msg.ID, &msg.Email, &msg.Message, &msg.IP, &created, &msg.ReadAt); err != nil {
+		if err := rows.Scan(&msg.ID, &msg.Email, &msg.Message, &msg.IP, &created); err != nil {
 			return nil, err
 		}
 		msg.CreatedAt = time.Unix(created, 0)
@@ -366,6 +371,7 @@ func clientIP(r *http.Request) string {
 }
 
 type contactRequest struct {
+	Name    string `json:"name"`
 	Email   string `json:"email"`
 	Message string `json:"message"`
 }
@@ -373,27 +379,6 @@ type contactRequest struct {
 type contactResponse struct {
 	OK      bool   `json:"ok"`
 	Message string `json:"message"`
-}
-
-type project struct {
-	Number      int      `json:"-"`
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	Tags        []string `json:"tags"`
-	ImageURL    string   `json:"imageUrl"`
-	SiteURL     string   `json:"siteUrl"`
-	SourceURL   string   `json:"sourceUrl"`
-}
-
-func loadProjects() ([]project, error) {
-	var projects []project
-	if err := json.Unmarshal(projectsJSON, &projects); err != nil {
-		return nil, fmt.Errorf("parse projects.json: %w", err)
-	}
-	for i := range projects {
-		projects[i].Number = i + 1
-	}
-	return projects, nil
 }
 
 func formatTime(t time.Time) string {
@@ -428,11 +413,6 @@ func cmdServe(port, envPath string) {
 		"formatTime": formatTime,
 	}).ParseFS(templatesFS, "templates/*.html"))
 
-	projects, err := loadProjects()
-	if err != nil {
-		log.Fatalf("Failed to load projects: %v", err)
-	}
-
 	mux := http.NewServeMux()
 
 	staticSub, err := fs.Sub(staticFS, "static")
@@ -457,8 +437,7 @@ func cmdServe(port, envPath string) {
 			return
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		data := struct{ Projects []project }{Projects: projects}
-		if err := tmpl.ExecuteTemplate(w, "index.html", data); err != nil {
+		if err := tmpl.ExecuteTemplate(w, "index.html", nil); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
@@ -472,6 +451,22 @@ func cmdServe(port, envPath string) {
 			return
 		}
 
+		ip := clientIP(r)
+		now := time.Now().Unix()
+		count, err := contactMessageCount(db, ip, now)
+		if err != nil {
+			log.Printf("Failed to check contact message limit: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(contactResponse{Message: "Server error. Please try again later."})
+			return
+		}
+		if count >= maxContactMessages {
+			w.Header().Set("Retry-After", fmt.Sprintf("%d", int(contactWindow.Seconds())))
+			w.WriteHeader(http.StatusTooManyRequests)
+			json.NewEncoder(w).Encode(contactResponse{Message: "Too many messages sent today. Please try again tomorrow."})
+			return
+		}
+
 		var req contactRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -479,9 +474,20 @@ func cmdServe(port, envPath string) {
 			return
 		}
 
+		req.Name = strings.TrimSpace(req.Name)
 		req.Email = strings.TrimSpace(req.Email)
 		req.Message = strings.TrimSpace(req.Message)
 
+		if req.Name == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(contactResponse{Message: "Please provide your name"})
+			return
+		}
+		if len(req.Name) > 120 {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(contactResponse{Message: "Name must be 120 characters or fewer"})
+			return
+		}
 		if req.Email == "" || !emailRegex.MatchString(req.Email) {
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(contactResponse{Message: "Please provide a valid email address"})
@@ -492,13 +498,14 @@ func cmdServe(port, envPath string) {
 			json.NewEncoder(w).Encode(contactResponse{Message: "Please provide a message"})
 			return
 		}
-		if len(req.Message) > 255 {
+		if len(req.Message) > 1200 {
 			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(contactResponse{Message: "Message must be 255 characters or fewer"})
+			json.NewEncoder(w).Encode(contactResponse{Message: "Message must be 1200 characters or fewer"})
 			return
 		}
 
-		if err := insertContactMessage(db, req.Email, req.Message, clientIP(r)); err != nil {
+		storedMessage := fmt.Sprintf("Name: %s\n\n%s", req.Name, req.Message)
+		if err := insertContactMessage(db, req.Email, storedMessage, ip); err != nil {
 			log.Printf("Failed to save contact message: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(contactResponse{Message: "Failed to save message. Please try again later."})

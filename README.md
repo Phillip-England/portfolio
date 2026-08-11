@@ -28,23 +28,13 @@ The contact form saves messages internally instead of sending email. Log in at
 `/login` and read messages at `/admin`.
 
 Failed admin login attempts are tracked by remote IP in SQLite. An IP is blocked
-after 5 failed attempts within 24 hours. Old login-failure rows are purged during
-normal login checks and failure inserts.
+after 5 failed attempts within 24 hours. Contact form submissions are also
+limited to 5 accepted messages per IP within 24 hours. Old login-failure rows
+are purged during normal login checks and failure inserts.
 
-## Projects
+## Public site
 
-Projects shown on the homepage live in `projects.json`. Add another object to the
-array and restart the site:
-
-```json
-{
-  "name": "Project name",
-  "description": "What it does and why it matters.",
-  "tags": ["Go", "JavaScript"],
-  "siteUrl": "https://project.example.com",
-  "sourceUrl": "https://github.com/your-name/project"
-}
-```
-
-Omit `siteUrl` or `sourceUrl` when that destination is not public. Project cards
-are intentionally image-free until dedicated artwork is available.
+The homepage is a personal engineering profile for Phillip England. It explains
+his background, software learning path, technical interests, and professional
+direction. It intentionally does not render a project gallery because
+applications live at `https://apps.phillip-england.com`.

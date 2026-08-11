@@ -1,9 +1,10 @@
 FROM golang:1.26
-WORKDIR /app
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends poppler-utils \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
 COPY . .
-RUN go build -o /usr/local/bin/portfolio .
+RUN go build -trimpath -ldflags="-s -w" -o /usr/local/bin/portfolio .
+
+WORKDIR /app
 EXPOSE 8112
 CMD ["portfolio"]
