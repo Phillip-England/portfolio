@@ -13,4 +13,6 @@ docker:
 		-p $(HOST_PORT):$(CONTAINER_PORT) \
 		-v $(CURDIR)/config:/app/config \
 		-v $(CURDIR)/data:/app/data \
+		-v $(CURDIR)/posts:/app/posts \
+		-v $(CURDIR)/static/blog-images:/app/static/blog-images \
 		$(IMAGE_NAME)

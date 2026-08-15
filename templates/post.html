@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Post.Title}} | Phillip England</title>
+  {{if .Post.Description}}<meta name="description" content="{{.Post.Description}}">{{end}}
+  <link rel="icon" href="/static/favicon/favicon.ico">
+  <style>
+    :root {
+      --bg: #060807;
+      --panel-soft: rgba(255, 255, 255, 0.035);
+      --ink: #f3f0e8;
+      --body: #b7b2a7;
+      --muted: #777166;
+      --line: rgba(243, 240, 232, 0.12);
+      --line-strong: rgba(243, 240, 232, 0.28);
+      --accent: #d7b56d;
+      --accent-dark: #f0d28d;
+      --code-bg: #101412;
+      --max: 1180px;
+      --measure: 760px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(circle at 50% 14%, rgba(215, 181, 109, 0.11), transparent 26%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 24rem),
+        var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.68;
+    }
+    a {
+      color: inherit;
+      text-decoration-color: rgba(215, 181, 109, 0.45);
+      text-underline-offset: 0.22em;
+    }
+    a:hover { color: var(--accent-dark); }
+    .shell {
+      width: min(calc(100% - 48px), var(--max));
+      margin-inline: auto;
+    }
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--line);
+      background: rgba(6, 8, 7, 0.76);
+      backdrop-filter: blur(18px);
+    }
+    .nav {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .brand {
+      font-size: 1.08rem;
+      font-weight: 680;
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(14px, 3vw, 28px);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--body);
+      font-size: 0.92rem;
+      text-decoration: none;
+    }
+    .nav-links a:hover,
+    .nav-links a[aria-current="true"] { color: var(--ink); }
+    .post-header {
+      max-width: var(--measure);
+      padding: clamp(54px, 8vw, 96px) 0 34px;
+    }
+    time,
+    .back-link,
+    .tag {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    .back-link {
+      display: inline-flex;
+      margin-bottom: 28px;
+      text-decoration: none;
+    }
+    h1,
+    .content h2,
+    .content h3 {
+      font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+      font-weight: 500;
+      letter-spacing: 0;
+    }
+    h1 {
+      margin: 10px 0 18px;
+      font-size: clamp(2.7rem, 6vw, 5.4rem);
+      line-height: 0.98;
+    }
+    .description {
+      margin: 0;
+      color: var(--body);
+      font-size: clamp(1.04rem, 2vw, 1.22rem);
+    }
+    .subtitle {
+      margin: 0 0 14px;
+      color: var(--accent-dark);
+      font-size: clamp(1.16rem, 2.2vw, 1.42rem);
+      line-height: 1.35;
+    }
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+    }
+    .tag {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 9px;
+    }
+    .post-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .copy-markdown-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.045);
+      color: var(--ink);
+      padding: 7px 12px;
+      font: inherit;
+      font-size: 0.9rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: color 160ms ease, border-color 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+    .copy-markdown-button:hover,
+    .copy-markdown-button:focus-visible {
+      border-color: rgba(215, 181, 109, 0.62);
+      background: rgba(215, 181, 109, 0.1);
+      color: var(--accent-dark);
+      outline: none;
+    }
+    .copy-markdown-button:active {
+      transform: translateY(1px);
+    }
+    .copy-markdown-button.is-copied {
+      border-color: rgba(215, 181, 109, 0.72);
+      color: var(--accent-dark);
+    }
+    .copy-markdown-button svg {
+      width: 17px;
+      height: 17px;
+      stroke-width: 2;
+      flex: 0 0 auto;
+    }
+    .copy-markdown-status {
+      min-height: 1.4em;
+      color: var(--accent-dark);
+      font-size: 0.88rem;
+    }
+    .markdown-source {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      border: 0;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+    .featured-image {
+      width: min(calc(100% - 48px), 980px);
+      margin: 0 auto clamp(38px, 6vw, 70px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--panel-soft);
+    }
+    .featured-image img {
+      display: block;
+      width: 100%;
+      max-height: 520px;
+      object-fit: cover;
+    }
+    .content {
+      max-width: var(--measure);
+      margin: 0 auto;
+      padding-bottom: clamp(78px, 10vw, 124px);
+      color: var(--body);
+      font-size: 1.05rem;
+    }
+    .content > *:first-child { margin-top: 0; }
+    .content h2,
+    .content h3 {
+      color: var(--ink);
+      line-height: 1.12;
+    }
+    .content h2 {
+      margin: 2.1em 0 0.6em;
+      font-size: clamp(1.85rem, 3.4vw, 2.65rem);
+    }
+    .content h3 {
+      margin: 1.8em 0 0.55em;
+      font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+    }
+    .content p,
+    .content ul,
+    .content ol,
+    .content blockquote {
+      margin: 0 0 1.18em;
+    }
+    .content img {
+      max-width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .content blockquote {
+      padding: 0 0 0 18px;
+      border-left: 2px solid var(--accent);
+      color: var(--ink);
+    }
+    .content code {
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.045);
+      color: var(--ink);
+      padding: 0.12em 0.35em;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9em;
+    }
+    .content pre {
+      margin: 1.55em 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--code-bg) !important;
+      overflow-x: auto;
+    }
+    .content .code-copy-wrapper {
+      position: relative;
+      margin: 1.55em 0;
+    }
+    .content .code-copy-wrapper pre {
+      margin: 0;
+    }
+    .content pre code {
+      display: block;
+      border: 0;
+      background: transparent;
+      padding: 18px 58px 18px 18px;
+      line-height: 1.55;
+    }
+    .code-copy-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border: 1px solid rgba(243, 240, 232, 0.18);
+      border-radius: 7px;
+      background: rgba(6, 8, 7, 0.78);
+      color: var(--body);
+      cursor: pointer;
+      transition: color 160ms ease, border-color 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+    .code-copy-button:hover,
+    .code-copy-button:focus-visible {
+      border-color: rgba(215, 181, 109, 0.62);
+      background: rgba(16, 20, 18, 0.95);
+      color: var(--accent-dark);
+      outline: none;
+    }
+    .code-copy-button:active {
+      transform: translateY(1px);
+    }
+    .code-copy-button.is-copied {
+      border-color: rgba(215, 181, 109, 0.72);
+      color: var(--accent-dark);
+    }
+    .code-copy-button svg {
+      width: 17px;
+      height: 17px;
+      stroke-width: 2;
+    }
+    footer {
+      padding: 36px 0;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    @media (max-width: 760px) {
+      .shell,
+      .featured-image { width: min(calc(100% - 30px), var(--max)); }
+      .nav {
+        min-height: 68px;
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: center;
+        padding-block: 14px;
+      }
+      .nav-links {
+        flex-wrap: wrap;
+        gap: 12px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav shell" aria-label="Main navigation">
+      <a class="brand" href="/">Phillip England</a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/blog" aria-current="true">Blog</a></li>
+        <li><a href="/static/resume.pdf" target="_blank" rel="noopener noreferrer">Resume</a></li>
+        <li><a href="https://github.com/phillip-england" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <article>
+      <header class="post-header shell">
+        <a class="back-link" href="/blog">Back to blog</a>
+        <time datetime="{{.Post.Date.Format "2006-01-02"}}">{{.Post.DateDisplay}}</time>
+        <h1>{{.Post.Title}}</h1>
+        {{if .Post.Subtitle}}<p class="subtitle">{{.Post.Subtitle}}</p>{{end}}
+        {{if .Post.Description}}<p class="description">{{.Post.Description}}</p>{{end}}
+        {{if .Post.Tags}}
+          <div class="tag-row" aria-label="Tags">
+            {{range .Post.Tags}}<span class="tag">{{.}}</span>{{end}}
+          </div>
+        {{end}}
+        <div class="post-actions">
+          <button class="copy-markdown-button" type="button" data-copy-markdown aria-describedby="copy-markdown-status">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <rect width="14" height="14" x="8" y="8" rx="2"></rect>
+              <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+            </svg>
+            <span>Copy Markdown</span>
+          </button>
+          <span class="copy-markdown-status" id="copy-markdown-status" role="status" aria-live="polite"></span>
+        </div>
+        <textarea class="markdown-source" id="markdown-source" readonly>{{.Post.Markdown}}</textarea>
+      </header>
+      {{if .Post.Image}}
+        <figure class="featured-image">
+          <img src="{{.Post.Image}}" alt="" decoding="async">
+        </figure>
+      {{end}}
+      <div class="content shell">
+        {{.Post.Content}}
+      </div>
+    </article>
+  </main>
+  <footer>
+    <div class="shell">Phillip England<br>Tulsa, Oklahoma</div>
+  </footer>
+  <script type="module" src="/static/js/site.js"></script>
+</body>
+</html>

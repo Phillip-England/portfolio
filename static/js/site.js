@@ -4,6 +4,122 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 const navToggle = document.querySelector('.nav-toggle');
 const primaryNavigation = document.querySelector('#primary-navigation');
 
+const copyIcon = `
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+    <rect width="14" height="14" x="8" y="8" rx="2"></rect>
+    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+  </svg>
+`;
+const checkIcon = `
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+    <path d="M20 6 9 17l-5-5"></path>
+  </svg>
+`;
+
+const copyText = async (text) => {
+  if (navigator.clipboard?.writeText && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.top = '-9999px';
+  document.body.append(textarea);
+  textarea.select();
+
+  try {
+    document.execCommand('copy');
+  } finally {
+    textarea.remove();
+  }
+};
+
+const setCopyState = (button, options = {}) => {
+  const {
+    copiedLabel = 'Copied',
+    defaultLabel = 'Copy',
+    copiedHTML = checkIcon,
+    defaultHTML = copyIcon,
+    status,
+    statusText = '',
+    resetStatusText = '',
+    resetDelay = 1600,
+  } = options;
+
+  button.classList.add('is-copied');
+  button.setAttribute('aria-label', copiedLabel);
+  button.title = copiedLabel;
+  button.innerHTML = copiedHTML;
+  if (status) status.textContent = statusText;
+
+  clearTimeout(button.copyResetTimer);
+  button.copyResetTimer = setTimeout(() => {
+    button.classList.remove('is-copied');
+    button.setAttribute('aria-label', defaultLabel);
+    button.title = defaultLabel;
+    button.innerHTML = defaultHTML;
+    if (status) status.textContent = resetStatusText;
+  }, resetDelay);
+};
+
+const markdownButton = document.querySelector('[data-copy-markdown]');
+const markdownSource = document.querySelector('#markdown-source');
+const markdownStatus = document.querySelector('#copy-markdown-status');
+
+markdownButton?.addEventListener('click', async () => {
+  try {
+    await copyText(markdownSource?.value ?? '');
+    setCopyState(markdownButton, {
+      copiedLabel: 'Markdown copied',
+      defaultLabel: 'Copy Markdown',
+      copiedHTML: `${checkIcon}<span>Markdown copied</span>`,
+      defaultHTML: `${copyIcon}<span>Copy Markdown</span>`,
+      status: markdownStatus,
+      statusText: 'Markdown copied',
+      resetDelay: 2200,
+    });
+  } catch {
+    markdownButton.setAttribute('aria-label', 'Unable to copy Markdown');
+    markdownButton.title = 'Unable to copy Markdown';
+    if (markdownStatus) markdownStatus.textContent = 'Unable to copy Markdown';
+  }
+});
+
+document.querySelectorAll('.content pre').forEach((pre) => {
+  if (pre.closest('.code-copy-wrapper')) return;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'code-copy-wrapper';
+  pre.before(wrapper);
+  wrapper.append(pre);
+
+  const button = document.createElement('button');
+  button.className = 'code-copy-button';
+  button.type = 'button';
+  button.setAttribute('aria-label', 'Copy code');
+  button.title = 'Copy code';
+  button.innerHTML = copyIcon;
+  wrapper.append(button);
+
+  button.addEventListener('click', async () => {
+    const code = pre.querySelector('code')?.innerText ?? pre.innerText;
+
+    try {
+      await copyText(code.replace(/\n$/, ''));
+      setCopyState(button, {
+        copiedLabel: 'Copied',
+        defaultLabel: 'Copy code',
+      });
+    } catch {
+      button.setAttribute('aria-label', 'Unable to copy');
+      button.title = 'Unable to copy';
+    }
+  });
+});
+
 const closeNavigation = () => {
   if (!navToggle || !primaryNavigation) return;
   navToggle.setAttribute('aria-expanded', 'false');

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
@@ -13,25 +14,30 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"io/fs"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	"sync"
 	"time"
+
+	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
+	"github.com/yuin/goldmark"
+	highlighting "github.com/yuin/goldmark-highlighting/v2"
+	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
+	goldmarkhtml "github.com/yuin/goldmark/renderer/html"
+	"gopkg.in/yaml.v3"
 
 	_ "modernc.org/sqlite"
 )
 
 //go:embed templates/*
 var templatesFS embed.FS
-
-//go:embed static/*
-var staticFS embed.FS
 
 const (
 	sessionCookieName  = "portfolio_session"
@@ -50,6 +56,7 @@ type appConfig struct {
 	AdminPassword string
 	SessionSecret string
 	DBPath        string
+	BlogDir       string
 }
 
 func readEnvFile(path string) (map[string]string, error) {
@@ -92,6 +99,10 @@ func loadConfig(envPath string) (appConfig, error) {
 		AdminPassword: values["ADMIN_PASSWORD"],
 		SessionSecret: values["SESSION_SECRET"],
 		DBPath:        filepath.Join("data", "main.sqlite"),
+		BlogDir:       "posts",
+	}
+	if strings.TrimSpace(values["BLOG_DIR"]) != "" {
+		cfg.BlogDir = strings.TrimSpace(values["BLOG_DIR"])
 	}
 
 	missing := make([]string, 0)
@@ -109,6 +120,7 @@ func loadConfig(envPath string) (appConfig, error) {
 	}
 
 	cfg.DBPath = filepath.Clean(cfg.DBPath)
+	cfg.BlogDir = filepath.Clean(cfg.BlogDir)
 
 	return cfg, nil
 }
@@ -133,6 +145,14 @@ func cmdInit(envPath string) {
 		fmt.Fprintf(os.Stderr, "Error creating data directory: %v\n", err)
 		os.Exit(1)
 	}
+	if err := os.MkdirAll("posts", 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating posts directory: %v\n", err)
+		os.Exit(1)
+	}
+	if err := os.MkdirAll(filepath.Join("static", "blog-images"), 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating blog images directory: %v\n", err)
+		os.Exit(1)
+	}
 	if _, err := os.Stat(envPath); err == nil {
 		fmt.Fprintf(os.Stderr, "Error: %s already exists\n", envPath)
 		os.Exit(1)
@@ -147,7 +167,7 @@ func cmdInit(envPath string) {
 		os.Exit(1)
 	}
 
-	content := fmt.Sprintf("ADMIN_USERNAME=admin\nADMIN_PASSWORD=change-me-now\nSESSION_SECRET=%s\n", secret)
+	content := fmt.Sprintf("ADMIN_USERNAME=admin\nADMIN_PASSWORD=change-me-now\nSESSION_SECRET=%s\nBLOG_DIR=posts\n", secret)
 	if err := os.WriteFile(envPath, []byte(content), 0600); err != nil {
 		fmt.Fprintf(os.Stderr, "Error writing env file: %v\n", err)
 		os.Exit(1)
@@ -381,8 +401,242 @@ type contactResponse struct {
 	Message string `json:"message"`
 }
 
+type blogPost struct {
+	Title       string
+	Subtitle    string
+	Slug        string
+	Date        time.Time
+	DateDisplay string
+	Description string
+	Tags        []string
+	Image       string
+	Content     template.HTML
+	Markdown    string
+}
+
+type postFrontMatter struct {
+	Title       string   `yaml:"title"`
+	Subtitle    string   `yaml:"subtitle"`
+	Date        string   `yaml:"date"`
+	Description string   `yaml:"description"`
+	Tags        []string `yaml:"tags"`
+	Draft       bool     `yaml:"draft"`
+}
+
 func formatTime(t time.Time) string {
 	return t.Format("Jan 2, 2006 3:04 PM")
+}
+
+func formatPostDate(t time.Time) string {
+	return t.Format("January 2, 2006")
+}
+
+func slugify(value string) string {
+	value = strings.ToLower(strings.TrimSpace(value))
+	var b strings.Builder
+	lastDash := false
+	for _, r := range value {
+		switch {
+		case r >= 'a' && r <= 'z', r >= '0' && r <= '9':
+			b.WriteRune(r)
+			lastDash = false
+		case r == ' ' || r == '-' || r == '_' || r == '.' || r == '/':
+			if !lastDash && b.Len() > 0 {
+				b.WriteByte('-')
+				lastDash = true
+			}
+		}
+	}
+	return strings.Trim(b.String(), "-")
+}
+
+func parsePostDate(value string) (time.Time, error) {
+	value = strings.TrimSpace(value)
+	for _, layout := range []string{time.DateOnly, time.RFC3339, "2006-01-02 15:04"} {
+		if parsed, err := time.Parse(layout, value); err == nil {
+			return parsed, nil
+		}
+	}
+	return time.Time{}, fmt.Errorf("invalid date %q", value)
+}
+
+func splitFrontMatter(src []byte) (postFrontMatter, []byte, error) {
+	var fm postFrontMatter
+	trimmed := bytes.TrimPrefix(src, []byte{0xef, 0xbb, 0xbf})
+	if !bytes.HasPrefix(trimmed, []byte("---\n")) {
+		return fm, trimmed, errors.New("missing YAML front matter")
+	}
+	rest := trimmed[len("---\n"):]
+	end := bytes.Index(rest, []byte("\n---\n"))
+	if end < 0 {
+		return fm, nil, errors.New("unterminated YAML front matter")
+	}
+	if err := yaml.Unmarshal(rest[:end], &fm); err != nil {
+		return fm, nil, err
+	}
+	return fm, rest[end+len("\n---\n"):], nil
+}
+
+func markdownRenderer() goldmark.Markdown {
+	return goldmark.New(
+		goldmark.WithExtensions(
+			extension.Table,
+			extension.Strikethrough,
+			extension.Linkify,
+			highlighting.NewHighlighting(
+				highlighting.WithStyle("native"),
+				highlighting.WithGuessLanguage(true),
+				highlighting.WithFormatOptions(chromahtml.WithClasses(false)),
+			),
+		),
+		goldmark.WithParserOptions(parser.WithAutoHeadingID()),
+		goldmark.WithRendererOptions(goldmarkhtml.WithUnsafe()),
+	)
+}
+
+func renderMarkdown(src []byte) (template.HTML, error) {
+	var buf bytes.Buffer
+	if err := markdownRenderer().Convert(src, &buf); err != nil {
+		return "", err
+	}
+	return template.HTML(buf.String()), nil
+}
+
+func featuredImageForSlug(slug string) string {
+	for _, ext := range []string{".webp", ".jpg", ".jpeg", ".png", ".gif", ".avif"} {
+		path := filepath.Join("static", "blog-images", slug+ext)
+		if info, err := os.Stat(path); err == nil && !info.IsDir() {
+			return "/static/blog-images/" + slug + ext
+		}
+	}
+	return ""
+}
+
+func loadBlogPostFromFile(path string) (blogPost, bool, error) {
+	src, err := os.ReadFile(path)
+	if err != nil {
+		return blogPost{}, false, err
+	}
+	fm, body, err := splitFrontMatter(src)
+	if err != nil {
+		return blogPost{}, false, fmt.Errorf("%s: %w", path, err)
+	}
+	if fm.Draft {
+		return blogPost{}, false, nil
+	}
+	title := strings.TrimSpace(fm.Title)
+	if title == "" {
+		title = strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
+	}
+	date, err := parsePostDate(fm.Date)
+	if err != nil {
+		return blogPost{}, false, fmt.Errorf("%s: %w", path, err)
+	}
+	content, err := renderMarkdown(body)
+	if err != nil {
+		return blogPost{}, false, fmt.Errorf("%s: %w", path, err)
+	}
+	slug := slugify(strings.TrimSuffix(filepath.Base(path), filepath.Ext(path)))
+	if slug == "" {
+		return blogPost{}, false, fmt.Errorf("%s: invalid slug", path)
+	}
+	return blogPost{
+		Title:       title,
+		Subtitle:    strings.TrimSpace(fm.Subtitle),
+		Slug:        slug,
+		Date:        date,
+		DateDisplay: formatPostDate(date),
+		Description: strings.TrimSpace(fm.Description),
+		Tags:        fm.Tags,
+		Image:       featuredImageForSlug(slug),
+		Content:     content,
+		Markdown:    string(src),
+	}, true, nil
+}
+
+func loadBlogPosts(postsDir string) ([]blogPost, error) {
+	entries, err := os.ReadDir(postsDir)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	posts := make([]blogPost, 0)
+	for _, entry := range entries {
+		if entry.IsDir() || strings.ToLower(filepath.Ext(entry.Name())) != ".md" {
+			continue
+		}
+		post, ok, err := loadBlogPostFromFile(filepath.Join(postsDir, entry.Name()))
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			posts = append(posts, post)
+		}
+	}
+	sort.Slice(posts, func(i, j int) bool {
+		if posts[i].Date.Equal(posts[j].Date) {
+			return posts[i].Title < posts[j].Title
+		}
+		return posts[i].Date.After(posts[j].Date)
+	})
+	return posts, nil
+}
+
+func loadBlogPost(postsDir, slug string) (blogPost, bool, error) {
+	posts, err := loadBlogPosts(postsDir)
+	if err != nil {
+		return blogPost{}, false, err
+	}
+	for _, post := range posts {
+		if post.Slug == slug {
+			return post, true, nil
+		}
+	}
+	return blogPost{}, false, nil
+}
+
+func cmdNewPost(title, postsDir string) {
+	title = strings.TrimSpace(title)
+	if title == "" {
+		fmt.Fprintln(os.Stderr, "Error: post title cannot be empty")
+		os.Exit(1)
+	}
+	slug := slugify(title)
+	if slug == "" {
+		fmt.Fprintln(os.Stderr, "Error: post title must contain at least one letter or number")
+		os.Exit(1)
+	}
+	if err := os.MkdirAll(postsDir, 0755); err != nil {
+		fmt.Fprintf(os.Stderr, "Error creating posts directory: %v\n", err)
+		os.Exit(1)
+	}
+	path := filepath.Join(postsDir, slug+".md")
+	if _, err := os.Stat(path); err == nil {
+		fmt.Fprintf(os.Stderr, "Error: %s already exists\n", path)
+		os.Exit(1)
+	} else if !errors.Is(err, os.ErrNotExist) {
+		fmt.Fprintf(os.Stderr, "Error checking post path: %v\n", err)
+		os.Exit(1)
+	}
+	content := fmt.Sprintf(`---
+title: %q
+subtitle: ""
+date: %s
+description: ""
+tags: []
+draft: false
+---
+
+Write the post here.
+`, title, time.Now().Format(time.DateOnly))
+	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+		fmt.Fprintf(os.Stderr, "Error writing post: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Printf("Created %s\n", path)
+	fmt.Printf("Featured image path: static/blog-images/%s.webp\n", slug)
 }
 
 func printUsage() {
@@ -390,9 +644,10 @@ func printUsage() {
 
 Commands:
 
-  portfolio                    Start the server on port 8112
-  init [env-file]              Create config/.env and data/ by default
-  serve <port> [env-file]      Start the server with config/.env by default`)
+  portfolio                         Start the server on port 8112
+  init [env-file]                   Create config/.env and data/ by default
+  new-post "Post Title" [posts-dir] Create a Markdown blog post draft
+  serve <port> [env-file]           Start the server with config/.env by default`)
 }
 
 func cmdServe(port, envPath string) {
@@ -415,11 +670,7 @@ func cmdServe(port, envPath string) {
 
 	mux := http.NewServeMux()
 
-	staticSub, err := fs.Sub(staticFS, "static")
-	if err != nil {
-		log.Fatalf("Failed to create static sub-filesystem: %v", err)
-	}
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticSub))))
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	requireAuth := func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -438,6 +689,51 @@ func cmdServe(port, envPath string) {
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		if err := tmpl.ExecuteTemplate(w, "index.html", nil); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
+	mux.HandleFunc("/blog", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/blog" {
+			http.NotFound(w, r)
+			return
+		}
+		posts, err := loadBlogPosts(cfg.BlogDir)
+		if err != nil {
+			log.Printf("Failed to load blog posts: %v", err)
+			http.Error(w, "Server error", http.StatusInternalServerError)
+			return
+		}
+		data := struct {
+			Posts []blogPost
+		}{Posts: posts}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if err := tmpl.ExecuteTemplate(w, "blog.html", data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+
+	mux.HandleFunc("/blog/", func(w http.ResponseWriter, r *http.Request) {
+		slug := strings.Trim(strings.TrimPrefix(r.URL.Path, "/blog/"), "/")
+		if slug == "" || strings.Contains(slug, "/") {
+			http.NotFound(w, r)
+			return
+		}
+		post, ok, err := loadBlogPost(cfg.BlogDir, slug)
+		if err != nil {
+			log.Printf("Failed to load blog post %q: %v", slug, err)
+			http.Error(w, "Server error", http.StatusInternalServerError)
+			return
+		}
+		if !ok {
+			http.NotFound(w, r)
+			return
+		}
+		data := struct {
+			Post blogPost
+		}{Post: post}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if err := tmpl.ExecuteTemplate(w, "post.html", data); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
@@ -611,7 +907,7 @@ func cmdServe(port, envPath string) {
 	}))
 
 	addr := ":" + port
-	log.Printf("Listening on %s with env %s and db %s", addr, cfg.EnvPath, cfg.DBPath)
+	log.Printf("Listening on %s with env %s, db %s, and blog dir %s", addr, cfg.EnvPath, cfg.DBPath, cfg.BlogDir)
 	log.Fatal(http.ListenAndServe(addr, mux))
 }
 
@@ -629,6 +925,17 @@ func main() {
 			envPath = args[1]
 		}
 		cmdInit(envPath)
+
+	case "new-post":
+		if len(args) < 2 || len(args) > 3 {
+			printUsage()
+			os.Exit(1)
+		}
+		postsDir := "posts"
+		if len(args) == 3 {
+			postsDir = args[2]
+		}
+		cmdNewPost(args[1], postsDir)
 
 	case "serve":
 		if len(args) < 2 {
